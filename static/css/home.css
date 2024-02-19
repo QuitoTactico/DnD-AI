@@ -1,0 +1,42 @@
+html {
+  height: 100%;
+  width: 100%;
+  margin: auto;
+}
+
+.history {
+  height: 200px;
+  background-color: #ffffff;
+  color: #000000;
+  border-radius: 10px;
+  padding: 1%;
+  overflow-y: auto;
+}
+
+.history::-webkit-scrollbar {
+  display: none;
+}
+
+#font1 {
+  font-family: "Sixtyfour", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    "BLED" 0,
+    "SCAN" 0;
+}
+
+#font2 {
+  font-family: "Workbench", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: bold;
+  font-style: normal;
+  font-variation-settings:
+    "BLED" 0,
+    "SCAN" 0;
+}
+/*
+brown #462e2e
+red #ff6f6f
+*/
