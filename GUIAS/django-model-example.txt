@@ -1,0 +1,12 @@
+MVT (Model-View-Template)
+
+user
+django
+url
+view
+template
+model
+database
+
+
+(Up to down and later up again)

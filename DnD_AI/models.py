@@ -218,12 +218,17 @@ monster_class: (The same as character_class)
 
 ''' FUTURE DEVELOPMENT:
 
-https://stackoverflow.com/questions/22340258/list-field-in-model 
-
 Weapon.effects:      str    (list or dict, interpretation needed)
+Weapon.unique:       bool   (If the weapon is going to be modified, then we'll need to create a new one
+                            to not modify that weapon template. This way, we will not have duplicated 
+                            weapons for each entity)
 
 Character.inventory: str    (list or dict, interpretation needed)
+Character.exp_top:   int    (this could be an alternative way to calculate each exp_top for each level, 
+                            we would increase that top manually when the character levels up. With this,
+                            we could know easier when a character has enough exp to level up.)
 
+Monster.inventory:   str    (list or dict, interpretation needed)
 Monster.item_drop:   str    (list or dict, interpretation needed)
 
 Skill.name:          str
@@ -235,4 +240,13 @@ Skill.coords:        str    (list, interpretation needed)
 
 Maybe a Story or Campaign class will be needed.
 
+#-----------------------------------------------------
+inventory and drop format example:
+{'Small HP Potion': 3, 'Big HP Potion': 1, 'Trowable Knife': 5}
+convert that to a str and save it?
+
+options:
+    https://stackoverflow.com/questions/22340258/list-field-in-model 
+    https://stackoverflow.com/questions/402217/how-to-store-a-dictionary-on-a-django-model
+    https://copyprogramming.com/howto/how-to-store-a-dictionary-in-a-django-database-model-s-field
 '''
