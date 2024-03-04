@@ -42,6 +42,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'DnD_AI',
+    'django_extensions',
+    # Uncomment the next line to enable admin documentation:
+    # 'django.contrib.admindocs',
 ]
 
 MIDDLEWARE = [
