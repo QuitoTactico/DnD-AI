@@ -7,10 +7,10 @@ class Weapon(models.Model):
     id = models.AutoField(primary_key=True) # added here to be seen in the __str__ 
     name = models.CharField(max_length=30, default="His bare hands")
     is_ranged = models.BooleanField(default=False)
-    weapon_type = models.CharField(max_length=15, default="Body") # type was reserved
+    weapon_type = models.CharField(max_length=15, default="Body part") # type was reserved
     damage_type = models.CharField(max_length=15, default="Physical")
 
-    physical_description = models.CharField(max_length=100, default="Using his hands")
+    physical_description = models.CharField(max_length=100, default="It's using his hands")
     image = models.ImageField(upload_to='weapon/images/', default='weapon/images/default.png')
 
     # Statistics
@@ -20,9 +20,9 @@ class Weapon(models.Model):
 
     def __str__(self):
         if self.is_ranged:
-            return f'({self.id}) WEAPON, RANGED, {self.name}, {self.weapon_type}, {self.damage_type}'
+            return f'({self.id}) WEAPON, ranged, {self.name}, {self.weapon_type}, {self.damage_type}'
         else:
-            return f'({self.id}) WEAPON, MELEE, {self.name}, {self.weapon_type}, {self.damage_type}'
+            return f'({self.id}) WEAPON, melee, {self.name}, {self.weapon_type}, {self.damage_type}'
 
 
 # for default, the character is a simple playable human
@@ -44,7 +44,6 @@ class Character(models.Model):
     # Weapon
     # A character or monster always has a weapon, including his bare hands.
     id_weapon = models.ForeignKey(Weapon, on_delete=models.CASCADE)
-    #idk how to really use a foreing key in django
 
     # Statistics
     max_health      = models.IntegerField(default=100)
@@ -71,9 +70,9 @@ class Character(models.Model):
     # return 'PLAYABLE, '+self.name+', '+self.character_race+', '+self.character_class
     def __str__(self):
         if self.is_playable:
-            return f'({self.id}) PLAYABLE, {self.name}, {self.character_race}, {self.character_class}'
+            return f'({self.id}) PLAYABLE, {self.name}, {self.character_race}, {self.character_class}, [{self.id_weapon}]'
         else:
-            return f'({self.id}) NPC, {self.name}, {self.character_race}, {self.character_class}'
+            return f'({self.id}) NPC, {self.name}, {self.character_race}, {self.character_class}, [{self.id_weapon}]'
 
 
 # for default, a monster is a simple goblin
