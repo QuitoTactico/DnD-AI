@@ -18,6 +18,17 @@ class Weapon(models.Model):
     range       = models.IntegerField(default=1)
     durability  = models.IntegerField(default=100)
 
+    # Only uses already existent weapons, if it doesn't exist then it creates it.
+    # The problem is that it brings all the default weapons that exists, I only need the first one it finds.
+    # Right now we are creating a new default every time a new character is created without a weapon.
+    # With a modification, it says "django.core.exceptions.AppRegistryNotReady: Models aren't loaded yet."
+    # The migration does not let me delete this method, so I leave it here.
+    @classmethod
+    def get_default_weapon(cls):
+        #default_weapon, created = cls.objects.get_or_create(name='DEFAULT')
+        default_weapon = cls.objects.create()
+        return default_weapon
+
     def __str__(self):
         if self.is_ranged:
             return f'({self.id}) WEAPON, ranged, {self.name}, {self.weapon_type}, {self.damage_type}'
@@ -43,7 +54,10 @@ class Character(models.Model):
 
     # Weapon
     # A character or monster always has a weapon, including his bare hands.
-    id_weapon = models.ForeignKey(Weapon, on_delete=models.CASCADE)
+    # weapon = models.ForeignKey(Weapon, on_delete=models.CASCADE, default=Weapon.get_default_weapon())
+    # weapon = models.ForeignKey(Weapon, on_delete=models.CASCADE, default=Weapon.objects.create())
+    weapon = models.ForeignKey(Weapon, on_delete=models.SET_NULL, null=True, blank=True)
+    
 
     # Statistics
     max_health      = models.IntegerField(default=100)
@@ -67,12 +81,19 @@ class Character(models.Model):
     y = models.IntegerField(default=0)
     icon = models.ImageField(upload_to="entity/icons/", default='entity/icons/default.png')
 
+    # If weapon doesn't exist, it creates a new one and assigns it to the character's weapon
+    def save(self, *args, **kwargs):
+        if not self.weapon:
+            self.weapon = Weapon.objects.create()
+        super().save(*args, **kwargs)
+
+        
     # return 'PLAYABLE, '+self.name+', '+self.character_race+', '+self.character_class
     def __str__(self):
         if self.is_playable:
-            return f'({self.id}) PLAYABLE, {self.name}, {self.character_race}, {self.character_class}, [{self.id_weapon}]'
+            return f'({self.id}) PLAYABLE, {self.name}, {self.character_race}, {self.character_class}, [{self.weapon}]'
         else:
-            return f'({self.id}) NPC, {self.name}, {self.character_race}, {self.character_class}, [{self.id_weapon}]'
+            return f'({self.id}) NPC, {self.name}, {self.character_race}, {self.character_class}, [{self.weapon}]'
 
 
 # for default, a monster is a simple goblin
@@ -90,8 +111,8 @@ class Monster(models.Model):
 
     # Weapon
     # A character or monster always has a weapon, including his bare hands.
-    id_weapon = models.ForeignKey(Weapon, on_delete=models.CASCADE)
-    #idk how to really use a foreing key in django
+    # weapon = models.ForeignKey(Weapon, on_delete=models.CASCADE)
+    weapon = models.ForeignKey(Weapon, on_delete=models.SET_NULL, null=True, blank=True)
 
     # Statistics
     max_health      = models.IntegerField(default=100)
@@ -114,6 +135,11 @@ class Monster(models.Model):
     y = models.IntegerField(default=2)
     icon = models.ImageField(upload_to="entity/icons/", default='entity/icons/default.png')
     
+    # If weapon doesn't exist, it creates a new one and assigns it to the monsters weapon
+    def save(self, *args, **kwargs):
+        if not self.weapon:
+            self.weapon = Weapon.objects.create()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f'({self.id}) MONSTER, {self.name}, {self.monster_race}, {self.monster_class}'
