@@ -7,9 +7,9 @@ from .models import *
 
 def home(request):
     player_name = request.GET.get('player')
-    Monsters = Monster.objects.all()
-    Characters = Character.objects.all()
-    Weapons = Weapon.objects.all()
+    monsters = Monster.objects.all()
+    characters = Character.objects.all()
+    weapons = Weapon.objects.all()
 
     # If through the player label they send the name of a playable character, it selects it as the player's character 
         # If the name of the character is not found, it tries to find a character whose name contains the string entered
@@ -27,4 +27,4 @@ def home(request):
         player = Character.objects.filter(is_playable=True).first()
 
 
-    return render(request, 'home.html', {'player':player, 'player_name': player_name, 'Monsters':Monsters, 'Characters':Characters, 'Weapons':Weapons})
+    return render(request, 'home.html', {'player':player, 'monsters':monsters, 'characters':characters, 'weapons':weapons})

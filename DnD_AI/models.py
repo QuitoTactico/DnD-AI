@@ -23,6 +23,7 @@ class Weapon(models.Model):
     # Right now we are creating a new default every time a new character is created without a weapon.
     # With a modification, it says "django.core.exceptions.AppRegistryNotReady: Models aren't loaded yet."
     # The migration does not let me delete this method, so I leave it here.
+    # --------ULTRA DEPRECATED----------
     @classmethod
     def get_default_weapon(cls):
         #default_weapon, created = cls.objects.get_or_create(name='DEFAULT')
@@ -150,37 +151,45 @@ class Monster(models.Model):
 ''' DESCRIPTIONS:
 
     BASICS
-is_playable: Is the character playable for the user, or it's an NPC like a merchant?
-name: the entity's name
-story: the character itself can own a proper story.
-physical_description: useful for prompts.
-image: the entity's image, to be seen on the character's interface, above the statistics.
-race: In rpg games, there's plenty of anthropomorphycal species to choose, not only humans.
-class: Every entity (Character or Monster) has a "role" among their group, as warriors, magicians, archers...
+is_playable:    Is the character playable for the user, or it's an NPC like a merchant?
+name:           the entity's name
+story:          the character itself can own a proper story.
+physical_description: Useful for prompts.
+image:          the entity's image, to be seen on the character's interface, above the statistics.
+race:           In rpg games, there's plenty of anthropomorphycal species to choose, not only humans.
+class:          Every entity (Character or Monster) has a "role" among their group, as warriors, magicians, archers...
 
     STATS DESCRIPTIONS
-max_health: the entity begins his health in this state, and can't surpass it.
-health: Can be reduced by attacks, and restored by skills and items used from the inventory. The entity dies if his health reaches 0 (or below). If the player reaches a new level, his health recovers to the max_health state.
-strength: damage points added to physical attacks
-intelligence: damage points added to magical attacks
-dexterity: defines who attacks/acts first in a battle
-physical_resistance: damage points reduced when the entity receives a physical attack.
-magical_resistance: damage points reduced when the entity receives a magical attack.
-constitution: damage points reduced when an entity receives an effect or a damaging state, like venom or poison. Effects/States resistance.
+max_health:     the entity begins his health in this state, and can't surpass it.
+health:         Can be reduced by attacks, and restored by skills and items used from the inventory. 
+                The entity dies if his health reaches 0 (or below). 
+                If the player reaches a new level, his health recovers to the max_health state.
+strength:       Damage points added to physical attacks
+intelligence:   damage points added to magical attacks
+dexterity:      defines who attacks/acts first in a battle
+physical_resistance:    damage points reduced when the entity receives a physical attack.
+magical_resistance:     damage points reduced when the entity receives a magical attack.
+constitution:   damage points reduced when an entity receives an effect or a damaging state, like venom or poison. Effects/States resistance.
 
     PROGRESS DESCRIPTIONS
-level: the entity's level. The entity can level up by gaining experience points (exp). The exp needed to reach a new level is calculated by a formula, and it's increased with every new level.
-exp: the entity's experience points. The entity gains exp by defeating monsters, (or completing quests and by using items, in posible future features). When the entity reaches a new level, his exp is reset to 0.
+level:      the entity's level. The entity can level up by gaining experience points (exp). 
+            The exp needed to reach a new level is calculated by a formula, 
+            and it's increased with every new level.
+exp:        the entity's experience points. The entity gains exp by defeating monsters, 
+            (or completing quests and by using items, in posible future features). 
+            When the entity reaches a new level, his exp is reset to 0.
 
     COORDINATES DESCRIPTIONS
-x: the entity's position in the x axis of the map
-y: the entity's position in the y axis of the map
-icon: in a map, this small squared image can be seen to represent that entity
+x:      the entity's position in the x axis of the map
+y:      the entity's position in the y axis of the map
+icon:   in a map, this small squared image can be seen to represent that entity
 
     WEAPON DESCRIPTIONS
-is_ranged: a weapon can be melee or ranged, so it's a bool.
-weapon_type: there's plenty of weapon types, as swords, axes, bows, knifes... (In future releases features, certain races could have a better handle of certain weapon types)
-damage_type: That weapon can affect the enemies in different ways, as physical or magical ones.
+is_ranged:      a weapon can be melee or ranged, so it's a bool.
+weapon_type:    there's plenty of weapon types, as swords, axes, bows, knifes... 
+                (In future releases features, certain races could have a better 
+                handle of certain weapon types)
+damage_type:    That weapon can affect the enemies in different ways, as physical or magical ones.
 '''
 
 # -----------------------------------------------------
@@ -191,7 +200,7 @@ weapon_type: [Sword, Axe, Mace, Hammer, Spear, Bow, Crossbow, Dagger, Knife, Sta
 
 damage_type: [physical, magical]
 
-(not exising yet) possible_weapon_effects: Acid, Poison, Venom, Fire, Ice, Lightning, Earth, Wind, Water, Light, Dark, Holy, Unholy, Arcane, Eldritch, Psychic, Sound, Force, Gravity, Time, Space, Reality, Void, Chaos, Order, Life, Death, Nature, Technology, Alchemy, Enchantment, Necromancy, Illusion, Divination, Conjuration, Evocation, Abjuration, Transmutation, Restoration, Destruction, Creation, Summoning, Binding, Banishing, Sealing, Warding, Hexing, Cursing, Blessing, Healing, Buffing, Debuffing, Disabling, Enfeebling, Empowering, Strengthening, Weakening, Fortifying, Weakening, Draining, Siphoning, Absorbing, Reflecting, Redirecting, Amplifying, Diminishing, Nullifying, Negating, Dispelling, Countering]
+(not exising yet) weapon_effects: Acid, Poison, Venom, Fire, Ice, Lightning, Earth, Wind, Water, Light, Dark, Holy, Unholy, Arcane, Eldritch, Psychic, Sound, Force, Gravity, Time, Space, Reality, Void, Chaos, Order, Life, Death, Nature, Technology, Alchemy, Enchantment, Necromancy, Illusion, Divination, Conjuration, Evocation, Abjuration, Transmutation, Restoration, Destruction, Creation, Summoning, Binding, Banishing, Sealing, Warding, Hexing, Cursing, Blessing, Healing, Buffing, Debuffing, Disabling, Enfeebling, Empowering, Strengthening, Weakening, Fortifying, Weakening, Draining, Siphoning, Absorbing, Reflecting, Redirecting, Amplifying, Diminishing, Nullifying, Negating, Dispelling, Countering]
 
 character_race: [Human, Elf, Dwarf, Halfling, Gnome, Orc, Goblin, Troll, Ogre, Minotaur, Centaur, Satyr, Siren, Mermaid, Dryad, Nymph, Faun, Gorgon, Cyclops, Sphinx, Chimera, Hydra, Golem, Wraith, Zombie, Skeleton, Ghost, Ghoul, Mummy, Lich, Vampire, Werewolf, Lycanthrope, Dragonborn]
 
@@ -208,6 +217,8 @@ monster_class: (The same as character_class)
 
 
 ''' FUTURE DEVELOPMENT:
+
+https://stackoverflow.com/questions/22340258/list-field-in-model 
 
 Weapon.effects:      str    (list or dict, interpretation needed)
 
