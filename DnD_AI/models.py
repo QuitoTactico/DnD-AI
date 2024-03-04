@@ -23,7 +23,7 @@ class Weapon(models.Model):
     # Right now we are creating a new default every time a new character is created without a weapon.
     # With a modification, it says "django.core.exceptions.AppRegistryNotReady: Models aren't loaded yet."
     # The migration does not let me delete this method, so I leave it here.
-    # --------ULTRA DEPRECATED----------
+    # Anyways... It could be useful in the future.
     @classmethod
     def get_default_weapon(cls):
         #default_weapon, created = cls.objects.get_or_create(name='DEFAULT')
@@ -32,9 +32,9 @@ class Weapon(models.Model):
 
     def __str__(self):
         if self.is_ranged:
-            return f'({self.id}) WEAPON, ranged, {self.name}, {self.weapon_type}, {self.damage_type}'
+            return f'({self.id}) WEAPON, {self.name}, ranged, {self.weapon_type}, {self.damage_type}'
         else:
-            return f'({self.id}) WEAPON, melee, {self.name}, {self.weapon_type}, {self.damage_type}'
+            return f'({self.id}) WEAPON, {self.name}, melee, {self.weapon_type}, {self.damage_type}'
 
 
 # for default, the character is a simple playable human
@@ -143,7 +143,7 @@ class Monster(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'({self.id}) MONSTER, {self.name}, {self.monster_race}, {self.monster_class}'
+        return f'({self.id}) MONSTER, {self.name}, {self.monster_race}, {self.monster_class}, [{self.weapon}]'
 
 
 # -----------------------------------------------------
