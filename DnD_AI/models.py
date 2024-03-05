@@ -54,7 +54,9 @@ def get_default_weapon_by_class(entity_class: str = 'Warrior', entity: str = 'Ch
     return template_weapon
     '''
     return None'''
-    # if something happens, comment all this function lines and return None
+    # if something happens, comment all this function lines and return None, 
+    # then eliminate the database and all migrations (except __init__) and 
+    # run createmigrations, then migrate.
 
 
 def get_default_weapon_by_name(weapon_name: str = 'Bare hands'):
@@ -73,7 +75,9 @@ def get_default_weapon_by_name(weapon_name: str = 'Bare hands'):
     return template_weapon
     '''
     return None'''
-    # if something happens, comment all this function lines and return None
+    # if something happens, comment all this function lines and return None, 
+    # then eliminate the database and all migrations (except __init__) and 
+    # run createmigrations, then migrate.
 
 
 # for default, the character is a simple playable human
