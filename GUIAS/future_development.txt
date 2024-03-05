@@ -99,4 +99,9 @@ options:
     https://stackoverflow.com/questions/22340258/list-field-in-model 
     https://stackoverflow.com/questions/402217/how-to-store-a-dictionary-on-a-django-model
     https://copyprogramming.com/howto/how-to-store-a-dictionary-in-a-django-database-model-s-field
+
+
+Create the other templates for monsters and character stats.
+Create their respective commands for creation and deletion.
+
 '''
