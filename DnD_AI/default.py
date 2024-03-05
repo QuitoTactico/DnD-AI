@@ -61,6 +61,7 @@ POSSIBLE_BOSSES = ['Sphinx', 'Cthulhu', 'Leviathan', 'Behemoth', 'Kraken', 'Hade
 
 DEFAULT_WEAPON_STATS = {
     'Sword': {
+        'weapon_type': 'Sword',
         'damage': 10,
         'range': 1,
         'is_ranged': False,
@@ -69,6 +70,7 @@ DEFAULT_WEAPON_STATS = {
         'damage_type': 'Physical'
     },
     'Bow': {
+        'weapon_type': 'Bow',
         'damage': 6,
         'range': 3,
         'is_ranged': True,
@@ -77,6 +79,7 @@ DEFAULT_WEAPON_STATS = {
         'damage_type': 'Physical'
     },
     'Staff': {
+        'weapon_type': 'Staff',
         'damage': 8,
         'range': 2,
         'is_ranged': True,
@@ -85,6 +88,7 @@ DEFAULT_WEAPON_STATS = {
         'damage_type': 'Magical'
     },
     'Beast Claws': {
+        'weapon_type': 'Body Part',
         'damage': 8,
         'range': 1,
         'is_ranged': False,
@@ -93,6 +97,7 @@ DEFAULT_WEAPON_STATS = {
         'damage_type': 'Physical'
     },
     'Dagger': {
+        'weapon_type': 'Dagger',
         'damage': 7,
         'range': 1,
         'is_ranged': False,
@@ -101,6 +106,7 @@ DEFAULT_WEAPON_STATS = {
         'damage_type': 'Physical'
     },
     'Mace': {
+        'weapon_type': 'Mace',
         'damage': 9,
         'range': 1,
         'is_ranged': False,
@@ -109,14 +115,16 @@ DEFAULT_WEAPON_STATS = {
         'damage_type': 'Physical'
     },
     'Axe': {
+        'weapon_type': 'Axe',
         'damage': 11,
         'range': 1,
         'is_ranged': False,
-        'physical_description': 'a axe',
+        'physical_description': 'an axe',
         'image': 'weapon/images/default/axe.png',
         'damage_type': 'Physical'
     },
     'Bare hands': {
+        'weapon_type': 'Body Part',
         'damage': 6,
         'range': 1,
         'is_ranged': False,
@@ -125,6 +133,7 @@ DEFAULT_WEAPON_STATS = {
         'damage_type': 'Physical'
     },
     'Crossbow': {
+        'weapon_type': 'Crossbow',
         'damage': 7,
         'range': 4,
         'is_ranged': True,
@@ -133,6 +142,7 @@ DEFAULT_WEAPON_STATS = {
         'damage_type': 'Physical'
     },
     'Long Bow': {
+        'weapon_type': 'Bow',
         'damage': 7,
         'range': 4,
         'is_ranged': True,
@@ -141,6 +151,7 @@ DEFAULT_WEAPON_STATS = {
         'damage_type': 'Physical'
     },
     'Blowpipe': {
+        'weapon_type': 'Blowpipe',
         'damage': 5,
         'range': 3,
         'is_ranged': True,
@@ -149,6 +160,7 @@ DEFAULT_WEAPON_STATS = {
         'damage_type': 'Physical'
     },
     'Warhammer': {
+        'weapon_type': 'Warhammer',
         'damage': 12,
         'range': 1,
         'is_ranged': False,
@@ -157,6 +169,7 @@ DEFAULT_WEAPON_STATS = {
         'damage_type': 'Physical'
     },
     'Battleaxe': {
+        'weapon_type': 'Axe',
         'damage': 10,
         'range': 1,
         'is_ranged': False,
@@ -165,6 +178,7 @@ DEFAULT_WEAPON_STATS = {
         'damage_type': 'Physical'
     },
     'Revolver': {
+        'weapon_type': 'Gun',
         'damage': 5,
         'range': 4,
         'is_ranged': True,
@@ -173,6 +187,7 @@ DEFAULT_WEAPON_STATS = {
         'damage_type': 'Physical'
     },
     'Trident': {
+        'weapon_type': 'Trident',
         'damage': 10,
         'range': 1,
         'is_ranged': False,
@@ -181,6 +196,7 @@ DEFAULT_WEAPON_STATS = {
         'damage_type': 'Physical'
     },
     'Shurikens': {
+        'weapon_type': 'Throwable',
         'damage': 7,
         'range': 3,
         'is_ranged': True,
@@ -189,6 +205,7 @@ DEFAULT_WEAPON_STATS = {
         'damage_type': 'Physical'
     },
     'Lance': {
+        'weapon_type': 'Lance',
         'damage': 9,
         'range': 2,
         'is_ranged': True,
@@ -197,6 +214,7 @@ DEFAULT_WEAPON_STATS = {
         'damage_type': 'Physical'
     },
     'Katana': {
+        'weapon_type': 'Sword',
         'damage': 11,
         'range': 1,
         'is_ranged': False,
@@ -205,6 +223,7 @@ DEFAULT_WEAPON_STATS = {
         'damage_type': 'Physical'
     },
     'Fangs': {
+        'weapon_type': 'Body Part',
         'damage': 9,
         'range': 1,
         'is_ranged': False,
@@ -213,6 +232,7 @@ DEFAULT_WEAPON_STATS = {
         'damage_type': 'Physical'
     },
     'Scythe': {
+        'weapon_type': 'Scythe',
         'damage': 10,
         'range': 1,
         'is_ranged': False,
@@ -221,6 +241,7 @@ DEFAULT_WEAPON_STATS = {
         'damage_type': 'Physical'
     },
     'Enchanted Book': {
+        'weapon_type': 'Book',
         'damage': 8,
         'range': 2,
         'is_ranged': True,
@@ -229,6 +250,7 @@ DEFAULT_WEAPON_STATS = {
         'damage_type': 'Magical'
     },
     'Great Warhammer': {
+        'weapon_type': 'Warhammer',
         'damage': 13,
         'range': 1,
         'is_ranged': False,
@@ -237,6 +259,7 @@ DEFAULT_WEAPON_STATS = {
         'damage_type': 'Physical'
     },
     'Sparkling Wand': {
+        'weapon_type': 'Wand',
         'damage': 7,
         'range': 2,
         'is_ranged': True,
@@ -245,6 +268,7 @@ DEFAULT_WEAPON_STATS = {
         'damage_type': 'Magical'
     },
     'Horn': {
+        'weapon_type': 'Body Part',
         'damage': 7,
         'range': 1,
         'is_ranged': False,
@@ -253,6 +277,7 @@ DEFAULT_WEAPON_STATS = {
         'damage_type': 'Physical'
     },
     'Spiked Tail': {
+        'weapon_type': 'Body Part',
         'damage': 9,
         'range': 1,
         'is_ranged': False,

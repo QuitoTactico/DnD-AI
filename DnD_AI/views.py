@@ -10,7 +10,7 @@ def home(request):
     # WEB LABELS
     # player_name=str   
     # roll_dice=bool    (optional)
-
+    
     if request.method == "POST":
 
         
