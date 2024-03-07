@@ -14,11 +14,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='character',
             name='weapon',
-            field=models.ForeignKey(blank=True, null=True, on_delete=models.SET(DnD_AI.models.get_default_weapon_by_name), to='DnD_AI.weapon'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=models.SET(DnD_AI.models.get_bare_hands), to='DnD_AI.weapon'),
         ),
         migrations.AlterField(
             model_name='monster',
             name='weapon',
-            field=models.ForeignKey(blank=True, null=True, on_delete=models.SET(DnD_AI.models.get_default_weapon_by_name), to='DnD_AI.weapon'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=models.SET(DnD_AI.models.get_bare_hands), to='DnD_AI.weapon'),
         ),
     ]

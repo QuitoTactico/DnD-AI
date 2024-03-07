@@ -56,6 +56,8 @@ DEFAULT_WEAPON_PER_MONSTER_CLASS = {
     'Basilisk': 'Beast Claws',
     'Manticore': 'Spiked Tail',
 }
+DEFAULT_WEAPON_PER_MONSTER_CLASS.update(DEFAULT_WEAPON_PER_CHARACTER_CLASS)
+
 
 POSSIBLE_BOSSES = ['Sphinx', 'Cthulhu', 'Leviathan', 'Behemoth', 'Kraken', 'Hades', 'Cerberus', 'God', 'Zeus', 'Ares', 'Thanatos', 'Mr Beast']
 

@@ -22,6 +22,7 @@ class Weapon(models.Model):
     damage      = models.IntegerField(default=6)
     range       = models.IntegerField(default=1)
     durability  = models.IntegerField(default=100)
+    level       = models.IntegerField(default=0)
 
     def __str__(self):
         str_is_ranged = 'Ranged' if self.is_ranged else 'Melee'
@@ -30,15 +31,16 @@ class Weapon(models.Model):
 
 
 # If the entity doesn't have a weapon, it gets the default weapon for its class
-def get_default_weapon_by_class(entity_class: str = 'Warrior', entity: str = 'Character'):
-    
-    try:
-        if entity == 'Character':
-            weapon_name = DEFAULT_WEAPON_PER_CHARACTER_CLASS[entity_class]
-        else:
-            weapon_name = DEFAULT_WEAPON_PER_MONSTER_CLASS[entity_class]
-    except:
-        weapon_name = 'Sword'
+def get_default_weapon(weapon_name:str = None, entity_class:str = 'Warrior', entity:str = 'Character'):
+    if weapon_name == None or weapon_name not in DEFAULT_WEAPON_STATS:
+        try:
+            if entity == 'Character':
+                weapon_name = DEFAULT_WEAPON_PER_CHARACTER_CLASS[entity_class]
+            else:
+                weapon_name = DEFAULT_WEAPON_PER_MONSTER_CLASS[entity_class]
+        except:
+            weapon_name = 'Sword'
+
 
     template_weapon, was_created = Weapon.objects.get_or_create(
             name=weapon_name, 
@@ -59,20 +61,9 @@ def get_default_weapon_by_class(entity_class: str = 'Warrior', entity: str = 'Ch
     # run createmigrations, then migrate.
 
 
-def get_default_weapon_by_name(weapon_name: str = 'Bare hands'):
+def get_bare_hands():
     
-    template_weapon, was_created = Weapon.objects.get_or_create(
-            name=weapon_name, 
-            is_template=True, 
-            damage=DEFAULT_WEAPON_STATS[weapon_name]['damage'], 
-            range=DEFAULT_WEAPON_STATS[weapon_name]['range'], 
-            image=DEFAULT_WEAPON_STATS[weapon_name]['image'],
-            is_ranged=DEFAULT_WEAPON_STATS[weapon_name]['is_ranged'],
-            physical_description=DEFAULT_WEAPON_STATS[weapon_name]['physical_description'],
-            damage_type=DEFAULT_WEAPON_STATS[weapon_name]['damage_type'],
-            weapon_type=DEFAULT_WEAPON_STATS[weapon_name]['weapon_type']
-    )
-    return template_weapon
+    return get_default_weapon(weapon_name='Bare hands')
     '''
     return None'''
     # if something happens, comment all this function lines and return None, 
@@ -100,7 +91,7 @@ class Character(models.Model):
     # A character or monster always has a weapon, including his bare hands.
     # weapon = models.ForeignKey(Weapon, on_delete=models.CASCADE, default=Weapon.get_default_weapon())
     # weapon = models.ForeignKey(Weapon, on_delete=models.CASCADE, default=Weapon.objects.create())
-    weapon = models.ForeignKey(Weapon, on_delete=models.SET(get_default_weapon_by_name), null=True, blank=True)
+    weapon = models.ForeignKey(Weapon, on_delete=models.SET(get_bare_hands), null=True, blank=True)
     got_initial_weapon = models.BooleanField(default=False)
     
 
@@ -137,10 +128,10 @@ class Character(models.Model):
         if not self.weapon:
             # the character gets his class' initial weapon
             if not self.got_initial_weapon:
-                self.weapon = get_default_weapon_by_class(entity_class=self.character_class, entity='Character')
+                self.weapon = get_default_weapon(entity_class=self.character_class, entity='Character')
                 self.got_initial_weapon = True
             else: # if he looses it, he gets his bare hands
-                self.weapon = get_default_weapon_by_name()     # bare hands
+                self.weapon = get_bare_hands()     # bare hands
         super().save(*args, **kwargs)
 
 
@@ -168,7 +159,7 @@ class Monster(models.Model):
     # Weapon
     # A character or monster always has a weapon, including his bare hands.
     # weapon = models.ForeignKey(Weapon, on_delete=models.CASCADE)
-    weapon = models.ForeignKey(Weapon, on_delete=models.SET(get_default_weapon_by_name), null=True, blank=True)
+    weapon = models.ForeignKey(Weapon, on_delete=models.SET(get_bare_hands), null=True, blank=True)
     got_initial_weapon = models.BooleanField(default=False)
 
     # Statistics
@@ -202,10 +193,10 @@ class Monster(models.Model):
         if not self.weapon:
             # it gets the default weapon for its class
             if not self.got_initial_weapon:
-                self.weapon = get_default_weapon_by_class(entity_class=self.monster_class, entity='Monster')
+                self.weapon = get_default_weapon(entity_class=self.monster_class, entity='Monster')
                 self.got_initial_weapon = True
             else:  # if he looses it, he gets his bare hands
-                self.weapon = get_default_weapon_by_name()     # bare hands
+                self.weapon = get_bare_hands()     # bare hands
         super().save(*args, **kwargs)
 
     def __str__(self):

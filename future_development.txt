@@ -104,4 +104,14 @@ options:
 Create the other templates for monsters and character stats.
 Create their respective commands for creation and deletion.
 
+Combinar funciones get_weapon
+Crear get_bare_hands que simplemente llame a get_weapon_template con weapon_name='Bare hands'
+Con cada mejora de arma, es permitido cambiar el nombre del arma y queda +level (por ejemplo +5)
+Poner field Weapon.level
+Función Weapon.level_up()
+
+Se puede subir el daño, o range_upgrades (sólo para ranged weapons)
+
+Cada 3 range_upgrades, sube un punto el range
+
 '''
