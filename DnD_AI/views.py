@@ -11,7 +11,8 @@ def home(request):
     # player_name=str   
     # roll_dice=bool    (optional)
     
-    if request.method == "POST":
+    #if request.method == "POST":
+    if True:     # i'm testing, sending all the things to the front.
 
         
         # DICE_ROLL

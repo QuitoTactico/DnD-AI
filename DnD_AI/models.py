@@ -1,11 +1,30 @@
 from django.db import models
 from .default import *
+import copy  # to level_up the weapon
 
 # Create your models here.
 
 
 # for default, the characters and monsters use their bare hands 
 class Weapon(models.Model):
+    """
+    Represents a weapon in the game.
+
+    Attributes:
+    - id (AutoField): The unique identifier of the weapon.
+    - is_template (BooleanField): Indicates if the weapon is a template or a unique instance.
+    - name (CharField): The name of the weapon.
+    - is_ranged (BooleanField): Indicates if the weapon is ranged or melee.
+    - weapon_type (CharField): The type of the weapon.
+    - damage_type (CharField): The type of damage the weapon deals.
+    - physical_description (CharField): A description of the physical appearance of the weapon.
+    - image (ImageField): An image of the weapon.
+    - damage (IntegerField): The amount of damage the weapon deals.
+    - range (IntegerField): The range of the weapon.
+    - durability (IntegerField): The durability of the weapon.
+    - level (IntegerField): The level of the weapon.
+    """
+
     id = models.AutoField(primary_key=True) # added here to be seen in the __str__ 
     # if the weapon is going to be modified, then we'll need to create a new one 
     # to not modify that weapon template. Set is_template to False
@@ -19,19 +38,32 @@ class Weapon(models.Model):
     image       = models.ImageField(upload_to='weapon/images/', default='weapon/images/default/bare_hands.png')
 
     # Statistics
-    damage      = models.IntegerField(default=6)
-    range       = models.IntegerField(default=1)
-    durability  = models.IntegerField(default=100)
-    level       = models.IntegerField(default=0)
+    damage          = models.IntegerField(default=6)
+    range           = models.IntegerField(default=1)
+    range_level_points = models.IntegerField(default=0)   # only for ranged weapons. 3 range level ups -> range +1
+    durability      = models.IntegerField(default=100)
+    level           = models.IntegerField(default=0)
+
 
     def __str__(self):
         str_is_ranged = 'Ranged' if self.is_ranged else 'Melee'
         str_is_template = 'TEMPLATE' if self.is_template else 'UNIQUE'
-        return f'({self.id}) WEAPON, {str_is_template}, {self.name}, {str_is_ranged}, {self.weapon_type}, {self.damage_type}, {self.damage}'
+        str_level = f'+{self.level}' if self.level != 0 else ''
+        return f'({self.id}) WEAPON{str_level}, {str_is_template}, {self.name}, {str_is_ranged}, {self.weapon_type}, {self.damage_type}, {self.damage}'
 
 
-# If the entity doesn't have a weapon, it gets the default weapon for its class
 def get_default_weapon(weapon_name:str = None, entity_class:str = 'Warrior', entity:str = 'Character'):
+    """
+    Returns the default weapon for a given entity.
+
+    Parameters:
+    - weapon_name (str): The name of the weapon. If None, the default weapon for the entity class will be returned.
+    - entity_class (str): The class of the entity.
+    - entity (str): The type of the entity (Character or Monster).
+
+    Returns:
+    - template_weapon (Weapon): The default weapon for the entity.
+    """
     if weapon_name == None or weapon_name not in DEFAULT_WEAPON_STATS:
         try:
             if entity == 'Character':
@@ -56,23 +88,56 @@ def get_default_weapon(weapon_name:str = None, entity_class:str = 'Warrior', ent
     return template_weapon
     '''
     return None'''
-    # if something happens, comment all this function lines and return None, 
-    # then eliminate the database and all migrations (except __init__) and 
+    # if the migrations are not running, comment all this function lines and return None, 
+    # then delete the database and all migrations (except __init__) and 
     # run createmigrations, then migrate.
 
 
 def get_bare_hands():
-    
+    """
+    Returns the default weapon for bare hands.
+
+    Returns:
+    - template_weapon (Weapon): The default weapon for bare hands.
+    """
     return get_default_weapon(weapon_name='Bare hands')
     '''
     return None'''
-    # if something happens, comment all this function lines and return None, 
-    # then eliminate the database and all migrations (except __init__) and 
+    # if the migrations are not running, comment all this function lines and return None, 
+    # then delete the database and all migrations (except __init__) and 
     # run createmigrations, then migrate.
 
 
-# for default, the character is a simple playable human
 class Character(models.Model):
+    """
+    Represents a character in the game.
+
+    Attributes:
+    - id (AutoField): The unique identifier of the character.
+    - is_playable (BooleanField): Indicates if the character is playable or an NPC.
+    - name (CharField): The name of the character.
+    - story (CharField): The story of the character.
+    - physical_description (CharField): A description of the physical appearance of the character.
+    - image (ImageField): An image of the character.
+    - character_race (CharField): The race of the character.
+    - character_class (CharField): The class of the character.
+    - weapon (ForeignKey): The weapon of the character.
+    - got_initial_weapon (BooleanField): Indicates if the character has obtained their initial weapon.
+    - max_health (IntegerField): The maximum health of the character.
+    - health (IntegerField): The current health of the character.
+    - strength (IntegerField): The strength of the character.
+    - intelligence (IntegerField): The intelligence of the character.
+    - dexterity (IntegerField): The dexterity of the character.
+    - physical_resistance (IntegerField): The physical resistance of the character.
+    - magical_resistance (IntegerField): The magical resistance of the character.
+    - constitution (IntegerField): The constitution of the character.
+    - level (IntegerField): The level of the character.
+    - exp (IntegerField): The experience points of the character.
+    - x (IntegerField): The x-coordinate of the character.
+    - y (IntegerField): The y-coordinate of the character.
+    - icon (ImageField): An icon representing the character.
+    """
+
     id          = models.AutoField(primary_key=True) # added here to be seen in the __str__ 
     is_playable = models.BooleanField(default=True) # playable or NPC
     name        = models.CharField(max_length=30, default="DEFAULT_CHARACTER")
@@ -87,116 +152,176 @@ class Character(models.Model):
     character_race  = models.CharField(max_length=30, default="Human")
     character_class = models.CharField(max_length=30, null=True, blank=True) 
 
-    # Weapon
-    # A character or monster always has a weapon, including his bare hands.
-    # weapon = models.ForeignKey(Weapon, on_delete=models.CASCADE, default=Weapon.get_default_weapon())
-    # weapon = models.ForeignKey(Weapon, on_delete=models.CASCADE, default=Weapon.objects.create())
     weapon = models.ForeignKey(Weapon, on_delete=models.SET(get_bare_hands), null=True, blank=True)
     got_initial_weapon = models.BooleanField(default=False)
     
 
-    # Statistics
     max_health      = models.IntegerField(default=100)
     health          = models.IntegerField(default=100)
-    #   For damage
     strength        = models.IntegerField(default=10)
     intelligence    = models.IntegerField(default=10)
-    #   To act first
     dexterity       = models.IntegerField(default=10)
-    #   For defense
     physical_resistance = models.IntegerField(default=10)
     magical_resistance  = models.IntegerField(default=10)
     constitution        = models.IntegerField(default=10)
 
-    # Progress
     level   = models.IntegerField(default=0)
     exp     = models.IntegerField(default=0)
+    exp_top = models.IntegerField(default=30)  # exp until level_up
 
-    # Coordinates
     x       = models.IntegerField(default=0)
     y       = models.IntegerField(default=0)
     icon    = models.ImageField(upload_to="entity/icons/", default='entity/icons/default.png')
 
-    # Default values for fields which depends on other fields values.
+    def level_up(self, stat:str = 'max_health'):
+        stat = stat.lower().replace('_', ' ')
+        if stat in ['max health', 'maxhealth', 'health', 'hp']:
+            self.max_health += 10
+        elif stat in ['str', 'strength']:
+            self.strength += 1
+        elif stat in ['int', 'intelligence']:
+            self.intelligence += 1
+        elif stat in ['dex', 'dexterity']:
+            self.dexterity += 1
+        elif stat in ['phys res', 'physical resistance']:
+            self.physical_resistance += 1
+        elif stat in ['mag res', 'magical resistance']:
+            self.magical_resistance += 1
+        elif stat in ['con', 'constitution']:
+            self.constitution += 1
+
+        self.level      += 1                        # the level increaces one point
+        self.exp        -= self.exp_top             # the experience reduces the top passed
+        self.exp_top    += int(self.exp_top*0.2)    # the top increaces by a function
+        self.health     = self.max_health           # the health recovers to the max
+        self.save()
+        return True   # successful
+        
+
+    def level_up_weapon(self, new_name:str = None, stat:str = 'damage'):
+        leveled_weapon = copy.deepcopy(self.weapon)  # I create a copy of that weapon
+
+        leveled_weapon.is_template = False  # Change is_template to false, now it's a unique weapon
+        leveled_weapon.level += 1
+        
+        if stat == 'damage':
+            leveled_weapon.damage += 1
+
+        # for ranged weapons, you can also level up the range, but it's a point accumulation system.
+        # if you reach five points (range_level_points), then the range is leveled up.
+        # else, you only get one more point
+        elif stat == 'range':
+            if leveled_weapon.is_ranged:
+                if leveled_weapon.range_level_points <= 5:
+                    leveled_weapon.range_level_points = 0
+                    leveled_weapon.range += 1
+                else:
+                    leveled_weapon.range_level_points += 1
+            else:
+                leveled_weapon.damage += 1  # dude, that's just only for ranged weapons
+
+        
+        # if a new name is sent, that will be the new name of the weapon. 
+        if new_name:
+            leveled_weapon.name = new_name
+        
+        leveled_weapon.save()
+        self.weapon = leveled_weapon
+        self.save()
+
+        return leveled_weapon  # if you want to easily show the weapon or something like that
+    
+    def disarm(self) -> bool:
+        self.weapon = get_bare_hands()
+        self.save()
+        return True  # if was succesful
+
     def save(self, *args, **kwargs):
-        # sometimes the race itself is the class. If the player doesn't choose a class, his class will be the race.
-        # but class "human" is kinda odd, so warrior is the default class for humans.
         if not self.character_class:
             self.character_class = self.character_race if self.character_race != 'Human' else 'Warrior'
 
-        # if the character doesn't have a weapon while it's created or saved...
         if not self.weapon:
-            # the character gets his class' initial weapon
             if not self.got_initial_weapon:
                 self.weapon = get_default_weapon(entity_class=self.character_class, entity='Character')
                 self.got_initial_weapon = True
-            else: # if he looses it, he gets his bare hands
-                self.weapon = get_bare_hands()     # bare hands
+            else:
+                self.weapon = get_bare_hands()
         super().save(*args, **kwargs)
 
-
-    # return 'PLAYABLE, '+self.name+', '+self.character_race+', '+self.character_class
     def __str__(self):
         str_is_playable = 'PLAYABLE' if self.is_playable else 'NPC'
         return f'({self.id}) {str_is_playable}, {self.name}, {self.character_race} {self.character_class}, HP: {self.health}, Level: {self.level}, Weapon: [{self.weapon}]'
 
 
-# for default, a monster is a simple goblin
 class Monster(models.Model):
+    """
+    Represents a monster in the game.
+
+    Attributes:
+    - id (AutoField): The unique identifier of the monster.
+    - name (CharField): The name of the monster.
+    - is_key_for_campaign (BooleanField): Indicates if the monster is a key monster for the campaign.
+    - monster_race (CharField): The race of the monster.
+    - monster_class (CharField): The class of the monster.
+    - physical_description (CharField): A description of the physical appearance of the monster.
+    - weapon (ForeignKey): The weapon of the monster.
+    - got_initial_weapon (BooleanField): Indicates if the monster has obtained their initial weapon.
+    - max_health (IntegerField): The maximum health of the monster.
+    - health (IntegerField): The current health of the monster.
+    - strength (IntegerField): The strength of the monster.
+    - intelligence (IntegerField): The intelligence of the monster.
+    - dexterity (IntegerField): The dexterity of the monster.
+    - physical_resistance (IntegerField): The physical resistance of the monster.
+    - magical_resistance (IntegerField): The magical resistance of the monster.
+    - constitution (IntegerField): The constitution of the monster.
+    - exp_drop (IntegerField): The amount of experience points the monster drops.
+    - x (IntegerField): The x-coordinate of the monster.
+    - y (IntegerField): The y-coordinate of the monster.
+    - icon (ImageField): An icon representing the monster.
+    """
+
     id      = models.AutoField(primary_key=True) # added here to be seen in the __str__ 
     name    = models.CharField(max_length=30, default="DEFAULT_MONSTER")
-    is_key_for_campaign = models.BooleanField(default=False) # if it's a key monster for the campaign, it's a boss
+    is_key_for_campaign = models.BooleanField(default=False)
 
-    # Monster description 
-    # We will see if the class and race can add a bonus to some statistics
-    # class was a reserved word. 
     monster_race  = models.CharField(max_length=30, default="Goblin")
-    monster_class = models.CharField(max_length=30, null=True, blank=True) # maybe blank=True would be better
-                                                                           # edit: it was better XD
+    monster_class = models.CharField(max_length=30, null=True, blank=True)
 
     physical_description = models.CharField(max_length=100, default="Green goblin, small, with no weapon")
 
-    # Weapon
-    # A character or monster always has a weapon, including his bare hands.
-    # weapon = models.ForeignKey(Weapon, on_delete=models.CASCADE)
     weapon = models.ForeignKey(Weapon, on_delete=models.SET(get_bare_hands), null=True, blank=True)
     got_initial_weapon = models.BooleanField(default=False)
 
-    # Statistics
     max_health      = models.IntegerField(default=100)
     health          = models.IntegerField(default=100)
-    #   For damage
     strength        = models.IntegerField(default=10)
     intelligence    = models.IntegerField(default=10)
-    #   To act first
     dexterity       = models.IntegerField(default=10)
-    #   For defense
     physical_resistance = models.IntegerField(default=10)
     magical_resistance  = models.IntegerField(default=10)
     constitution        = models.IntegerField(default=10)
 
-    # For character progress
     exp_drop = models.IntegerField(default=10)
 
-    # Coordinates
     x       = models.IntegerField(default=2)
     y       = models.IntegerField(default=2)
     icon    = models.ImageField(upload_to="entity/icons/", default='entity/icons/default.png')
+
+    def disarm(self) -> bool:
+        self.weapon = get_bare_hands()
+        self.save()
+        return True  # if was succesful
     
-    # Default values for fields which depends on other fields values.
     def save(self, *args, **kwargs):
-        # sometimes the race itself is a race for the monsters, so the class will be the the race if it's not set.
         if not self.monster_class:
             self.monster_class = self.monster_race
 
-        # if the monster doesn't have a weapon while it's created...
         if not self.weapon:
-            # it gets the default weapon for its class
             if not self.got_initial_weapon:
                 self.weapon = get_default_weapon(entity_class=self.monster_class, entity='Monster')
                 self.got_initial_weapon = True
-            else:  # if he looses it, he gets his bare hands
-                self.weapon = get_bare_hands()     # bare hands
+            else:
+                self.weapon = get_bare_hands()
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -233,18 +358,25 @@ level:      the entity's level. The entity can level up by gaining experience po
             The exp needed to reach a new level is calculated by a formula, 
             and it's increased with every new level.
 exp:        the entity's experience points. The entity gains exp by defeating monsters, 
-            (or completing quests and by using items, in posible future features). 
+            (or completing quests and by using items, in possible future features). 
             When the entity reaches a new level, his exp is reset to 0.
 
     COORDINATES DESCRIPTIONS
-x:      the entity's position in the x axis of the map
-y:      the entity's position in the y axis of the map
+x:      the entity's position in the x-axis of the map
+y:      the entity's position in the y-axis of the map
 icon:   in a map, this small squared image can be seen to represent that entity
 
     WEAPON DESCRIPTIONS
 is_ranged:      a weapon can be melee or ranged, so it's a bool.
-weapon_type:    there's plenty of weapon types, as swords, axes, bows, knifes... 
+weapon_type:    there's plenty of weapon types, as swords, axes, bows, knives... 
                 (In future releases features, certain races could have a better 
                 handle of certain weapon types)
 damage_type:    That weapon can affect the enemies in different ways, as physical or magical ones.
+
+    CHARACTER DESCRIPTIONS
+got_initial_weapon:     Indicates if the character has obtained their initial weapon.
+
+    MONSTER DESCRIPTIONS
+is_key_for_campaign:    Indicates if the monster is a key monster for the campaign.
+exp_drop:               The amount of experience points the monster drops.
 '''
