@@ -174,7 +174,9 @@ class Character(models.Model):
     y       = models.IntegerField(default=0)
     icon    = models.ImageField(upload_to="entity/icons/", default='entity/icons/default.png')
 
-    def level_up(self, stat:str = 'max_health'):
+    def level_up_stat(self, stat:str = 'max_health'):
+        ''' levels up the character, you can choose the stat to increace \n
+        returns if was succesful '''
         stat = stat.lower().replace('_', ' ')
         if stat in ['max health', 'maxhealth', 'health', 'hp']:
             self.max_health += 10
@@ -200,6 +202,10 @@ class Character(models.Model):
         
 
     def level_up_weapon(self, new_name:str = None, stat:str = 'damage'):
+        ''' levels up the weapon of the character, the damage will be increaced if you choose it. \n
+        if is a ranged weapon, you can also level up the range, but with a five points accumulation system. \n
+        returns the leveled up weapon, but now the character has it equipped  .
+        '''
         leveled_weapon = copy.deepcopy(self.weapon)  # I create a copy of that weapon
 
         leveled_weapon.is_template = False  # Change is_template to false, now it's a unique weapon
@@ -227,14 +233,25 @@ class Character(models.Model):
             leveled_weapon.name = new_name
         
         leveled_weapon.save()
-        self.weapon = leveled_weapon
+        self.weapon = leveled_weapon                # now the character has the leveled up weapon equipped
+        self.level      += 1                        # the level increaces one point
+        self.exp        -= self.exp_top             # the experience reduces the top passed
+        self.exp_top    += int(self.exp_top*0.2)    # the top increaces by a function
+        self.health     = self.max_health           # the health recovers to the max
         self.save()
 
         return leveled_weapon  # if you want to easily show the weapon or something like that
     
     def disarm(self) -> bool:
+        ''' disarms the character, his weapon will be "Bare hands" \n
+        returns if was succesful '''
         self.weapon = get_bare_hands()
         self.save()
+        return True  # if was succesful
+    
+    def kill(self) -> bool:
+        ''' deletes the character '''
+        self.delete()
         return True  # if was succesful
 
     def save(self, *args, **kwargs):
@@ -295,7 +312,7 @@ class Monster(models.Model):
 
     # Stats
     max_health      = models.IntegerField(default=100)  # health limit
-    health          = models.IntegerField(default=100)  # if reaches 0, the character dies
+    health          = models.IntegerField(default=100)  # if reaches 0, the monster dies
     strength        = models.IntegerField(default=10)   # plus to physical attacks
     intelligence    = models.IntegerField(default=10)   # plus to magical attacks
     recursiveness   = models.IntegerField(default=10)   # plus to item attacks
@@ -311,9 +328,18 @@ class Monster(models.Model):
     icon    = models.ImageField(upload_to="entity/icons/", default='entity/icons/default.png')
 
     def disarm(self) -> bool:
+        ''' disarms the monster, his weapon will be "Bare hands"\n
+        returns if was succesful '''
         self.weapon = get_bare_hands()
         self.save()
         return True  # if was succesful
+    
+    def kill(self) -> tuple[bool, bool]:
+        ''' deletes the monster \n
+        returns a tuple. (if was succesful , if was a key monster)'''
+        was_key = True if self.is_key_for_campaign else False
+        self.delete()
+        return True, was_key  
     
     def save(self, *args, **kwargs):
         if not self.monster_class:
