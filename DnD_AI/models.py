@@ -155,15 +155,16 @@ class Character(models.Model):
     weapon = models.ForeignKey(Weapon, on_delete=models.SET(get_bare_hands), null=True, blank=True)
     got_initial_weapon = models.BooleanField(default=False)
     
-
-    max_health      = models.IntegerField(default=100)
-    health          = models.IntegerField(default=100)
-    strength        = models.IntegerField(default=10)
-    intelligence    = models.IntegerField(default=10)
-    dexterity       = models.IntegerField(default=10)
-    physical_resistance = models.IntegerField(default=10)
-    magical_resistance  = models.IntegerField(default=10)
-    constitution        = models.IntegerField(default=10)
+    # Stats
+    max_health      = models.IntegerField(default=100)  # health limit
+    health          = models.IntegerField(default=100)  # if reaches 0, the character dies
+    strength        = models.IntegerField(default=10)   # plus to physical attacks
+    intelligence    = models.IntegerField(default=10)   # plus to magical attacks
+    recursiveness   = models.IntegerField(default=10)   # plus to item attacks
+    dexterity       = models.IntegerField(default=10)   # decides who attacks first
+    physical_resistance = models.IntegerField(default=10)   # reduces physical damage
+    magical_resistance  = models.IntegerField(default=10)   # reduces magical damage
+    constitution        = models.IntegerField(default=10)   # reduces item damage
 
     level   = models.IntegerField(default=0)
     exp     = models.IntegerField(default=0)
@@ -292,14 +293,16 @@ class Monster(models.Model):
     weapon = models.ForeignKey(Weapon, on_delete=models.SET(get_bare_hands), null=True, blank=True)
     got_initial_weapon = models.BooleanField(default=False)
 
-    max_health      = models.IntegerField(default=100)
-    health          = models.IntegerField(default=100)
-    strength        = models.IntegerField(default=10)
-    intelligence    = models.IntegerField(default=10)
-    dexterity       = models.IntegerField(default=10)
-    physical_resistance = models.IntegerField(default=10)
-    magical_resistance  = models.IntegerField(default=10)
-    constitution        = models.IntegerField(default=10)
+    # Stats
+    max_health      = models.IntegerField(default=100)  # health limit
+    health          = models.IntegerField(default=100)  # if reaches 0, the character dies
+    strength        = models.IntegerField(default=10)   # plus to physical attacks
+    intelligence    = models.IntegerField(default=10)   # plus to magical attacks
+    recursiveness   = models.IntegerField(default=10)   # plus to item attacks
+    dexterity       = models.IntegerField(default=10)   # decides who attacks first
+    physical_resistance = models.IntegerField(default=10)   # reduces physical damage
+    magical_resistance  = models.IntegerField(default=10)   # reduces magical damage
+    constitution        = models.IntegerField(default=10)   # reduces item damage
 
     exp_drop = models.IntegerField(default=10)
 
