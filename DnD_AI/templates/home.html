@@ -34,6 +34,16 @@
         </div>
     </nav>
 
+    <form action="{% url 'home' %}" method="post">
+        {% csrf_token %}
+    
+        <input type="text" name="player_name" placeholder="Player Name">
+        <input type="checkbox" id="test" name="test">
+        <input type="checkbox" id="dice_needed" name="dice_needed">
+    
+        <input type="submit" value="Submit">
+    </form>
+    
     <hr>
 
     <h1 class="row">HISTORY</h1>

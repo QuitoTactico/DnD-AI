@@ -157,7 +157,7 @@ class Character(models.Model):
     
     # Stats
     max_health      = models.IntegerField(default=100)  # health limit
-    health          = models.IntegerField(default=100)  # if reaches 0, the character dies
+    health          = models.IntegerField(null=True, blank=True)  # if reaches 0, the character dies
     strength        = models.IntegerField(default=10)   # plus to physical attacks
     intelligence    = models.IntegerField(default=10)   # plus to magical attacks
     recursiveness   = models.IntegerField(default=10)   # plus to item attacks
@@ -257,6 +257,9 @@ class Character(models.Model):
     def save(self, *args, **kwargs):
         if not self.character_class:
             self.character_class = self.character_race if self.character_race != 'Human' else 'Warrior'
+        
+        if self.health == None:
+            self.health = self.max_health
 
         if not self.weapon:
             if not self.got_initial_weapon:
@@ -312,7 +315,7 @@ class Monster(models.Model):
 
     # Stats
     max_health      = models.IntegerField(default=100)  # health limit
-    health          = models.IntegerField(default=100)  # if reaches 0, the monster dies
+    health          = models.IntegerField(null=True, blank=True)  # if reaches 0, the monster dies
     strength        = models.IntegerField(default=10)   # plus to physical attacks
     intelligence    = models.IntegerField(default=10)   # plus to magical attacks
     recursiveness   = models.IntegerField(default=10)   # plus to item attacks
@@ -344,6 +347,9 @@ class Monster(models.Model):
     def save(self, *args, **kwargs):
         if not self.monster_class:
             self.monster_class = self.monster_race
+
+        if self.health == None:
+            self.health = self.max_health
 
         if not self.weapon:
             if not self.got_initial_weapon:

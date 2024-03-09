@@ -11,13 +11,16 @@ def home(request):
     # player_name=str   
     # roll_dice=bool    (optional)
     
-    #if request.method == "POST":
-    if True:     # i'm testing, sending all the things to the front.
+    if request.method == "POST":
+    #if True:     # i'm testing, sending all the things to the front.
 
         
         # DICE_ROLL
-        dice_needed = request.GET.get('diceNeeded')
-        if dice_needed:     # If the roll_dice label is sent, it rolls the dice
+        #dice_needed = request.GET.get('dice_needed')
+        #dice_needed = request.POST['dice_needed']
+        dice_needed = 'dice_needed' in request.POST
+        
+        if dice_needed:   # If the roll_dice label is sent, it rolls the dice
             dice_value = roll_dice()
         else:               # If the roll_dice label is not sent, it sets the dice value to None, this way isn't rendered
             dice_value = None 
@@ -25,7 +28,8 @@ def home(request):
 
 
         # GETTING DATA FROM THE DATABASE
-        player_name = request.GET.get('player') # Change this for a post, not a get
+        # player_name = request.GET.get('player')
+        player_name = request.POST['player_name']
         
 
         # If there's any get/post, then gets the data from the database
@@ -58,9 +62,13 @@ def home(request):
                 player = Character.objects.create()
                 player.save()
 
-        pruebas = request.GET.get('pruebas')
-        page = 'home.html' if pruebas == None else 'pruebas.html'
+        players = Character.objects.filter(is_playable=True)
 
-        return render(request, page, {'player':player, 'monsters':monsters, 'characters':characters, 'weapons':weapons, 'dice_value': dice_value, 'dice_needed': dice_needed} )
+        #test = request.GET.get('test')
+        #test = request.POST['test']
+        test = 'test' in request.POST
+        page = 'test.html' if test else 'home.html'
+
+        return render(request, page, {'player':player, 'players':players, 'player_name_sent':player_name, 'monsters':monsters, 'characters':characters, 'weapons':weapons, 'dice_value': dice_value, 'dice_needed': dice_needed} )
     else:
         return render(request, 'home.html', {} )

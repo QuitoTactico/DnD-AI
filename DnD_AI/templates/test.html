@@ -12,12 +12,40 @@
         rel="stylesheet">
 </head>
 
-<h1>Dice value:     {{dice_value}}</h1>
-<h1>Dice needed:    {{dice_needed}}</h1>
+<form action="{% url 'home' %}" method="post">
+    {% csrf_token %}
+    <input type="text" name="player_name" placeholder="Player Name">
+    <input type="checkbox" id="test" name="test" checked>
+    <input type="checkbox" id="dice_needed" name="dice_needed">
+
+    <input type="submit" value="Submit">
+</form>
+
+<!--                GETS                  -->
+<h1>GETS</h1>
+<h3>
+    <ul>
+        <li>Dice value:  {{dice_value}}</li>
+        <li>Dice needed: {{dice_needed}}</li>
+        <li>Player name (Sent): {{player_name_sent}}</li>
+        <li>Player name (Rcvd): {{player.name}}</li>
+        <li>Characters: {{characters.count}}</li>
+        <ul>
+            <li>Playable: {{players.count}}</li>
+        </ul>
+        <li>Monsters: {{monsters.count}}</li>
+        <li>Weapons: {{weapons.count}}</li>
+        
+    </ul>
+</h3>
+
+
+<!--                PLAYER                  -->
 
 <br>
 <h1>Player</h1>
-<h3>{{ player.name }}</h3>
+<h3>{{player.name}}</h3>
+<h5>{{player}}</h5>
 <div>
     <h4>
         Player Image: 
@@ -68,6 +96,8 @@
 
 <br>
 <h3>PLAYER'S WEAPON</h3>
+<h5>{{player.weapon.name}}</h5>
+<h5>{{player.weapon}}</h5>
 <div>
     <h5>
         Weapon Image: 
