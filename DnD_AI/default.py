@@ -55,6 +55,7 @@ DEFAULT_WEAPON_PER_MONSTER_CLASS = {
     'Unicorn': 'Horn',
     'Basilisk': 'Beast Claws',
     'Manticore': 'Spiked Tail',
+    'Rat': 'Fangs',
 }
 DEFAULT_WEAPON_PER_MONSTER_CLASS.update(DEFAULT_WEAPON_PER_CHARACTER_CLASS)
 
