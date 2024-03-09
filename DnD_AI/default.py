@@ -60,7 +60,7 @@ DEFAULT_WEAPON_PER_MONSTER_CLASS = {
 DEFAULT_WEAPON_PER_MONSTER_CLASS.update(DEFAULT_WEAPON_PER_CHARACTER_CLASS)
 
 
-POSSIBLE_BOSSES = ['Sphinx', 'Cthulhu', 'Leviathan', 'Behemoth', 'Kraken', 'Hades', 'Cerberus', 'God', 'Zeus', 'Ares', 'Thanatos', 'Mr Beast']
+POSSIBLE_BOSSES = ['Sphinx', 'Cthulhu', 'Leviathan', 'Behemoth', 'Kraken', 'Hades', 'Cerberus', 'God', 'Zeus', 'Ares', 'Thanatos', 'Megatron', 'Mr Beast']
 
 DEFAULT_WEAPON_STATS = {
     'Sword': {

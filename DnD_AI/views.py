@@ -16,15 +16,16 @@ def home(request):
 
         
         # DICE_ROLL
-        dice_needed = request.POST.get('roll_dice')
+        dice_needed = request.GET.get('diceNeeded')
         if dice_needed:     # If the roll_dice label is sent, it rolls the dice
             dice_value = roll_dice()
         else:               # If the roll_dice label is not sent, it sets the dice value to None, this way isn't rendered
             dice_value = None 
+            dice_needed = False
 
 
         # GETTING DATA FROM THE DATABASE
-        player_name = request.POST.get('player') # Change this for a post, not a get
+        player_name = request.GET.get('player') # Change this for a post, not a get
         
 
         # If there's any get/post, then gets the data from the database
@@ -42,9 +43,11 @@ def home(request):
             except:
                 try:
                     # If the name of the character is not found, it tries to find a character whose name contains the string entered
-                    player = Character.objects.filter(name__icontains=player_name).first() 
+                    player = Character.objects.filter(name__icontains=player_name).first()
+                    if player == None:
+                        # If there is no character containing the name entered, it selects the first playable character in the database
+                        player = Character.objects.filter(is_playable=True).first()
                 except:
-                    # If there is no character containing the name entered, it selects the first playable character in the database
                     player = Character.objects.filter(is_playable=True).first()
         else:
             # If the player label is not sent, it selects the first playable character in the database
@@ -53,9 +56,11 @@ def home(request):
                 player = Character.objects.filter(is_playable=True).first()
             except:
                 player = Character.objects.create()
+                player.save()
 
+        pruebas = request.GET.get('pruebas')
+        page = 'home.html' if pruebas == None else 'pruebas.html'
 
-        
-        return render(request, 'home.html', {'player':player, 'monsters':monsters, 'characters':characters, 'weapons':weapons, 'dice_value': dice_value, 'dice_needed': dice_needed} )
+        return render(request, page, {'player':player, 'monsters':monsters, 'characters':characters, 'weapons':weapons, 'dice_value': dice_value, 'dice_needed': dice_needed} )
     else:
         return render(request, 'home.html', {} )
