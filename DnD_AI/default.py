@@ -21,7 +21,7 @@ DEFAULT_WEAPON_PER_CHARACTER_CLASS = {
     'Knight': 'Sword',
     'Samurai': 'Katana',
     'Ninja': 'Shurikens',
-    'Lancer': 'Lance',
+    'Spearr': 'Spear',
     'Dwarf': 'Warhammer',
     'Viking': 'Battleaxe',
     'Cowboy': 'Revolver',
@@ -41,20 +41,20 @@ DEFAULT_WEAPON_PER_MONSTER_CLASS = {
     'Demon': 'Trident',
     'Giant': 'Great Warhammer',
     'Spider': 'Fangs',
-    'Scorpion': 'Spiked Tail',
+    'Scorpion': 'Tail',
     'Centaur': 'Bow',
     'Minotaur': 'Battleaxe',
     'Cyclops': 'Great Warhammer',
     'Medusa': 'Sword',
     'Siren': 'Trident',
     'Golem': 'Great Warhammer',
-    'Fairy': 'Sparkling Wand',
+    'Fairy': 'Magic Wand',
     'Mermaid': 'Trident',
     'Chimera': 'Fangs',
     'Hydra': 'Fangs',
-    'Unicorn': 'Horn',
+    'Unicorn': 'Horns',
     'Basilisk': 'Beast Claws',
-    'Manticore': 'Spiked Tail',
+    'Manticore': 'Tail',
     'Rat': 'Fangs',
 }
 DEFAULT_WEAPON_PER_MONSTER_CLASS.update(DEFAULT_WEAPON_PER_CHARACTER_CLASS)
@@ -207,13 +207,13 @@ DEFAULT_WEAPON_STATS = {
         'image': 'weapon/images/default/shurikens.png',
         'damage_type': 'Physical'
     },
-    'Lance': {
-        'weapon_type': 'Lance',
+    'Spear': {
+        'weapon_type': 'Spear',
         'damage': 9,
         'range': 2,
         'is_ranged': True,
-        'physical_description': 'a lance',
-        'image': 'weapon/images/default/lance.png',
+        'physical_description': 'a spear',
+        'image': 'weapon/images/default/spear.png',
         'damage_type': 'Physical'
     },
     'Katana': {
@@ -261,31 +261,31 @@ DEFAULT_WEAPON_STATS = {
         'image': 'weapon/images/default/great_warhammer.png',
         'damage_type': 'Physical'
     },
-    'Sparkling Wand': {
+    'Magic Wand': {
         'weapon_type': 'Wand',
         'damage': 7,
         'range': 2,
         'is_ranged': True,
-        'physical_description': 'a sparkling wand',
-        'image': 'weapon/images/default/sparkling_wand.png',
+        'physical_description': 'a Magic wand',
+        'image': 'weapon/images/default/magic_wand.png',
         'damage_type': 'Magical'
     },
-    'Horn': {
+    'Horns': {
         'weapon_type': 'Body Part',
         'damage': 7,
         'range': 1,
         'is_ranged': False,
-        'physical_description': 'a horn',
-        'image': 'weapon/images/default/horn.png',
+        'physical_description': 'his horns',
+        'image': 'weapon/images/default/horns.png',
         'damage_type': 'Physical'
     },
-    'Spiked Tail': {
+    'Tail': {
         'weapon_type': 'Body Part',
         'damage': 9,
         'range': 1,
         'is_ranged': False,
-        'physical_description': 'a spiked tail',
-        'image': 'weapon/images/default/spiked_tail.png',
+        'physical_description': 'a tail',
+        'image': 'weapon/images/default/tail.png',
         'damage_type': 'Physical'
     },
 }
