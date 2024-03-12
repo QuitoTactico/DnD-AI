@@ -4,6 +4,10 @@ html {
   margin: auto;
 }
 
+.colorfondo {
+  background-color: #0a0c0e;
+}
+
 .history {
   height: 200px;
   background-color: #ffffff;
@@ -36,7 +40,15 @@ html {
     "BLED" 0,
     "SCAN" 0;
 }
+
 /*
 brown #462e2e
 red #ff6f6f
+
+god ones:
+  black: #333333
+  red: #D62828
+  grey: #8DA1B9
+  brown: #BCA371
+  green: #21D19F
 */
