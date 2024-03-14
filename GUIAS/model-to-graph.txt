@@ -1,8 +1,0 @@
-(write)         add 'django_extensions' to INSTALLED_APPS in settings.py
-(run)           pip install django-extensions
-(run)           pip install pydotplus
-(run)           winget install graphviz         
-(add to path)   C:\Program Files\Graphviz\bin
-(restart)
-(run)           python manage.py graph_models DnD_AI --dot -o  DnD_AI_models.dot
-(run)           dot DnD_AI_models.dot -Tpng -o DnD_AI_models.png  

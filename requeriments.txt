@@ -1,4 +1,0 @@
-django
-pillow
-django-extensions
-pydotplus
