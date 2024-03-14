@@ -1,0 +1,28 @@
+- Actualizar tu rama con las cosas nuevas del main:
+git merge main
+git push
+
+- Actualizar la main con tus cosas nuevas (asegurarse de que está funcionando bien):
+git checkout main
+git merge miguel
+git push
+git checkout miguel
+
+- Actualizar tu propia rama remota, lo que más se hace:
+git add .
+git commit -m "hice esto y esto"
+git push
+
+
+- Con "checkout" sin nada, miras en qué rama estás
+
+- Con "checkout <nombre rama>" te mueves a cierta rama
+
+- Para ignorar archivos, agregar por ejemplo estas líneas al .gitignore:
+DnD_AI_models.dot (ignora el archivo DnD_AI_models.dot que está en la raiz)
+media/weapon/images/default/axe.png (ignorar ese archivo)
+DB_BACKUP (la carpeta entera DB_BACKUP que está en la raiz)
+media/weapon/images/default_beta   (la carpeta entera default_beta)
+
+- Si no los deja ignorar algo, es que ya se le hizo seguimiento, entonces por ejemplo hay que hacer:
+git rm --cached -r media\weapon\images\default_beta

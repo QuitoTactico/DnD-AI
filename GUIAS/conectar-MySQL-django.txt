@@ -1,0 +1,59 @@
+Pasos conectar mysql con django:
+
+crear el folder donde va a estar todo el proyecto: instrucción: "django-admin startproject (nombreproyecto)"
+cd (nombreproyecto)
+
+Crear la app con la que se va a conectar la base de datos
+python manage.py startapp (nombre app)
+
+instalar mysqlclient por medio de pip para conectar mysql con django: "pip install mysqlclient"
+Configurar settings.py en la sección de: DATABASE, con los datos de la base de datos, ejm:
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'otro',
+        'USER': 'root',
+        'PASSWORD': '1234',
+        'HOST':'localhost',
+        'PORT':'3306',
+    }
+}
+
+Con el comando: "python manage.py inspectdb" se podrá ver la base de datos que está cargando de mysql
+y con el comando: "python manage.py migrate > (ruta de models.py)" se cargarán todas las clases al archivo models.py
+o simplemente con la primera instrucción inspectdb se podrá copiar y pegar en el mismo archivo las clases que saca
+
+Siguiente paso:
+Ejecutar el comando: "python manage.py makemigrations" para ejecutar las clases creadas en models.py y que las mande al mysql, después, ejecutar el comando: "python manage.py migrate" para lanzar lo antes dicho
+#Nota: cada que se haga algún cambio en el archivo models.py, se tienen que volver a ejecutar las 2 instrucciones previas
+
+'''
+Ejemplo Insertando un registro desde la terminal del proyecto hacia mysql:
+	python manage.py shell #se tiene que abrir un shell de python
+	from administracion.models import Mesas #se tiene que importar la tabla(modelo) con el que se vaya a 	trabajar
+	mesas = Mesas(idmesas=3, color = 'Cafe', tamaño= '60x70cm')
+	mesas.save() #el save, ejecuta la consulta que es mandada directamente a la base de datos
+'''
+'''
+Ejemplo Actualización de un valor de una tabla
+
+mesas.color= 'Azul'
+mesas.save()
+'''
+'''
+Ejemplo Borrado de un registro de una tabla
+mesaborrado = Mesas.objects.get(idmesas=3)
+mesaborrado.delete()
+'''
+'''
+Ejemplo consultas con where
+En la zona que queramos hacer la consulta, hay que definir una función para retonar el string formateado que queramos con los valores de la tabla, ejemplo: con la tabla usuarios
+por ejemplo: 
+def __str__(self):
+        return 'El usuario con id: %s, se llama %s  %s, con celular: %s, correo: %s, nacido en: %s, y es: %s ' % (self.idusuarios, self.nombre, self.apellido, self.celular, self.correo, self.fecha_nacimiento, self.ocupacion_idocupacion)
+luego de volver a ejecutar el makemigrations y el migrate, volvemos a la shell de python, importamos la tabla que queramos:from administracion.models import Usuarios
+y posteriormente, filtramos por el where que queramos, por ejemplo:
+Usuarios.objects.filter(idusuarios=1)
+RESULTADO:<QuerySet [<Usuarios: El usuario con id: 1, se llama Jonathan  Betancur Espinosa, con celular: 3043910313, correo: Jonathanbetancurespinosa@gmail.com, nacido en: 2003-11-02, y es: Ocupacion object (2) >]>
+'''
