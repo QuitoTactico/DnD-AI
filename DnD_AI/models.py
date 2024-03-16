@@ -21,6 +21,7 @@ class Weapon(models.Model):
     - image (ImageField): An image of the weapon.
     - damage (IntegerField): The amount of damage the weapon deals.
     - range (IntegerField): The range of the weapon.
+    - range_level_points (IntegerField): The number of level points that increase the range of the weapon.
     - durability (IntegerField): The durability of the weapon.
     - level (IntegerField): The level of the weapon.
     """
@@ -127,12 +128,14 @@ class Character(models.Model):
     - health (IntegerField): The current health of the character.
     - strength (IntegerField): The strength of the character.
     - intelligence (IntegerField): The intelligence of the character.
+    - recursiveness (IntegerField): The recursiveness of the character.
     - dexterity (IntegerField): The dexterity of the character.
     - physical_resistance (IntegerField): The physical resistance of the character.
     - magical_resistance (IntegerField): The magical resistance of the character.
     - constitution (IntegerField): The constitution of the character.
     - level (IntegerField): The level of the character.
     - exp (IntegerField): The experience points of the character.
+    - exp_top (IntegerField): The experience points required to level up.
     - x (IntegerField): The x-coordinate of the character.
     - y (IntegerField): The y-coordinate of the character.
     - icon (ImageField): An icon representing the character.
@@ -291,6 +294,7 @@ class Monster(models.Model):
     - health (IntegerField): The current health of the monster.
     - strength (IntegerField): The strength of the monster.
     - intelligence (IntegerField): The intelligence of the monster.
+    - recursiveness (IntegerField): The recursiveness of the monster.
     - dexterity (IntegerField): The dexterity of the monster.
     - physical_resistance (IntegerField): The physical resistance of the monster.
     - magical_resistance (IntegerField): The magical resistance of the monster.

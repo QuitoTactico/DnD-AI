@@ -15,8 +15,9 @@
 <form action="{% url 'home' %}" method="post">
     {% csrf_token %}
     <input type="text" name="player_name" placeholder="Player Name">
-    <input type="checkbox" id="test" name="test" checked>
-    <input type="checkbox" id="dice_needed" name="dice_needed">
+    <input type="text" name="monster_id" placeholder="Monster ID">
+    Test Page?<input type="checkbox" id="test" name="test" checked> 
+    Roll Dice?<input type="checkbox" id="dice_needed" name="dice_needed"> 
 
     <input type="submit" value="Submit">
 </form>
@@ -60,6 +61,9 @@
         URL: {{player.icon.url}}
     </h4>
 </div>
+<div>
+    <h4>x: {{player.x}} , y: {{player.y}}</h4>
+</div>
 
 <br>
 <h3>INFO</h3>
@@ -70,6 +74,8 @@
         <li>Name:               {{player.name}}</li>
         <li>Character Race:     {{player.character_race}}</li>
         <li>Character Class:    {{player.character_class}}</li>
+        <li>Story:              {{player.story}}</li>
+        <li>Physical Desc:      {{player.physical_description}}</li>
         <li>Weapon:             {{player.weapon}}</li>
         <li>Got Initial Weapon: {{player.got_initial_weapon}}</li>
     </ul>
@@ -84,6 +90,7 @@
         <li>Max HP: {{player.max_health}}</li>
         <li>STR:    {{player.strength}}</li>
         <li>INT:    {{player.intelligence}}</li>
+        <li>REC:    {{player.recursiveness}}</li>
         <li>DEX:    {{player.dexterity}}</li>
         <li>P-RES:  {{player.physical_resistance}}</li>
         <li>M-RES:  {{player.magical_resistance}}</li>
@@ -120,5 +127,89 @@
         <li>Range LVLPoints: {{player.weapon.range_level_points}}</li>
         <li>Durability:     {{player.weapon.durability}}</li>
         <li>Level:          {{player.weapon.level}}</li>
+    </ul>
+</h5>
+
+
+<!--                MONSTER                  -->
+<br>
+<br>
+<h1>Monster</h1>
+<h3>{{monster.name}}</h3>
+<h5>{{monster}}</h5>
+<div>
+    <h4>
+        Monster Image (Icon): 
+        <img src="{{monster.icon.url}}" width="150" height="150">
+        URL: {{monster.icon.url}}
+    </h4>
+</div>
+<div>
+    <h4>
+        Monster Map Icon (It's the same XD):
+        <img src="{{monster.icon.url}}" width="30" height="30">
+        URL: {{monster.icon.url}}
+    </h4>
+</div>
+<div>
+    <h4>x: {{monster.x}} , y: {{monster.y}}</h4>
+</div>
+<br>
+<h3>INFO</h3>
+<h5>
+    <ul>
+        <li>Monster ID:         {{monster.id}}</li>
+        <li>Is Key:             {{monster.is_key_for_campaign}}</li>
+        <li>Name:               {{monster.name}}</li>
+        <li>Monster Race:       {{monster.monster_race}}</li>
+        <li>Monster Class:      {{monster.monster_class}}</li>
+        <li>Physical Desc:      {{monster.physical_description}}</li>
+        <li>Weapon:             {{monster.weapon}}</li>
+        <li>Got Initial Weapon: {{monster.got_initial_weapon}}</li>
+    </ul>
+</h5>
+<br>
+<h3>STATS</h3>
+<h5>
+    <ul>
+        <li>HP:     {{monster.health}}</li>
+        <li>Max HP: {{monster.max_health}}</li>
+        <li>STR:    {{monster.strength}}</li>
+        <li>INT:    {{monster.intelligence}}</li>
+        <li>REC:    {{mosnter.recursiveness}}</li>
+        <br>
+        <li>DEX:    {{monster.dexterity}}</li>
+        <li>P-RES:  {{monster.physical_resistance}}</li>
+        <li>M-RES:  {{monster.magical_resistance}}</li>
+        <li>CON:    {{monster.constitution}}</li>
+        <li>EXP_DRP: {{monster.exp_drop}}</li>
+    </ul>
+</h5>
+<br>
+<h3>MONSTER'S WEAPON</h3>
+<h5>{{monster.weapon.name}}</h5>
+<h5>{{monster.weapon}}</h5>
+<div>
+    <h5>
+        Weapon Image: 
+        <img src="{{monster.weapon.image.url}}" width="150" height="150">
+        URL: {{monster.image.url}}
+    </h5>
+</div>
+<h5>
+    <ul>
+        <li>ID:             {{monster.weapon.id}}</li>
+        <li>Name:           {{monster.weapon.name}}</li>
+        <li>Is Template:    {{monster.weapon.is_template}}</li>
+        <li>Is Ranged:      {{monster.weapon.is_ranged}}</li>
+        <li>Weapon Type:    {{monster.weapon.weapon_type}}</li>
+        <li>Damage Type:    {{monster.weapon.damage_type}}</li>
+        <li>Description:    {{monster.weapon.physical_description}}</li>
+        <li>Image:          {{monster.weapon.image}}</li>
+        <li>Damage:         {{monster.weapon.damage}}</li>
+        <li>Range:          {{monster.weapon.range}}</li>
+        <li>Range LVLPoints: {{monster.weapon.range_level_points}}</li>
+        <li>Durability:     {{monster.weapon.durability}}</li>
+        <li>Level:          {{monster.weapon.level}}</li>
     </ul>
 </h5>
