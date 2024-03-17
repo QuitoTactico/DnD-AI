@@ -4,6 +4,9 @@ from django.shortcuts import render
 from .models import *
 from .functions import *
 
+from bokeh.plotting import figure, show
+from bokeh.models import ColumnDataSource, Range1d
+
 # Create your views here.
 
 def home(request):
@@ -51,6 +54,8 @@ def home(request):
         player = player_selection(player_name)
         monster = monster_selection_by_id(monster_id)
 
+        create_map(player)
+
         players = Character.objects.filter(is_playable=True)
 
         #test = request.GET.get('test')
@@ -72,6 +77,35 @@ def home(request):
         # If there's no get/post, then it selects the first playable character in the database
         player = player_selection(None)
         return render(request, 'home.html', {'player':player} )
+    
+def create_map(player:Character):
+    '''
+    #logo_src = ColumnDataSource(dict(url = player.icon.url))
+    #logo_src = ColumnDataSource(player.icon.url)
+    logo_src = ColumnDataSource(data=dict(url=[player.icon.url]))
+    map = figure(width = 500, height = 500, title="")
+    map.toolbar.logo = None
+    map.toolbar_location = None
+    map.x_range=Range1d(start=0, end=1)
+    map.y_range=Range1d(start=0, end=1)
+    #map.xaxis.visible = None
+    #map.yaxis.visible = None
+    #map.xgrid.grid_line_color = None
+    #map.ygrid.grid_line_color = None
+    #map.image_url(url='url', x=0.05, y = 0.85, h=0.7, w=0.9, source=logo_src)
+    map.image_url(url=player.icon.url, x=0.05, y = 0.85, h=0.7, w=0.9, source=logo_src)
+    map.outline_line_alpha = 0 
+    show(map)
+    '''
+    #logo_src = ColumnDataSource(data=dict(url=['/..'+player.icon.url]))
+    map = figure(active_scroll='wheel_zoom', width=500, height=500, title="")
+    map.toolbar.logo = None
+    map.toolbar_location = None
+    map.x_range = Range1d(start=0, end=1)
+    map.y_range = Range1d(start=0, end=1)
+    map.image_url(url=['http://localhost:8000/media/entity/icons/Frieren_icon.png'], x=0, y=0, h=1, w=1)
+    map.outline_line_alpha = 0
+    show(map)
 
 def player_selection(player_name):
     if player_name:
