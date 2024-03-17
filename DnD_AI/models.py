@@ -177,6 +177,40 @@ class Character(models.Model):
     y       = models.IntegerField(default=0)
     icon    = models.ImageField(upload_to="entity/icons/", default='entity/icons/default.png')
 
+    inventory = models.TextField(default=str({'gold': 10, 'health potion': 2}))  # the inventory is a dictionary, but it's saved as a string
+
+    def get_inventory(self) -> dict:
+        ''' returns the inventory as a dictionary '''
+        inventory_dict = {}
+        try:
+            inventory_dict = eval(self.inventory)
+        except:
+            pass
+        return inventory_dict
+    
+    def add_to_inventory(self, item:str, amount:int = 1) -> bool:
+        ''' adds an item to the inventory, returns if was succesful '''
+        inventory_dict = self.get_inventory()
+        if item in inventory_dict:
+            inventory_dict[item] += amount
+        else:
+            inventory_dict[item] = amount
+        self.inventory = str(inventory_dict)
+        self.save()
+        return True
+    
+    def use_from_inventory(self, item:str, amount:int = 1) -> bool:
+        ''' removes an item from the inventory, returns if was succesful '''
+        inventory_dict = self.get_inventory()
+        if item in inventory_dict:
+            inventory_dict[item] -= amount
+            if inventory_dict[item] <= 0:
+                del inventory_dict[item]
+            self.inventory = str(inventory_dict)
+            self.save()
+            return True
+        return False
+
     def level_up_stat(self, stat:str = 'max_health'):
         ''' levels up the character, you can choose the stat to increace \n
         returns if was succesful '''
@@ -339,6 +373,28 @@ class Monster(models.Model):
     x       = models.IntegerField(default=2)
     y       = models.IntegerField(default=2)
     icon    = models.ImageField(upload_to="entity/icons/", default='entity/icons/default.png')
+
+    inventory = models.TextField(default=str({'gold': 10}))  # the inventory is a dictionary, but it's saved as a string
+
+    def get_inventory(self) -> dict:
+        ''' returns the inventory as a dictionary '''
+        inventory_dict = {}
+        try:
+            inventory_dict = eval(self.inventory)
+        except:
+            pass
+        return inventory_dict
+    
+    def add_to_inventory(self, item:str, amount:int = 1) -> bool:
+        ''' adds an item to the inventory, returns if was succesful '''
+        inventory_dict = self.get_inventory()
+        if item in inventory_dict:
+            inventory_dict[item] += amount
+        else:
+            inventory_dict[item] = amount
+        self.inventory = str(inventory_dict)
+        self.save()
+        return True
 
     def disarm(self) -> bool:
         ''' disarms the monster, his weapon will be "Bare hands"\n

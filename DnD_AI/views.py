@@ -32,7 +32,10 @@ def home(request):
         player_name = request.POST['player_name']
 
         if 'monster_id' in request.POST:
-            monster_id = int(request.POST['monster_id'])
+            try:
+                monster_id = int(request.POST['monster_id'])
+            except:
+                monster_id = None
         else:
             monster_id = None
 
@@ -60,6 +63,7 @@ def home(request):
                                       'player_name_sent':player_name, 
                                       'monster': monster, 
                                       'monsters':monsters, 
+                                      'monster_id_sent': monster_id,
                                       'characters':characters, 
                                       'weapons':weapons, 
                                       'dice_value': dice_value, 

@@ -22,6 +22,34 @@
     <input type="submit" value="Submit">
 </form>
 
+<H5>PLAYER FUNCTIONS</H5>
+<form action="{% url 'home' %}" method="post">
+    {% csrf_token %}
+    <input type="text" name="player_name" placeholder="Player Name">
+    KILL<input type="checkbox" id="P_KILL" name="P_KILL"> 
+    ADD HEALTH POTION<input type="checkbox" id="P_ADD_HEALTH_POTION" name="P_ADD_HEALTH_POTION"> 
+    USE HEALTH POTION<input type="checkbox" id="P_USE_HEALTH_POTION" name="P_USE_HEALTH_POTION"> 
+    LVL UP STAT<input type="checkbox" id="P_LVL_UP_STAT" name="P_LVL_UP_STAT">
+    <input type="text" name="P_STAT_TO_LVL" placeholder="Stat">
+    LVL UP WPN<input type="checkbox" id="P_LVL_UP_WPN" name="P_LVL_UP_WPN">
+    <input type="text" name="P_WPN_STAT_TO_LVL" placeholder="DMG or RNG">
+    DISARM<input type="checkbox" id="P_DISARM" name="P_DISARM">
+
+    <input type="submit" value="Submit">
+</form>
+
+<H5>MONSTER FUNCTIONS</H5>
+<form action="{% url 'home' %}" method="post">
+    {% csrf_token %}
+    <input type="text" name="monster_id" placeholder="Monster ID">
+    KILL<input type="checkbox" id="M_KILL" name="M_KILL"> 
+    ADD HEALTH POTION<input type="checkbox" id="M_ADD_HEALTH_POTION" name="M_ADD_HEALTH_POTION"> 
+    USE HEALTH POTION<input type="checkbox" id="M_USE_HEALTH_POTION" name="M_USE_HEALTH_POTION">
+    DISARM<input type="checkbox" id="M_DISARM" name="M_DISARM">
+
+    <input type="submit" value="Submit">
+</form>
+
 <!--                GETS                  -->
 <h1>GETS</h1>
 <h3>
@@ -35,6 +63,8 @@
             <li>Playable: {{players.count}}</li>
         </ul>
         <li>Monsters: {{monsters.count}}</li>
+        <li>Monster ID (Sent): {{monster_id_sent}}</li>
+        <li>Monster ID (Rcvd): {{monster.id}}</li>
         <li>Weapons: {{weapons.count}}</li>
         
     </ul>
@@ -98,6 +128,7 @@
         <li>LVL:    {{player.level}}</li>
         <li>EXP:    {{player.exp}}</li>
         <li>EXP TOP: {{player.exp_top}}</li>
+        <li>INV:    {{player.inventory}}</li>
     </ul>
 </h5>
 
@@ -183,6 +214,7 @@
         <li>M-RES:  {{monster.magical_resistance}}</li>
         <li>CON:    {{monster.constitution}}</li>
         <li>EXP_DRP: {{monster.exp_drop}}</li>
+        <li>INV:    {{monster.inventory}}</li>
     </ul>
 </h5>
 <br>
