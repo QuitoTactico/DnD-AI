@@ -31,8 +31,8 @@ def home(request):
         # player_name = request.GET.get('player')
         player_name = request.POST['player_name']
 
-        if 'monster' in request.POST:
-            monster_id = request.POST['monster']
+        if 'monster_id' in request.POST:
+            monster_id = int(request.POST['monster_id'])
         else:
             monster_id = None
 

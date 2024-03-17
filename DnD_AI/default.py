@@ -1,4 +1,12 @@
-DEFAULT_WEAPON_PER_CHARACTER_CLASS = {
+#import database of common names
+from faker import Faker
+
+fake = Faker()
+
+def get_random_name():
+    return fake.first_name()
+
+DEFAULT_WEAPON_PER_CLASS = {
     'Alchemist': 'Dagger',
     'Archer': 'Long Bow',
     'Artificer': 'Dagger',
@@ -28,7 +36,7 @@ DEFAULT_WEAPON_PER_CHARACTER_CLASS = {
     'Wizard': 'Staff',
 }
 
-DEFAULT_WEAPON_PER_MONSTER_CLASS = {
+DEFAULT_WEAPON_PER_RACE = {
     'Basilisk': 'Beast Claws',
     'Centaur': 'Bow',
     'Chimera': 'Fangs',
@@ -59,7 +67,7 @@ DEFAULT_WEAPON_PER_MONSTER_CLASS = {
     'Witch': 'Enchanted Book',
     'Zombie': 'Bare hands',
 }
-DEFAULT_WEAPON_PER_MONSTER_CLASS.update(DEFAULT_WEAPON_PER_CHARACTER_CLASS)
+DEFAULT_WEAPON_PER_RACE.update(DEFAULT_WEAPON_PER_CLASS)
 
 
 POSSIBLE_BOSSES = ['The Sphinx', 'Cthulhu', 'The Leviathan', 'Behemoth', 'The Kraken', 'Hades', 'Cerberus', 'GOD', 'Zeus', 'Ares', 'Thanatos', 'Megatron', 'Mr Beast', 'Lord Voldemort', 'Your Mom', 'The Devil', 'Telematica Demon', 'Diomedes Diaz', 'Makima', 'Donald Trump', 'MechaHitler', 'John Cena', 'The Rock', 'Undertaker', 'Jackie Chan', 'Megamind', 'Shrek', 'Darth Vader', 'Sauron', 'Mike Wazousky', 'The Joker', 'John Wick', 'Cristionel Messinaldo', 'Fernanfloo', 'Michael Jackson', 'PewDiePie', 'Elon Musk', 'Terminator', 'The Creators, a Malformed Three-Headed Beast Who Rules Everything and Fears Nothing', 'Yourself but Chinese', 'Hatsune Miku', 'Racism Demon', 'The Cancer', 'NekoKiller', 'Mbappe', 'Dross Rotzank', 'Doc Tops', 'El Putas de Aguadas', 'Waluigi', 'Slenderman', 'Flying Spagguetti God', 'Sonic.exe', 'Spongebob', 'Sans', 'The Game', 'Juan Carlos', 'El Pepe', 'Ete Sech', 'Tilín', 'Eminem', 'Yourself', 'Wolverine', 'Dracula', 'Link', 'The Hollow Knight', 'Moai', 'Skeleton King', 'Anubis', "Fetus"]
@@ -292,3 +300,14 @@ DEFAULT_WEAPON_STATS = {
         'damage_type': 'Physical'
     },
 }
+
+DEFAULT_MONSTER_STATS = {
+    'Goblin': {
+        'name': 'Goblin '+get_random_name(),
+        
+        'image': 'monster/images/default/goblin.png',
+        'description': 'A small, green creature with a big nose and pointy ears. It is known for its cowardice and its love for gold.'
+    },
+}
+
+#print(DEFAULT_MONSTER_STATS['Goblin']['name'])
