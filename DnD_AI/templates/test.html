@@ -10,6 +10,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Jacquarda+Bastarda+9&family=Sixtyfour&family=Workbench&display=swap"
         rel="stylesheet">
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-3.4.0.min.js" crossorigin="anonymous"></script>
 </head>
 
 <form action="{% url 'home' %}" method="post">
@@ -66,6 +67,8 @@
         <li>Monster ID (Sent): {{monster_id_sent}}</li>
         <li>Monster ID (Rcvd): {{monster.id}}</li>
         <li>Weapons: {{weapons.count}}</li>
+        <li>Host: {{host}}</li>
+        <li>Media url acceded (example): {{url_prueba}}</li>
         
     </ul>
 </h3>
@@ -245,3 +248,6 @@
         <li>Level:          {{monster.weapon.level}}</li>
     </ul>
 </h5>
+
+{{ div|safe }}
+{{ script|safe }}
