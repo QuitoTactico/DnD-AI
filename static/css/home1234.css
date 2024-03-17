@@ -42,13 +42,44 @@ a:hover {
 
 .text {grid-area: text;}
 
-.player {grid-area: player;}
+.player {
+  width: 200px;
+  grid-area: player;
+}
 
-.weapon {grid-area: weapon;}
+.weapon {
+  width: 200px;
+  grid-area: weapon;
+}
+
+.monster {
+  grid-area: monster;
+}
 
 .action {grid-area: action;}
 
-.lvl {grid-area: lvl;}
+.lvl {
+  grid-area: lvl;
+  display: relative;
+  border-radius: 10px;
+  background-color: #BCA371;
+  height: 40px;
+}
+
+.number {
+  
+}
+
+.experience {
+  height: 100%;
+  width: 20%;
+  border-radius: 10px;
+  background-color: aquamarine;
+}
+
+.maxExperience {
+  
+}
 
 .grid-container {
   display: grid;
@@ -56,7 +87,8 @@ a:hover {
   grid-template:
     'logo logo logo logo about wiki'
     'text text text text player weapon'
-    'action action action action player weapon'
+    'text text text text monster monster'
+    'action action action action monster monster'
     'lvl lvl lvl lvl lvl lvl';
 }
 
@@ -103,7 +135,7 @@ a:hover {
 #font2 {
   font-family: "Workbench", sans-serif;
   font-optical-sizing: auto;
-  font-weight: bold;
+  font-weight: 700;
   font-style: normal;
   font-variation-settings:
     "BLED" 0,
