@@ -61,6 +61,7 @@ def home(request):
         players = Character.objects.filter(is_playable=True)
 
         host = request.get_host()
+        #map = create_map(player, characters, monsters, show_map = True)  # for map testing
         map = create_map(player, characters, monsters, host)
         script, div = components(map)
 
@@ -89,7 +90,7 @@ def home(request):
         player = player_selection(None)
         return render(request, 'home.html', {'player':player} )
     
-def create_map(player:Character, characters, monsters, host:str = None):
+def create_map(player:Character, characters, monsters, host:str=None, show_map:bool=False):
     '''
     #logo_src = ColumnDataSource(dict(url = player.icon.url))
     #logo_src = ColumnDataSource(player.icon.url)
@@ -130,7 +131,7 @@ def create_map(player:Character, characters, monsters, host:str = None):
             icon_path, weapon_path = os.path.join(settings.BASE_DIR, character.icon.url[1:]).replace('\\', '/'), os.path.join(settings.BASE_DIR, character.weapon.image.url[1:]).replace('\\', '/')
         map.image_url(url=[icon_path], x=character_x+0.1, y=character_y+0.9, h=0.8, w=0.8)
         map.image_url(url=[weapon_path], x=character_x+0.5, y=character_y+0.5, h=0.4, w=0.4)
-        if player.is_playable:
+        if character.is_playable:
             map.rect(x=character_x+0.5, y=character_y+0.5, width=0.8, height=0.8, line_color="blue", fill_alpha=0, line_width=2)
         else:
             map.rect(x=character_x+0.5, y=character_y+0.5, width=0.8, height=0.8, line_color="yellow", fill_alpha=0, line_width=2)
@@ -161,7 +162,10 @@ def create_map(player:Character, characters, monsters, host:str = None):
     map.sizing_mode = 'stretch_both'
     map.aspect_scale = 1
     '''
-    #show(map)
+    if show_map:
+        map.sizing_mode = 'scale_height'
+        show(map)
+        map.sizing_mode = 'scale_width'
     return map
 
 def player_selection(player_name):
