@@ -145,19 +145,11 @@
 
         <img src="{{player.image.url}}" width="150" height="150" />
 
-        <div>HP: {{player.health}} / {{player.max_health}}</div>
+        <div>HP: {{player.health}}/{{player.max_health}}</div>
         <div>STR: {{player.strength}}</div>
         <div>INT: {{player.intelligence}}</div>
         <div>DEX: {{player.dexterity}}</div>
-
-        <h3>INFO</h3>
-        <ul>
-          <li>Name: {{player.name}}</li>
-          <li>Race: {{player.character_race}}</li>
-          <li>Class: {{player.character_class}}</li>
-          <li>Initial Weapon: {{player.got_initial_weapon}}</li>
-        </ul>
-
+        <div>RACE: {{player.character_race}}</div>
       </div>
 
       <div class="weapon">
@@ -173,6 +165,11 @@
           >/<span style="color: cyan">{{player.magical_resistance}}</span>
         </div>
         <div>CON: {{player.constitution}}</div>
+        <div>CLASS: {{player.character_class}}</div>
+      </div>
+
+      <div class="monster">
+        asfasd
       </div>
 
       <div class="action">
@@ -193,9 +190,9 @@
       </div>
 
       <div class="lvl">
-        <div>LVL: {{player.level}}</div>
-        <div>EXP: {{player.exp}}</div>
-        <div>EXP TOP: {{player.exp_top}}</div>
+        <div class="number">LVL: {{player.level}}</div>
+        <div class="experience">EXP: {{player.exp}}</div>
+        <div class="maxExperience">EXP TOP: {{player.exp_top}}</div>
       </div>
     </div>
 
