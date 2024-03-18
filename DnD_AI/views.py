@@ -13,6 +13,8 @@ import os
 
 # Create your views here.
 
+text_history = [f'{i}: Lorem ipsum dolor, sit amet consectetur adipisicing elit. Necessitatibus, sapiente? Beatae autem soluta modi alias, voluptatibus fugiat ab a mollitia qui laborum quae necessitatibus officia odit hic neque optio quibusdam.' for i in range(10)]
+
 def home(request):
     # WEB LABELS
     # player_name=str   
@@ -33,10 +35,13 @@ def home(request):
             dice_value = None 
             dice_needed = False
 
+        if 'action' in request.POST:
+            text_history.append(request.POST['player_name']+': '+request.POST['action'])
 
         # GETTING DATA FROM THE DATABASE
         # player_name = request.GET.get('player')
         player_name = request.POST['player_name']
+
 
         if 'monster_id' in request.POST:
             try:
@@ -83,12 +88,14 @@ def home(request):
                                       'script': script, 'div': div,
                                       #'url_prueba' : os.path.join(settings.BASE_DIR, player.icon.url[1:]).replace('\\', '/')
                                       'host': host,
-                                      'url_prueba' : host + player.icon.url
+                                      'url_prueba' : host + player.icon.url,
+                                      'text_history': text_history,
                                       } )
     else:
         # If there's no get/post, then it selects the first playable character in the database
         player = player_selection(None)
-        return render(request, 'home.html', {'player':player} )
+        return render(request, 'home.html', {'player':player,
+                                             'text_history': text_history,} )
     
 def create_map(player:Character, characters, monsters, host:str=None, show_map:bool=False):
     '''
