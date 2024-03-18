@@ -2,3 +2,4 @@ django
 pillow
 django-extensions
 pydotplus
+faker

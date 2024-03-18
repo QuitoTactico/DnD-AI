@@ -68,9 +68,9 @@ def get_default_weapon(weapon_name:str = None, entity_class:str = 'Warrior', ent
     if weapon_name == None or weapon_name not in DEFAULT_WEAPON_STATS:
         try:
             if entity == 'Character':
-                weapon_name = DEFAULT_WEAPON_PER_CHARACTER_CLASS[entity_class]
+                weapon_name = DEFAULT_WEAPON_PER_CLASS[entity_class]
             else:
-                weapon_name = DEFAULT_WEAPON_PER_MONSTER_CLASS[entity_class]
+                weapon_name = DEFAULT_WEAPON_PER_RACE[entity_class]
         except:
             weapon_name = 'Sword'
 
@@ -143,7 +143,7 @@ class Character(models.Model):
 
     id          = models.AutoField(primary_key=True) # added here to be seen in the __str__ 
     is_playable = models.BooleanField(default=True) # playable or NPC
-    name        = models.CharField(max_length=30, default="DEFAULT_CHARACTER")
+    name        = models.CharField(max_length=30, null=True, blank=True)
     story       = models.CharField(max_length=1000, default="DEFAULT_STORY")
 
     physical_description    = models.CharField(max_length=200, default="Masculine, tall, white skin, black clothes")
@@ -176,6 +176,40 @@ class Character(models.Model):
     x       = models.IntegerField(default=0)
     y       = models.IntegerField(default=0)
     icon    = models.ImageField(upload_to="entity/icons/", default='entity/icons/default.png')
+
+    inventory = models.TextField(default=str({'gold': 10, 'health potion': 2}))  # the inventory is a dictionary, but it's saved as a string
+
+    def get_inventory(self) -> dict:
+        ''' returns the inventory as a dictionary '''
+        inventory_dict = {}
+        try:
+            inventory_dict = eval(self.inventory)
+        except:
+            pass
+        return inventory_dict
+    
+    def add_to_inventory(self, item:str, amount:int = 1) -> bool:
+        ''' adds an item to the inventory, returns if was succesful '''
+        inventory_dict = self.get_inventory()
+        if item in inventory_dict:
+            inventory_dict[item] += amount
+        else:
+            inventory_dict[item] = amount
+        self.inventory = str(inventory_dict)
+        self.save()
+        return True
+    
+    def use_from_inventory(self, item:str, amount:int = 1) -> bool:
+        ''' removes an item from the inventory, returns if was succesful '''
+        inventory_dict = self.get_inventory()
+        if item in inventory_dict:
+            inventory_dict[item] -= amount
+            if inventory_dict[item] <= 0:
+                del inventory_dict[item]
+            self.inventory = str(inventory_dict)
+            self.save()
+            return True
+        return False
 
     def level_up_stat(self, stat:str = 'max_health'):
         ''' levels up the character, you can choose the stat to increace \n
@@ -260,6 +294,12 @@ class Character(models.Model):
     def save(self, *args, **kwargs):
         if not self.character_class:
             self.character_class = self.character_race if self.character_race != 'Human' else 'Warrior'
+
+        if not self.name:
+            if self.character_race == 'Human':
+                self.name = self.character_class+' '+get_random_name()
+            else:
+                self.name = self.character_race+' '+get_random_name()
         
         if self.health == None:
             self.health = self.max_health
@@ -306,7 +346,7 @@ class Monster(models.Model):
     """
 
     id      = models.AutoField(primary_key=True) # added here to be seen in the __str__ 
-    name    = models.CharField(max_length=30, default="DEFAULT_MONSTER")
+    name    = models.CharField(max_length=30, null=True, blank=True)
     is_key_for_campaign = models.BooleanField(default=False)
 
     monster_race  = models.CharField(max_length=30, default="Goblin")
@@ -334,6 +374,28 @@ class Monster(models.Model):
     y       = models.IntegerField(default=2)
     icon    = models.ImageField(upload_to="entity/icons/", default='entity/icons/default.png')
 
+    inventory = models.TextField(default=str({'gold': 10}))  # the inventory is a dictionary, but it's saved as a string
+
+    def get_inventory(self) -> dict:
+        ''' returns the inventory as a dictionary '''
+        inventory_dict = {}
+        try:
+            inventory_dict = eval(self.inventory)
+        except:
+            pass
+        return inventory_dict
+    
+    def add_to_inventory(self, item:str, amount:int = 1) -> bool:
+        ''' adds an item to the inventory, returns if was succesful '''
+        inventory_dict = self.get_inventory()
+        if item in inventory_dict:
+            inventory_dict[item] += amount
+        else:
+            inventory_dict[item] = amount
+        self.inventory = str(inventory_dict)
+        self.save()
+        return True
+
     def disarm(self) -> bool:
         ''' disarms the monster, his weapon will be "Bare hands"\n
         returns if was succesful '''
@@ -351,6 +413,9 @@ class Monster(models.Model):
     def save(self, *args, **kwargs):
         if not self.monster_class:
             self.monster_class = self.monster_race
+
+        if not self.name:
+            self.name = self.monster_race+' '+get_random_name()
 
         if self.health == None:
             self.health = self.max_health
