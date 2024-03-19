@@ -13,17 +13,24 @@ import os
 
 from django.shortcuts import render
 from django.http import JsonResponse
-from openai import OpenAI
+import openai
+import langchain
 from .API import API_KEY
 
 # Create your views here.
-session = OpenAI(api_key=API_KEY)
+
+# config openai key
+openai.api_key = API_KEY
+
+# create language chain
+chain = langchain.LanguageChain()
 
 text_history = [f'{i}: Lorem ipsum dolor, sit amet consectetur adipisicing elit. Necessitatibus, sapiente? Beatae autem soluta modi alias, voluptatibus fugiat ab a mollitia qui laborum quae necessitatibus officia odit hic neque optio quibusdam.' for i in range(10)]
 
 
 def get_response(prompt):
 
+    '''
     query = session.chat.completions.create(
         response_format={"type":"json:object"},
         messages=[
@@ -33,9 +40,16 @@ def get_response(prompt):
         ],
         model="gpt-3.5-turbo",  
     )
+    '''
+    
+    chain.add_link(openai.Completion.create, engine="davinci-codex", prompt=prompt, max_tokens=60)
 
-    print(query.choices[0].message.content)
+    response = chain.run()
 
+    print(response.choices[0].text.strip())
+    #print(query.choices[0].message.content)
+
+    
 def home(request):
     # WEB LABELS
     # player_name=str   
@@ -58,8 +72,9 @@ def home(request):
         if 'action' in request.POST or "prompt" in request.POST:
             prompt = request.POST.get('prompt')
             response = get_response(prompt)
-            text_history.append(request.POST['player_name']+':'+str(response))
             text_history.append(request.POST['player_name']+': '+request.POST['prompt'])
+            
+            text_history.append('SYSTEM:'+str(response))
 
         # GETTING DATA FROM THE DATABASE
         # player_name = request.GET.get('player')
@@ -117,7 +132,10 @@ def home(request):
     else:
         # If there's no get/post, then it selects the first playable character in the database
         player = player_selection(None)
-        return render(request, 'home.html', {'player':player, 'text_history':text_history,} )
+        monster = monster_selection_by_id(None)
+        return render(request, 'home.html', {'player':player, 
+                                            'monster': monster,
+                                             'text_history':text_history,} )
     
 def create_map(player:Character, characters, monsters, host:str=None, show_map:bool=False):
     '''

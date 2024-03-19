@@ -3,3 +3,5 @@ pillow
 django-extensions
 pydotplus
 faker
+openai
+langchain

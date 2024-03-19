@@ -72,6 +72,7 @@
         <img src="{{monster.icon.url}}" width="150" height="150" />
       </div>
 
+      <!--
       <script>
         $(document).ready(function() { 
             
@@ -105,6 +106,7 @@
           }); 
         }); 
       </script>
+      -->
 
       <div class="action">
         <form action="{% url 'home' %}" method="post">
@@ -113,14 +115,14 @@
           <br />
           <br />
           <input
-            id="prompt"
+            id="font1"
             class="txtAction"
             type="text"
             name="prompt"
             placeholder="Its time to do it"
           />
           <input type="hidden" name="player_name" value="{{player.name}}" />
-          <button id="actButton" class="btn btn-primary" type="submit">Submit</button> 
+          <input id="font1" class="btnAction" type="submit" value="Act" />
         </form>
       </div>
 
