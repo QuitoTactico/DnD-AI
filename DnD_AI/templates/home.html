@@ -19,6 +19,7 @@
         <img height="55" src="static/DnD.png" alt="" />
         <hr />
       </div>
+
       <div class="about">
         <h1><a href="#">ABOUT</a></h1>
       </div>
@@ -36,9 +37,8 @@
         {% endfor %}
 
       </div>
-
+      
       <br />
-
       <div class="player">
         <h3>{{player.name}}</h3>
 
@@ -72,6 +72,40 @@
         <img src="{{monster.icon.url}}" width="150" height="150" />
       </div>
 
+      <script>
+        $(document).ready(function() { 
+            
+          $('actButton').click(function(event) { 
+            event.preventDefault(); 
+            $('form').submit(); 
+          }); 
+
+          $('form').on('submit', function(event) { 
+            event.preventDefault(); 
+            var prompt = $('#prompt').val(); 
+
+            // Add the prompt to the response div 
+            $('#response').append('<p>' + prompt + '</p>'); 
+            //Clear the prompt 
+            $('#prompt').val(''); 
+
+            // Send the prompt to the server
+            $.ajax({ 
+              url: '/', 
+              type: 'POST', 
+              data: {prompt: prompt}, 
+              dataType: 'json', 
+              success: function(data) { 
+                $('#font2').append('<p>' + data.response + '</p>'); 
+              },
+              error: function(jqXHR, textStatus, errorThrown){
+                console.error('Error:', textStatus,errorThrown)
+              } 
+            }); 
+          }); 
+        }); 
+      </script>
+
       <div class="action">
         <form action="{% url 'home' %}" method="post">
           {% csrf_token %}
@@ -79,14 +113,14 @@
           <br />
           <br />
           <input
-            id="font1"
+            id="prompt"
             class="txtAction"
             type="text"
-            name="action"
+            name="prompt"
             placeholder="Its time to do it"
           />
           <input type="hidden" name="player_name" value="{{player.name}}" />
-          <input id="font1" class="btnAction" type="submit" value="Act" />
+          <button id="actButton" class="btn btn-primary" type="submit">Submit</button> 
         </form>
       </div>
 
