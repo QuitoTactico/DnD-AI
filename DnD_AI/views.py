@@ -13,33 +13,28 @@ import os
 
 from django.shortcuts import render
 from django.http import JsonResponse
-import openai
+from openai import OpenAI
 from .API import API_KEY
 
-
-
-openai.api_key = API_KEY
 # Create your views here.
+session = OpenAI(api_key=API_KEY)
 
 text_history = [f'{i}: Lorem ipsum dolor, sit amet consectetur adipisicing elit. Necessitatibus, sapiente? Beatae autem soluta modi alias, voluptatibus fugiat ab a mollitia qui laborum quae necessitatibus officia odit hic neque optio quibusdam.' for i in range(10)]
 
 
 def get_response(prompt):
-    print(prompt)
 
-    query = openai.chat.completions.create(
+    query = session.chat.completions.create(
+        response_format={"type":"json:object"},
         messages=[
             {
-                "role":"user",
-                "content":"This is a test"
+                "role":"user","content":prompt
             }
         ],
         model="gpt-3.5-turbo",  
     )
 
-    response = query.choices[0].text
-    print(response)
-    return response
+    print(query.choices[0].message.content)
 
 def home(request):
     # WEB LABELS
