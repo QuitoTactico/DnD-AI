@@ -12,18 +12,38 @@ from django.conf import settings
 import os
 
 from django.shortcuts import render
-from django.http import JsonResponse
-import openai
-import langchain
+from langchain.chains.llm import LLMChain
+from langchain.prompts import PromptTemplate
+from langchain_openai import OpenAI
 from .API import API_KEY
 
 # Create your views here.
 
+template = """Question: {question}
+
+Answer: Let's think step by step."""
+
+prompt_template = PromptTemplate.from_template(template)
+
+llm = OpenAI(openai_api_key=API_KEY)
+
+llm_chain = LLMChain(prompt=prompt_template, llm=llm)
+
+
+'''
 # config openai key
 openai.api_key = API_KEY
 
+response = openai.Completion.create(
+  engine="text-davinci-002",
+  prompt="Traduce 'Hola mundo' al inglés",
+  max_tokens=60
+)
+
+print(response.choices[0].text.strip())
 # create language chain
-chain = langchain.LanguageChain()
+#chain = langchain.LanguageChain()
+'''
 
 text_history = [f'{i}: Lorem ipsum dolor, sit amet consectetur adipisicing elit. Necessitatibus, sapiente? Beatae autem soluta modi alias, voluptatibus fugiat ab a mollitia qui laborum quae necessitatibus officia odit hic neque optio quibusdam.' for i in range(10)]
 
@@ -42,11 +62,16 @@ def get_response(prompt):
     )
     '''
     
-    chain.add_link(openai.Completion.create, engine="davinci-codex", prompt=prompt, max_tokens=60)
+    #chain.add_link(openai.Completion.create, engine="davinci-codex", prompt=prompt, max_tokens=60)
 
-    response = chain.run()
+    #response = chain.run()
+    
+    response = llm_chain.invoke(prompt)
 
-    print(response.choices[0].text.strip())
+    text_responses = response['text'].split('\n')
+
+    return text_responses
+    #print(response.choices[0].text.strip())
     #print(query.choices[0].message.content)
 
     
@@ -74,7 +99,10 @@ def home(request):
             response = get_response(prompt)
             text_history.append(request.POST['player_name']+': '+request.POST['prompt'])
             
-            text_history.append('SYSTEM:'+str(response))
+            made_by = 'SYSTEM: '
+            for i in response:
+                text_history.append(made_by+str(i))
+                made_by=''
 
         # GETTING DATA FROM THE DATABASE
         # player_name = request.GET.get('player')

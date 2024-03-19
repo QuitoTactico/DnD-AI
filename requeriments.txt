@@ -5,3 +5,4 @@ pydotplus
 faker
 openai
 langchain
+langchain_openai
