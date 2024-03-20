@@ -11,6 +11,7 @@
       href="https://fonts.googleapis.com/css2?family=Jacquarda+Bastarda+9&family=Sixtyfour&family=Workbench&display=swap"
       rel="stylesheet"
     />
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-3.4.0.min.js" crossorigin="anonymous"></script>
   </head>
 
   <body class="background" id="font1">
@@ -28,6 +29,13 @@
       </div>
 
       <h1 class="text">HISTORY</h1>
+      
+      <div class="map">
+        {{ div|safe }}
+        {{ script|safe }}
+      </div>
+
+      <br />
       <div class="history text" id="font2">
 
         {% for text in text_history %}

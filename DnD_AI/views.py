@@ -5,7 +5,7 @@ from .models import *
 from .functions import *
 
 from bokeh.plotting import figure, show
-from bokeh.models import Range1d
+from bokeh.models import Range1d, Span, CrosshairTool, HoverTool
 from bokeh.embed import components
 
 from django.conf import settings
@@ -191,7 +191,21 @@ def create_map(player:Character, characters, monsters, host:str=None, show_map:b
     #icon_path = PurePath(player.icon.url)
     #icon_path = icon_path.__str__()
     #('stretch_width', 'stretch_height', 'stretch_both', 'scale_width', 'scale_height', 'scale_both', 'fixed', 'inherit')
-    map = figure(active_scroll='wheel_zoom', title="", aspect_scale=1, sizing_mode='scale_width', align='center')
+    map = figure(active_scroll='wheel_zoom', 
+                 title="", 
+                 aspect_scale=1, 
+                 sizing_mode='scale_height', 
+                 align='center', 
+                 min_height=410, 
+                 min_width=410)
+    
+    # añado herramientas bacanas al gráfico
+    width = Span(dimension="width", line_dash="dotted", line_alpha=0.4, line_width=1)
+    height = Span(dimension="height", line_dash="dotted", line_alpha=0.4, line_width=1)
+    map.add_tools(CrosshairTool(overlay=[width, height]))
+    map.add_tools(HoverTool(tooltips= [("name", "$name"), ('location', '($x{0.}, $y{0.})')]))
+
+
     map.toolbar.logo = None
     map.toolbar_location = None
     map.x_range = Range1d(start=(player.x)-2, end=(player.x)+3)
@@ -207,12 +221,12 @@ def create_map(player:Character, characters, monsters, host:str=None, show_map:b
             icon_path, weapon_path = character.icon.url, character.weapon.image.url
         else:
             icon_path, weapon_path = os.path.join(settings.BASE_DIR, character.icon.url[1:]).replace('\\', '/'), os.path.join(settings.BASE_DIR, character.weapon.image.url[1:]).replace('\\', '/')
-        map.image_url(url=[icon_path], x=character_x+0.1, y=character_y+0.9, h=0.8, w=0.8)
-        map.image_url(url=[weapon_path], x=character_x+0.5, y=character_y+0.5, h=0.4, w=0.4)
+        map.image_url(url=[icon_path], x=character_x+0.1, y=character_y+0.9, h=0.8, w=0.8, name=character.name)
+        map.image_url(url=[weapon_path], x=character_x+0.5, y=character_y+0.5, h=0.4, w=0.4, name=character.weapon.name)
         if character.is_playable:
-            map.rect(x=character_x+0.5, y=character_y+0.5, width=0.8, height=0.8, line_color="blue", fill_alpha=0, line_width=2)
+            map.rect(x=character_x+0.5, y=character_y+0.5, width=0.8, height=0.8, line_color="blue", fill_alpha=0, line_width=2, name=character.name)
         else:
-            map.rect(x=character_x+0.5, y=character_y+0.5, width=0.8, height=0.8, line_color="yellow", fill_alpha=0, line_width=2)
+            map.rect(x=character_x+0.5, y=character_y+0.5, width=0.8, height=0.8, line_color="yellow", fill_alpha=0, line_width=2, name=character.name)
 
     for monster in monsters:
         monster_x, monster_y = monster.x, monster.y
@@ -220,9 +234,9 @@ def create_map(player:Character, characters, monsters, host:str=None, show_map:b
             icon_path, weapon_path = monster.icon.url, monster.weapon.image.url
         else:
             icon_path, weapon_path = os.path.join(settings.BASE_DIR, monster.icon.url[1:]).replace('\\', '/'), os.path.join(settings.BASE_DIR, monster.weapon.image.url[1:]).replace('\\', '/')
-        map.image_url(url=[icon_path], x=monster_x+0.1, y=monster_y+0.9, h=0.8, w=0.8)
-        map.image_url(url=[weapon_path], x=monster_x+0.5, y=monster_y+0.5, h=0.4, w=0.4)
-        map.rect(x=monster_x+0.5, y=monster_y+0.5, width=0.8, height=0.8, line_color="red", fill_alpha=0, line_width=2)
+        map.image_url(url=[icon_path], x=monster_x+0.1, y=monster_y+0.9, h=0.8, w=0.8, name=monster.name)
+        map.image_url(url=[weapon_path], x=monster_x+0.5, y=monster_y+0.5, h=0.4, w=0.4, name=monster.weapon.name)
+        map.rect(x=monster_x+0.5, y=monster_y+0.5, width=0.8, height=0.8, line_color="red", fill_alpha=0, line_width=2, name=monster.name)
 
     # Player
     player_x, player_y = player.x, player.y

@@ -42,6 +42,11 @@ a:hover {
 
 .text {grid-area: text;}
 
+.map {
+  height: 400px;
+  grid-area: map;
+}
+
 .player {
   width: 200px;
   grid-area: player;
@@ -86,8 +91,8 @@ a:hover {
   grid-gap: 10px;
   grid-template:
     'logo logo logo logo about wiki'
-    'text text text text player weapon'
-    'text text text text monster monster'
+    'map map text text player weapon'
+    'map map text text monster monster'
     'action action action action monster monster'
     'lvl lvl lvl lvl lvl lvl';
 }
