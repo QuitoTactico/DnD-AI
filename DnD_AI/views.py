@@ -127,9 +127,11 @@ def home(request):
         # PLAYER SELECTION
         # If through the player label they send the name of a playable character, it selects it as the player's character 
         player = player_selection(player_name)
+        players = Character.objects.filter(is_playable=True)
         monster = monster_selection_by_id(monster_id)
 
-        players = Character.objects.filter(is_playable=True)
+        weapon_lvl = player.weapon.level
+        weapon_lvl_label = '+'+str(weapon_lvl) if weapon_lvl > 0 else ''
 
         host = request.get_host()
         #map = create_map(player, characters, monsters, show_map = True)  # for map testing
@@ -156,6 +158,7 @@ def home(request):
                                       'host': host,
                                       'url_prueba' : host + player.icon.url,
                                       'text_history': text_history,
+                                      'weapon_lvl_label': weapon_lvl_label,
                                       } )
     else:
         # If there's no get/post, then it selects the first playable character in the database
