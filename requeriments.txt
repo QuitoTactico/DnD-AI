@@ -3,6 +3,7 @@ pillow
 django-extensions
 pydotplus
 faker
+bokeh
 openai
 langchain
 langchain_openai
