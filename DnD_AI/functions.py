@@ -148,111 +148,6 @@ def full_combat(player:Character, monster:Monster):
     return {'player_died': player_died, 'monster_died': monster_died, 'combat_results': combat_results}
 
 
-def create_map(player:Character, characters, monsters, host:str=None, show_map:bool=False):
-    '''
-    #logo_src = ColumnDataSource(dict(url = player.icon.url))
-    #logo_src = ColumnDataSource(player.icon.url)
-    logo_src = ColumnDataSource(data=dict(url=[player.icon.url]))
-    map = figure(width = 500, height = 500, title="")
-    map.toolbar.logo = None
-    map.toolbar_location = None
-    map.x_range=Range1d(start=0, end=1)
-    map.y_range=Range1d(start=0, end=1)
-    #map.xaxis.visible = None
-    #map.yaxis.visible = None
-    #map.xgrid.grid_line_color = None
-    #map.ygrid.grid_line_color = None
-    #map.image_url(url='url', x=0.05, y = 0.85, h=0.7, w=0.9, source=logo_src)
-    map.image_url(url=player.icon.url, x=0.05, y = 0.85, h=0.7, w=0.9, source=logo_src)
-    map.outline_line_alpha = 0 
-    show(map)
-    '''
-    #logo_src = ColumnDataSource(data=dict(url=['/..'+player.icon.url]))
-    #icon_path = PurePath(player.icon.url)
-    #icon_path = icon_path.__str__()
-    #('stretch_width', 'stretch_height', 'stretch_both', 'scale_width', 'scale_height', 'scale_both', 'fixed', 'inherit')
-    map = figure(active_scroll='wheel_zoom', 
-                 title="", 
-                 aspect_scale=1, 
-                 sizing_mode='scale_height', 
-                 align='center', 
-                 min_height=410, 
-                 min_width=410)
-    
-    # añado herramientas bacanas al gráfico
-    width = Span(dimension="width", line_dash="dotted", line_alpha=0.4, line_width=1)
-    height = Span(dimension="height", line_dash="dotted", line_alpha=0.4, line_width=1)
-    map.add_tools(CrosshairTool(overlay=[width, height]))
-    TOOLTIPS = """
-                <div>
-                    <div>
-                        <span style="font-size: 17px; font-weight: bold;">$name</span>
-                    </div>
-                    <div>
-                        <span style="font-size: 15px;">Location</span>
-                        <span style="font-size: 10px; color: #696;">(x, $y)</span>
-                    </div>
-                </div>
-            """
-
-    #map.add_tools(HoverTool(tooltips= [("name", "$name"), ('location', '(${$x-(10)}{0.}, $y{0.})')]))
-    map.add_tools(HoverTool(tooltips= TOOLTIPS))
-
-
-    map.toolbar.logo = None
-    map.toolbar_location = None
-    map.x_range = Range1d(start=(player.x)-2, end=(player.x)+3)
-    map.y_range = Range1d(start=(player.y)-2, end=(player.y)+3)
-    #map.x_range.start = (player.x)-2
-    #map.image_url(url=['http://127.0.0.1:8000'+player.icon.url], x=0, y=0, h=1, w=1)
-
-
-
-    for character in characters:
-        character_x, character_y = character.x, character.y
-        if host:
-            icon_path, weapon_path = character.icon.url, character.weapon.image.url
-        else:
-            icon_path, weapon_path = os.path.join(settings.BASE_DIR, character.icon.url[1:]).replace('\\', '/'), os.path.join(settings.BASE_DIR, character.weapon.image.url[1:]).replace('\\', '/')
-        map.image_url(url=[icon_path], x=character_x+0.1, y=character_y+0.9, h=0.8, w=0.8, name=character.name)
-        map.image_url(url=[weapon_path], x=character_x+0.5, y=character_y+0.5, h=0.4, w=0.4, name=character.weapon.name)
-        if character.is_playable:
-            map.rect(x=character_x+0.5, y=character_y+0.5, width=0.8, height=0.8, line_color="blue", fill_alpha=0, line_width=2, name=character.name)
-        else:
-            map.rect(x=character_x+0.5, y=character_y+0.5, width=0.8, height=0.8, line_color="yellow", fill_alpha=0, line_width=2, name=character.name)
-
-    for monster in monsters:
-        monster_x, monster_y = monster.x, monster.y
-        if host:
-            icon_path, weapon_path = monster.icon.url, monster.weapon.image.url
-        else:
-            icon_path, weapon_path = os.path.join(settings.BASE_DIR, monster.icon.url[1:]).replace('\\', '/'), os.path.join(settings.BASE_DIR, monster.weapon.image.url[1:]).replace('\\', '/')
-        map.image_url(url=[icon_path], x=monster_x+0.1, y=monster_y+0.9, h=0.8, w=0.8, name=monster.name)
-        map.image_url(url=[weapon_path], x=monster_x+0.5, y=monster_y+0.5, h=0.4, w=0.4, name=monster.weapon.name)
-        map.rect(x=monster_x+0.5, y=monster_y+0.5, width=0.8, height=0.8, line_color="red", fill_alpha=0, line_width=2, name=monster.name)
-
-    # Player
-    player_x, player_y = player.x, player.y
-    if host:
-        icon_path, weapon_path = player.icon.url, player.weapon.image.url
-    else:
-        icon_path, weapon_path = os.path.join(settings.BASE_DIR, player.icon.url[1:]).replace('\\', '/'), os.path.join(settings.BASE_DIR, player.weapon.image.url[1:]).replace('\\', '/')
-    map.image_url(url=[icon_path], x=player_x+0.1, y=player_y+0.9, h=0.8, w=0.8)
-    map.image_url(url=[weapon_path], x=player_x+0.5, y=player_y+0.5, h=0.4, w=0.4)
-    map.rect(x=player_x+0.5, y=player_y+0.5, width=0.8, height=0.8, line_color="green", fill_alpha=0, line_width=2)
- 
-    map.outline_line_alpha = 0
-    '''
-    map.aspect_scale = 1
-    map.sizing_mode = 'stretch_both'
-    map.aspect_scale = 1
-    '''
-    if show_map:
-        map.sizing_mode = 'scale_height'
-        show(map)
-        map.sizing_mode = 'scale_width'
-    return map
-
 def player_selection(player_name):
     if player_name:
         try:
@@ -319,3 +214,139 @@ def monster_selection_by_id(monster_id):
             monster = Monster.objects.create()
             monster.save()
     return monster
+
+
+# --------------------------------------------- MAP ---------------------------------------------
+
+
+def create_map(player:Character, monster:Monster, characters, monsters, host:str=None, show_map:bool=False):
+
+    map = figure(active_scroll='wheel_zoom', 
+                 title="", 
+                 aspect_scale=1, 
+                 sizing_mode='scale_height', 
+                 align='center', 
+                 min_height=410, 
+                 min_width=410,
+                 background_fill_alpha=0.05,
+                 border_fill_alpha=0,
+                 outline_line_color='white')
+
+    # modifying the borders and background of the map
+    map.outline_line_alpha = 0.1
+    map.axis.axis_line_color = "white"
+    map.axis.axis_line_alpha = 0.1
+    map.axis.major_tick_line_alpha = 0
+    map.axis.minor_tick_line_alpha = 0
+    map.axis.major_label_text_color = "white"
+    map.yaxis.major_label_orientation = "vertical"
+    #map.outline_line_color = "white"
+    
+    # añado herramientas bacanas al gráfico
+    width = Span(dimension="width", line_dash="dotted", line_alpha=0.4, line_width=1)
+    height = Span(dimension="height", line_dash="dotted", line_alpha=0.4, line_width=1)
+    map.add_tools(CrosshairTool(overlay=[width, height]))
+    TOOLTIPS = """
+                <div>
+                    <div>
+                        <span style="font-size: 17px; font-weight: bold;">$name</span>
+                    </div>
+                    <div>
+                        <span style="font-size: 15px;">Location</span>
+                        <span style="font-size: 10px; color: #696;">(x, $y)</span>
+                    </div>
+                </div>
+            """
+
+    #map.add_tools(HoverTool(tooltips= [("name", "$name"), ('location', '(${$x-(10)}{0.}, $y{0.})')]))
+    map.add_tools(HoverTool(tooltips= TOOLTIPS))
+
+
+    map.toolbar.logo = None
+    map.toolbar_location = None
+    map.x_range = Range1d(start=(player.x)-2, end=(player.x)+3)
+    map.y_range = Range1d(start=(player.y)-2, end=(player.y)+3)
+    #map.x_range.start = (player.x)-2
+    #map.image_url(url=['http://127.0.0.1:8000'+player.icon.url], x=0, y=0, h=1, w=1)
+
+
+
+    for character in characters:
+        character_x, character_y = character.x, character.y
+        if host:
+            icon_path, weapon_path = character.icon.url, character.weapon.image.url
+        else:
+            icon_path, weapon_path = os.path.join(settings.BASE_DIR, character.icon.url[1:]).replace('\\', '/'), os.path.join(settings.BASE_DIR, character.weapon.image.url[1:]).replace('\\', '/')
+
+        map.image_url(url=[icon_path], x=character_x+0.1, y=character_y+0.9, h=0.8, w=0.8, name=character.name)
+        map.image_url(url=[weapon_path], x=character_x+0.5, y=character_y+0.5, h=0.4, w=0.4, name=character.weapon.name)
+        if character.is_playable:
+            map.rect(x=character_x+0.5, y=character_y+0.5, width=0.8, height=0.8, line_color="blue", fill_alpha=0, line_width=2, name=character.name)
+        else:
+            map.rect(x=character_x+0.5, y=character_y+0.5, width=0.8, height=0.8, line_color="yellow", fill_alpha=0, line_width=2, name=character.name)
+
+    for monster in monsters:
+        monster_x, monster_y = monster.x, monster.y
+        if host:
+            icon_path, weapon_path = monster.icon.url, monster.weapon.image.url
+        else:
+            icon_path, weapon_path = os.path.join(settings.BASE_DIR, monster.icon.url[1:]).replace('\\', '/'), os.path.join(settings.BASE_DIR, monster.weapon.image.url[1:]).replace('\\', '/')
+        map.image_url(url=[icon_path], x=monster_x+0.1, y=monster_y+0.9, h=0.8, w=0.8, name=monster.name)
+        map.image_url(url=[weapon_path], x=monster_x+0.5, y=monster_y+0.5, h=0.4, w=0.4, name=monster.weapon.name)
+        map.rect(x=monster_x+0.5, y=monster_y+0.5, width=0.8, height=0.8, line_color="red", fill_alpha=0, line_width=2, name=monster.name)
+
+    # Player
+    player_x, player_y = player.x, player.y
+    if host:
+        icon_path, weapon_path = player.icon.url, player.weapon.image.url
+    else:
+        icon_path, weapon_path = os.path.join(settings.BASE_DIR, player.icon.url[1:]).replace('\\', '/'), os.path.join(settings.BASE_DIR, player.weapon.image.url[1:]).replace('\\', '/')
+    map.image_url(url=[icon_path], x=player_x+0.1, y=player_y+0.9, h=0.8, w=0.8)
+    map.image_url(url=[weapon_path], x=player_x+0.5, y=player_y+0.5, h=0.4, w=0.4)
+    map.rect(x=player_x+0.5, y=player_y+0.5, width=0.8, height=0.8, line_color="green", fill_alpha=0, line_width=2)
+ 
+    '''
+    map.aspect_scale = 1
+    map.sizing_mode = 'stretch_both'
+    map.aspect_scale = 1
+    '''
+    if show_map:
+        map.sizing_mode = 'scale_height'
+        show(map)
+        map.sizing_mode = 'scale_width'
+    return map
+
+
+
+'''
+MAP PAST TRIES
+
+    #logo_src = ColumnDataSource(dict(url = player.icon.url))
+    #logo_src = ColumnDataSource(player.icon.url)
+    logo_src = ColumnDataSource(data=dict(url=[player.icon.url]))
+    map = figure(width = 500, height = 500, title="")
+    map.toolbar.logo = None
+    map.toolbar_location = None
+    map.x_range=Range1d(start=0, end=1)
+    map.y_range=Range1d(start=0, end=1)
+    #map.xaxis.visible = None
+    #map.yaxis.visible = None
+    #map.xgrid.grid_line_color = None
+    #map.ygrid.grid_line_color = None
+    #map.image_url(url='url', x=0.05, y = 0.85, h=0.7, w=0.9, source=logo_src)
+    map.image_url(url=player.icon.url, x=0.05, y = 0.85, h=0.7, w=0.9, source=logo_src)
+    map.outline_line_alpha = 0 
+    show(map)
+
+    #logo_src = ColumnDataSource(data=dict(url=['/..'+player.icon.url]))
+    #icon_path = PurePath(player.icon.url)
+    #icon_path = icon_path.__str__()
+    #('stretch_width', 'stretch_height', 'stretch_both', 'scale_width', 'scale_height', 'scale_both', 'fixed', 'inherit')
+    
+
+
+MAP LABELS
+
+unexpected attribute 'theme' to figure, possible attributes are above, active_drag, active_inspect, active_multi, active_scroll, active_tap, align, aspect_ratio, aspect_scale, attribution, background_fill_alpha, background_fill_color, below, border_fill_alpha, border_fill_color, center, context_menu, css_classes, css_variables, disabled, elements, extra_x_ranges, extra_x_scales, extra_y_ranges, extra_y_scales, flow_mode, frame_align, frame_height, frame_width, height, height_policy, hidpi, hold_render, inner_height, inner_width, js_event_callbacks, js_property_callbacks, left, lod_factor, lod_interval, lod_threshold, lod_timeout, margin, match_aspect, max_height, max_width, min_border, min_border_bottom, min_border_left, min_border_right, min_border_top, min_height, min_width, name, outer_height, outer_width, outline_line_alpha, outline_line_cap, outline_line_color, outline_line_dash, outline_line_dash_offset, outline_line_join, outline_line_width, output_backend, renderers, reset_policy, resizable, right, sizing_mode, styles, stylesheets, subscribed_events, syncable, tags, title, title_location, toolbar, toolbar_inner, toolbar_location, toolbar_sticky, tools, tooltips, visible, width, width_policy, x_axis_label, x_axis_location, x_axis_type, x_minor_ticks, x_range, x_scale, y_axis_label, y_axis_location, y_axis_type, y_minor_ticks, y_range or y_scale
+
+'''
