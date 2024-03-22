@@ -241,35 +241,40 @@ def create_map(player:Character, monster:Monster, characters, monsters, host:str
     map.axis.major_label_text_color = "white"
     map.yaxis.major_label_orientation = "vertical"
     #map.outline_line_color = "white"
+
+    # deleting the toolbar, they're not going to use it
+    map.toolbar.logo = None
+    map.toolbar_location = None
     
-    # añado herramientas bacanas al gráfico
-    width = Span(dimension="width", line_dash="dotted", line_alpha=0.4, line_width=1)
-    height = Span(dimension="height", line_dash="dotted", line_alpha=0.4, line_width=1)
+
+    # adding crosshair 
+    width = Span(dimension="width", line_dash="dotted", line_alpha=0.5, line_width=1, line_color="white")
+    height = Span(dimension="height", line_dash="dotted", line_alpha=0.5, line_width=1, line_color="white")
     map.add_tools(CrosshairTool(overlay=[width, height]))
+
+    # adding crosshair hover functions, like showing the entities information
     TOOLTIPS = """
                 <div>
                     <div>
                         <span style="font-size: 17px; font-weight: bold;">$name</span>
                     </div>
                     <div>
+                        <!--
                         <span style="font-size: 15px;">Location</span>
-                        <span style="font-size: 10px; color: #696;">(x, $y)</span>
+                        -->
+                        <center>
+                        <span style="font-size: 10px; color: #696; text-align:center;">($x{0.}, $y{0.})</span>
+                        </center>
                     </div>
                 </div>
             """
-
     #map.add_tools(HoverTool(tooltips= [("name", "$name"), ('location', '(${$x-(10)}{0.}, $y{0.})')]))
     map.add_tools(HoverTool(tooltips= TOOLTIPS))
 
-
-    map.toolbar.logo = None
-    map.toolbar_location = None
-    map.x_range = Range1d(start=(player.x)-2, end=(player.x)+3)
-    map.y_range = Range1d(start=(player.y)-2, end=(player.y)+3)
-    #map.x_range.start = (player.x)-2
-    #map.image_url(url=['http://127.0.0.1:8000'+player.icon.url], x=0, y=0, h=1, w=1)
-
-
+    # setting the initial map center and range. The player will be the center with a visual range of 2.5
+    map.x_range = Range1d(start=(player.x)-2.5, end=(player.x)+3.5) # -2, +3
+    map.y_range = Range1d(start=(player.y)-2.5, end=(player.y)+3.5) # -2, +3
+    
 
     for character in characters:
         character_x, character_y = character.x, character.y
@@ -293,23 +298,20 @@ def create_map(player:Character, monster:Monster, characters, monsters, host:str
             icon_path, weapon_path = os.path.join(settings.BASE_DIR, monster.icon.url[1:]).replace('\\', '/'), os.path.join(settings.BASE_DIR, monster.weapon.image.url[1:]).replace('\\', '/')
         map.image_url(url=[icon_path], x=monster_x+0.1, y=monster_y+0.9, h=0.8, w=0.8, name=monster.name)
         map.image_url(url=[weapon_path], x=monster_x+0.5, y=monster_y+0.5, h=0.4, w=0.4, name=monster.weapon.name)
-        map.rect(x=monster_x+0.5, y=monster_y+0.5, width=0.8, height=0.8, line_color="red", fill_alpha=0, line_width=2, name=monster.name)
+        if monster.is_key_for_campaign:
+            map.rect(x=monster_x+0.5, y=monster_y+0.5, width=0.8, height=0.8, line_color="purple", fill_alpha=0, line_width=2, name=monster.name)
+        else:
+            map.rect(x=monster_x+0.5, y=monster_y+0.5, width=0.8, height=0.8, line_color="red", fill_alpha=0, line_width=2, name=monster.name)
 
     # Player
     player_x, player_y = player.x, player.y
-    if host:
-        icon_path, weapon_path = player.icon.url, player.weapon.image.url
-    else:
-        icon_path, weapon_path = os.path.join(settings.BASE_DIR, player.icon.url[1:]).replace('\\', '/'), os.path.join(settings.BASE_DIR, player.weapon.image.url[1:]).replace('\\', '/')
+    icon_path   = player.icon.url if host else os.path.join(settings.BASE_DIR, player.icon.url[1:]).replace('\\', '/') 
+    weapon_path = player.weapon.image.url if host else os.path.join(settings.BASE_DIR, player.weapon.image.url[1:]).replace('\\', '/')
     map.image_url(url=[icon_path], x=player_x+0.1, y=player_y+0.9, h=0.8, w=0.8)
     map.image_url(url=[weapon_path], x=player_x+0.5, y=player_y+0.5, h=0.4, w=0.4)
-    map.rect(x=player_x+0.5, y=player_y+0.5, width=0.8, height=0.8, line_color="green", fill_alpha=0, line_width=2)
+    map.rect(name=player.name, x=player_x+0.5, y=player_y+0.5, width=0.8, height=0.8, line_color="green", fill_alpha=0, line_width=2)
  
-    '''
-    map.aspect_scale = 1
-    map.sizing_mode = 'stretch_both'
-    map.aspect_scale = 1
-    '''
+
     if show_map:
         map.sizing_mode = 'scale_height'
         show(map)
@@ -342,7 +344,13 @@ MAP PAST TRIES
     #icon_path = PurePath(player.icon.url)
     #icon_path = icon_path.__str__()
     #('stretch_width', 'stretch_height', 'stretch_both', 'scale_width', 'scale_height', 'scale_both', 'fixed', 'inherit')
-    
+
+    #map.x_range.start = (player.x)-2
+    #map.image_url(url=['http://127.0.0.1:8000'+player.icon.url], x=0, y=0, h=1, w=1)
+
+    map.aspect_scale = 1
+    map.sizing_mode = 'stretch_both'
+    map.aspect_scale = 1
 
 
 MAP LABELS
