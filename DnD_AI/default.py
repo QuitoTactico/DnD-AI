@@ -70,9 +70,6 @@ DEFAULT_WEAPON_PER_RACE = {
 DEFAULT_WEAPON_PER_RACE.update(DEFAULT_WEAPON_PER_CLASS)
 
 
-POSSIBLE_BOSSES = ['The Sphinx', 'Cthulhu', 'The Leviathan', 'Behemoth', 'The Kraken', 'Hades', 'Cerberus', 'GOD', 'Zeus', 'Ares', 'Thanatos', 'Megatron', 'Mr Beast', 'Lord Voldemort', 'Your Mom', 'The Devil', 'Telematica Demon', 'Diomedes Diaz', 'Makima', 'Donald Trump', 'MechaHitler', 'John Cena', 'The Rock', 'Undertaker', 'Jackie Chan', 'Megamind', 'Shrek', 'Darth Vader', 'Sauron', 'Mike Wazousky', 'The Joker', 'John Wick', 'Cristionel Messinaldo', 'Fernanfloo', 'Michael Jackson', 'PewDiePie', 'Elon Musk', 'Terminator', 'The Creators, a Malformed Three-Headed Beast Who Rules Everything and Fears Nothing', 'Yourself but Chinese', 'Hatsune Miku', 'Racism Demon', 'The Cancer', 'NekoKiller', 'Mbappe', 'Dross Rotzank', 'Doc Tops', 'El Putas de Aguadas', 'Waluigi', 'Slenderman', 'Flying Spagguetti God', 'Sonic.exe', 'Spongebob', 'Sans', 'The Game', 'Juan Carlos', 'El Pepe', 'Ete Sech', 'Tilín', 'Eminem', 'Yourself', 'Wolverine', 'Dracula', 'Link', 'The Hollow Knight', 'Moai', 'Skeleton King', 'Anubis', "Fetus"]
-
-
 DEFAULT_WEAPON_STATS = {
     'Sword': {
         'weapon_type': 'Sword',
@@ -311,3 +308,188 @@ DEFAULT_MONSTER_STATS = {
 }
 
 #print(DEFAULT_MONSTER_STATS['Goblin']['name'])
+
+
+# strange things, don't take this seriously
+
+POSSIBLE_BOSSES = [
+    'The Sphinx', 
+    'Cthulhu', 
+    'The Leviathan', 
+    'Behemoth', 
+    'The Kraken', 
+    'Hades', 
+    'Cerberus', 
+    'GOD', 
+    'Zeus', 
+    'Ares', 
+    'Thanatos', 
+    'Megatron', 
+    'Mr Beast', 
+    'Lord Voldemort', 
+    'Your Mom', 
+    'The Devil', 
+    'Telematica Demon', 
+    'Diomedes Diaz', 
+    'Makima', 
+    'Donald Trump', 
+    'MechaHitler', 
+    'John Cena', 
+    'The Rock', 
+    'Undertaker', 
+    'Jackie Chan', 
+    'Megamind', 
+    'Shrek', 
+    'Darth Vader', 
+    'Sauron', 
+    'Mike Wazousky', 
+    'The Joker', 
+    'John Wick', 
+    'Cristionel Messinaldo', 
+    'Fernanfloo', 
+    'Michael Jackson', 
+    'PewDiePie', 
+    'Elon Musk', 
+    'Terminator', 
+    'The Creators: a Malformed Three-Headed Beast Who Rules Everything and Fears Nothing', 
+    'Yourself but Chinese', 
+    'Hatsune Miku', 
+    'Racism Demon', 
+    'The Cancer', 
+    'NekoKiller', 
+    'Mbappe', 
+    'Dross Rotzank', 
+    'Doc Tops', 
+    'El Putas de Aguadas', 
+    'Waluigi', 
+    'Slenderman', 
+    'Flying Spagguetti God', 
+    'Sonic.exe', 
+    'Spongebob', 
+    'Sans', 
+    'The Game', 
+    'Juan Carlos', 
+    'El Pepe', 
+    'Ete Sech', 
+    'Tilín', 
+    'Eminem', 
+    'Yourself', 
+    'Wolverine', 
+    'Dracula', 
+    'Link', 
+    'The Hollow Knight', 
+    'Moai', 
+    'Skeleton King', 
+    'Anubis', 
+    'Fetus',
+    'Conde Eyácula',
+    'Jax: Minor Hunter',
+    'Unas salchipapas',
+    'Sr. Pelo',
+    'Molinete',
+    'Powerbazinga',
+    'Vegetta: The Bear Hunter',
+    'El payaso que se esconde de los gays',
+    'Cirno',
+    'Tyler The Creator',
+    'Kratos',
+    'Trece',
+    '13',
+    'Hello Kitty',
+    'DoomSlayer',
+    'El espectro del fortinaiti',
+    'Skinwalker',
+    'SirenHead',
+    'Skibidi Toilet',
+    'Titan Sprakerman',
+    'The End',
+    'Bloodbath',
+    'Tidal Wave',
+    'RobTop',
+    'GuitarHeroStyles',
+    'Tienes 13 activa cam',
+    'Akira Toriyama',
+    'Kanye West',
+    'Meru The Demon',
+    'Ankha',
+    'Auronplay',
+    'Jim Carrey',
+    'El Chavo',
+    'Roblox God',
+    'ERR 404',
+    'Circular 303',
+    'Circular 302',
+    'Kick Buttowsky',
+    'Acetato',
+    'Dr. Doofenshmirtz',
+    'Genio Peruano',
+    'Kronk',
+    'THE ZULU',
+    'Lucio',
+    'Roberta'
+]
+
+COOL_SORCERY_NAMES = [
+    "Qui's Crotolamo",
+    "Qui's Uxiono",
+    'Testicular Torsion',
+    'Anal Palpitations',
+]
+
+
+COOL_NPCS = [
+    'El Ayudador de Pibes',
+    'El Vendedor de Vainas',
+    'Diomedes Diaz',
+
+]
+
+COOL_LOCATIONS = [
+    'El club de las papeadas',
+    'Taberna el Balde de ###',
+    'La Montañañañañañaña'
+]
+
+
+COOL_EVENTS = {
+    # familia de lechugas, todos son opcionales. Si matas muchos de ellos tendrás que pagar por tus pecados
+    'LETTUCE FAMILY': [  
+        'Lettuce Boy',
+        'Lettuce Man',
+        'Lotus Girl',
+        'Lotus M.I.L.F',
+        'SINNER LETTUCE: THE KILLER',
+        'LETTUCE GOD: THE IMMORTAL',
+        'UNIVERSAL LETTUCE: THE ALL-BEYONDER',
+        'Last Lettuce on the World...',
+        'Lotus Avenger'
+    ],
+    # evento del club de comedores de niños, debes acabar con todos
+    # esto fué autogenerado y me pareció demasiado gracioso como para borrarlo, dios mío
+    'KID EATERS': [
+        'El que se come a los niños',
+        'El que se come a los niños pero con salsa',
+        'El que se come a los niños pero con salsa de tomate',
+        'El que se come a los niños pero con salsa de tomate y queso',
+        'El que se come a los niños pero con salsa de tomate y queso rallado',
+        'El que se come a los niños pero con salsa de tomate y queso rallado y pan',
+        'El que se come a los niños pero con salsa de tomate y queso rallado y pan tostado',
+        'El que se come a los niños pero con salsa de tomate y queso rallado y pan tostado con manteca',
+        'El que se come a los niños pero con salsa de tomate y queso rallado y pan tostado con manteca y un vaso de leche',
+        'El que se come a los niños pero con salsa de tomate y queso rallado y pan tostado con manteca y un vaso de leche con chocolate',
+        'El que se come a los niños pero con salsa de tomate y queso rallado y pan tostado con manteca y un vaso de leche con chocolate y un plato de galletitas',
+        'El que se come a los niños pero con salsa de tomate y queso rallado y pan tostado con manteca y un vaso de leche con chocolate y un plato de galletitas y un plato de frutas',
+        'El que se come a los niños pero con salsa de tomate y queso rallado y pan tostado con manteca y un vaso de leche con chocolate y un plato de galletitas y un plato de frutas y un plato de verduras',
+        'El que se come a los niños pero con salsa de tomate y queso rallado y pan tostado con manteca y un vaso de leche con chocolate y un plato de galletitas y un plato de frutas y un plato de verduras y un plato de carne',
+        'El que se come a los niños pero con salsa de tomate y queso rallado y pan tostado con manteca y un vaso de leche con chocolate y un plato de galletitas y un plato de frutas y un plato de verduras y un plato de carne y un plato de pescado',
+        'El que se come a los niños pero con salsa de tomate y queso rallado y pan tostado con manteca y un vaso de leche con chocolate y un plato de galletitas y un plato de frutas y un plato de verduras y un plato de carne y un plato de pescado y un plato de pastas',
+        'El que se come a los niños pero con salsa de tomate y queso rallado y pan tostado con manteca y un vaso de leche con chocolate y un plato de galletitas y un plato de frutas y un plato de verduras y un plato de carne y un plato de pescado y un plato de pastas y un plato de arroz',
+        'El que se come a los niños pero con salsa de tomate y queso rallado y pan tostado con manteca y un vaso de leche con chocolate y un plato de galletitas y un plato de frutas y un plato de verduras y un plato de carne y un plato de pescado y un plato de pastas y un plato de arroz y un plato de sopa',
+        'El que se come a los niños pero con salsa de tomate y queso rallado y pan tostado con manteca y un vaso de leche con chocolate y un plato de galletitas y un plato de frutas y un plato de verduras y un plato de carne y un plato de pescado y un plato de pastas y un plato de arroz y un plato de sopa y un plato de postre',
+        'El que se come a los niños pero con salsa de tomate y queso rallado y pan tostado con manteca y un vaso de leche con chocolate y un plato de galletitas y un plato de frutas y un plato de verduras y un plato de carne y un plato de pescado y un plato de pastas y un plato de arroz y un plato de sopa y un plato de postre y un plato de helado',
+        'El que se come a los niños pero con salsa de tomate y queso rallado y pan tostado con manteca y un vaso de leche con chocolate y un plato de galletitas y un plato de frutas y un plato de verduras y un plato de carne y un plato de pescado y un plato de pastas y un plato de arroz y un plato de sopa y un plato de postre y un plato de helado y un plato de frutas secas',
+        'El que se come a los niños pero con salsa de tomate y queso rallado y pan tostado con manteca y un vaso de leche con chocolate y un plato de galletitas y un plato de frutas y un plato de verduras y un plato de carne y un plato de pescado y un plato de pastas y un plato de arroz y un plato de sopa y un plato de postre y un plato de helado y un plato de frutas secas y un plato de frutas en almibar',
+        'El que se come a los niños pero con salsa de tomate y queso rallado y pan tostado con manteca y un vaso de leche con chocolate y un plato de galletitas y un plato de frutas y un plato de verduras y un plato de carne y un plato de pescado y un plato de pastas y un plato de arroz y un plato de sopa y un plato de postre y un plato de helado y un plato de frutas secas y un plato de frutas en almibar y un plato de frutas en almibar con crema',
+        'El que se come a los niños pero con salsa de tomate y queso rallado y pan tostado con manteca y un vaso de leche con chocolate y un plato de galletitas y un plato de frutas y un plato de verduras y un plato de carne y un plato de pescado y un plato de pastas y un plato de arroz y un plato de sopa y un plato de postre y un plato de helado y un plato de frutas secas y un plato de frutas en almibar y un plato de frutas en almibar con crema y un plato de frutas en almibar con crema y un vaso de jugo'
+    ]
+}
