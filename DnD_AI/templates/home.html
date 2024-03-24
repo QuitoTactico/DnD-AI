@@ -38,9 +38,9 @@
       <br />
       <div class="history text" id="font2">
 
-        {% for text in text_history %}
-        <div>
-          <p>{{text}}</p>
+        {% for entry in text_history %}
+        <div style="color: {{entry.color}}">
+          <p>{{entry.author}}: {{ entry.text|safe }}</p>
         </div>
         {% endfor %}
 

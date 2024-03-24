@@ -219,7 +219,7 @@ def monster_selection_by_id(monster_id):
 # --------------------------------------------- MAP ---------------------------------------------
 
 
-def create_map(player:Character, monster:Monster, characters, monsters, host:str=None, show_map:bool=False):
+def create_map(player:Character, objective:Monster, characters, monsters, host:str=None, show_map:bool=False):
 
     map = figure(active_scroll='wheel_zoom', 
                  title="", 

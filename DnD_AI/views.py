@@ -40,7 +40,7 @@ print(response.choices[0].text.strip())
 #chain = langchain.LanguageChain()
 '''
 
-text_history = [f'{i}: Lorem ipsum dolor, sit amet consectetur adipisicing elit. Necessitatibus, sapiente? Beatae autem soluta modi alias, voluptatibus fugiat ab a mollitia qui laborum quae necessitatibus officia odit hic neque optio quibusdam.' for i in range(10)]
+#text_history = [f'{i}: Lorem ipsum dolor, sit amet consectetur adipisicing elit. Necessitatibus, sapiente? Beatae autem soluta modi alias, voluptatibus fugiat ab a mollitia qui laborum quae necessitatibus officia odit hic neque optio quibusdam.' for i in range(10)]
 
 
 def get_response(prompt):
@@ -62,10 +62,10 @@ def get_response(prompt):
     #response = chain.run()
     
     response = llm_chain.invoke(prompt)
+    return response['text'].replace('\n', '<br>')
+    #text_responses = response['text'].split('\n')
 
-    text_responses = response['text'].split('\n')
-
-    return text_responses
+    #return text_responses
     #print(response.choices[0].text.strip())
     #print(query.choices[0].message.content)
 
@@ -92,12 +92,16 @@ def home(request):
         if 'action' in request.POST or "prompt" in request.POST:
             prompt = request.POST.get('prompt')
             response = get_response(prompt)
-            text_history.append(request.POST['player_name']+': '+request.POST['prompt'])
+            #text_history.append(request.POST['player_name']+': '+request.POST['prompt'])
+            History.objects.create(author=request.POST['player_name'], text=request.POST['prompt'], color='blue').save()
+            History.objects.create(author='SYSTEM', text=response).save()
             
+            '''
             made_by = 'SYSTEM: '
             for i in response:
                 text_history.append(made_by+str(i))
                 made_by=''
+            '''
 
         # GETTING DATA FROM THE DATABASE
         # player_name = request.GET.get('player')
@@ -113,6 +117,7 @@ def home(request):
                 monster = monster_selection(monster_id)
         else:
             monster_id = None
+            monster = monster_selection_by_id(None)
 
         # If there's any get/post, then gets the data from the database
        
@@ -128,6 +133,8 @@ def home(request):
 
         weapon_lvl = player.weapon.level
         weapon_lvl_label = '+'+str(weapon_lvl) if weapon_lvl > 0 else ''
+
+        text_history = History.objects.all()
 
         host = request.get_host()
         #map = create_map(player, characters, monsters, show_map = True)  # for map testing
@@ -158,6 +165,7 @@ def home(request):
                                       } )
     else:
         # If there's no get/post, then it selects the first playable character in the database
+        text_history = History.objects.all()
         player = player_selection(None)
         monster = monster_selection_by_id(None)
         return render(request, 'home.html', {'player':player, 
