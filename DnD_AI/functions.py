@@ -278,6 +278,10 @@ def create_map(player:Character, monster:Monster, characters, monsters, host:str
 
     for character in characters:
         character_x, character_y = character.x, character.y
+
+        character_color = 'blue' if character.is_playable else 'yellow'
+        map.rect(x=character_x+0.5, y=character_y+0.5, width=0.8, height=0.8, line_color=character_color, fill_color=character_color, fill_alpha=0.3, line_width=2, name=character.name)
+
         if host:
             icon_path, weapon_path = character.icon.url, character.weapon.image.url
         else:
@@ -285,31 +289,30 @@ def create_map(player:Character, monster:Monster, characters, monsters, host:str
 
         map.image_url(url=[icon_path], x=character_x+0.1, y=character_y+0.9, h=0.8, w=0.8, name=character.name)
         map.image_url(url=[weapon_path], x=character_x+0.5, y=character_y+0.5, h=0.4, w=0.4, name=character.weapon.name)
-        if character.is_playable:
-            map.rect(x=character_x+0.5, y=character_y+0.5, width=0.8, height=0.8, line_color="blue", fill_alpha=0, line_width=2, name=character.name)
-        else:
-            map.rect(x=character_x+0.5, y=character_y+0.5, width=0.8, height=0.8, line_color="yellow", fill_alpha=0, line_width=2, name=character.name)
+
 
     for monster in monsters:
         monster_x, monster_y = monster.x, monster.y
+
+        monster_line_dash = 'dashed' if monster.is_key else 'solid'
+        monster_color = 'deeppink' if monster.is_boss else 'red'
+        map.rect(x=monster_x+0.5, y=monster_y+0.5, width=0.8, height=0.8, line_color=monster_color, line_dash=monster_line_dash, fill_color=monster_color, fill_alpha=0.3, line_width=2, name=monster.name)
+
         if host:
             icon_path, weapon_path = monster.icon.url, monster.weapon.image.url
         else:
             icon_path, weapon_path = os.path.join(settings.BASE_DIR, monster.icon.url[1:]).replace('\\', '/'), os.path.join(settings.BASE_DIR, monster.weapon.image.url[1:]).replace('\\', '/')
         map.image_url(url=[icon_path], x=monster_x+0.1, y=monster_y+0.9, h=0.8, w=0.8, name=monster.name)
         map.image_url(url=[weapon_path], x=monster_x+0.5, y=monster_y+0.5, h=0.4, w=0.4, name=monster.weapon.name)
-        if monster.is_key:
-            map.rect(x=monster_x+0.5, y=monster_y+0.5, width=0.8, height=0.8, line_color="purple", fill_alpha=0, line_width=2, name=monster.name)
-        else:
-            map.rect(x=monster_x+0.5, y=monster_y+0.5, width=0.8, height=0.8, line_color="red", fill_alpha=0, line_width=2, name=monster.name)
 
     # Player
     player_x, player_y = player.x, player.y
+    map.rect(name=player.name, x=player_x+0.5, y=player_y+0.5, width=0.8, height=0.8, line_color="green", fill_alpha=0.3, line_width=2)
     icon_path   = player.icon.url if host else os.path.join(settings.BASE_DIR, player.icon.url[1:]).replace('\\', '/') 
     weapon_path = player.weapon.image.url if host else os.path.join(settings.BASE_DIR, player.weapon.image.url[1:]).replace('\\', '/')
     map.image_url(url=[icon_path], x=player_x+0.1, y=player_y+0.9, h=0.8, w=0.8)
     map.image_url(url=[weapon_path], x=player_x+0.5, y=player_y+0.5, h=0.4, w=0.4)
-    map.rect(name=player.name, x=player_x+0.5, y=player_y+0.5, width=0.8, height=0.8, line_color="green", fill_alpha=0, line_width=2)
+    
  
 
     if show_map:

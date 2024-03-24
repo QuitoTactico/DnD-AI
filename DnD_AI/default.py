@@ -6,37 +6,11 @@ fake = Faker()
 def get_random_name():
     return fake.first_name()
 
-DEFAULT_WEAPON_PER_CLASS = {
-    'Alchemist': 'Dagger',
-    'Archer': 'Long Bow',
-    'Artificer': 'Dagger',
-    'Assassin': 'Crossbow',
-    'Barbarian': 'Axe',
-    'Bard': 'Dagger',
-    'Cleric': 'Mace',
-    'Cowboy': 'Revolver',
+DEFAULT_WEAPON_PER_RACE = {
+    'Human': 'Sword',
     'Druid': 'Staff',
     'Dwarf': 'Warhammer',
     'Elf': 'Bow',
-    'Fighter': 'Bare hands',
-    'Hunter': 'Bow',
-    'Knight': 'Sword',
-    'Lancer': 'Spear',
-    'Mage': 'Staff',
-    'Monk': 'Bare hands',
-    'Ninja': 'Shurikens',
-    'Paladin': 'Sword',
-    'Ranger': 'Bow',
-    'Rogue': 'Dagger',
-    'Samurai': 'Katana',
-    'Tribe': 'Blowpipe',
-    'Viking': 'Battleaxe',
-    'Warrior': 'Sword',
-    'Wizard': 'Staff',
-    'Wizard': 'Staff',
-}
-
-DEFAULT_WEAPON_PER_RACE = {
     'Basilisk': 'Beast Claws',
     'Centaur': 'Bow',
     'Chimera': 'Fangs',
@@ -54,7 +28,6 @@ DEFAULT_WEAPON_PER_RACE = {
     'Mermaid': 'Trident',
     'Minotaur': 'Battleaxe',
     'Orc': 'Axe',
-    'Overlord': 'Great Warhammer',
     'Rat': 'Fangs',
     'Scorpion': 'Tail',
     'Skeleton': 'Sword',
@@ -64,10 +37,39 @@ DEFAULT_WEAPON_PER_RACE = {
     'Vampire': 'Fangs',
     'Werewolf': 'Beast Claws',
     'Wolf': 'Fangs',
-    'Witch': 'Enchanted Book',
     'Zombie': 'Bare hands',
 }
-DEFAULT_WEAPON_PER_RACE.update(DEFAULT_WEAPON_PER_CLASS)
+
+DEFAULT_WEAPON_PER_CLASS = {
+    'Alchemist': 'Dagger',
+    'Archer': 'Long Bow',
+    'Artificer': 'Dagger',
+    'Assassin': 'Crossbow',
+    'Barbarian': 'Axe',
+    'Bard': 'Dagger',
+    'Cleric': 'Mace',
+    'Cowboy': 'Revolver',
+    'Fighter': 'Bare hands',
+    'Hunter': 'Bow',
+    'Knight': 'Sword',
+    'Lancer': 'Spear',
+    'Mage': 'Staff',
+    'Monk': 'Bare hands',
+    'Ninja': 'Shurikens',
+    'Paladin': 'Sword',
+    'Ranger': 'Bow',
+    'Rogue': 'Dagger',
+    'Samurai': 'Katana',
+    'Tribe': 'Blowpipe',
+    'Warrior': 'Sword',
+    'Wizard': 'Staff',
+    'Overlord': 'Great Warhammer',
+    'Witch': 'Enchanted Book',
+    'Viking': 'Battleaxe',
+    'Merchant': 'Katana',
+}
+#DEFAULT_WEAPON_PER_RACE.update(DEFAULT_WEAPON_PER_CLASS)
+DEFAULT_WEAPON_PER_CLASS.update(DEFAULT_WEAPON_PER_RACE)
 
 
 DEFAULT_WEAPON_STATS = {

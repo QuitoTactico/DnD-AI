@@ -107,8 +107,10 @@ def home(request):
         if 'monster_id' in request.POST:
             try:
                 monster_id = int(request.POST['monster_id'])
+                monster = monster_selection_by_id(monster_id)
             except:
-                monster_id = None
+                monster_id = request.POST['monster_id']
+                monster = monster_selection(monster_id)
         else:
             monster_id = None
 
@@ -123,7 +125,6 @@ def home(request):
         # If through the player label they send the name of a playable character, it selects it as the player's character 
         player = player_selection(player_name)
         players = Character.objects.filter(is_playable=True)
-        monster = monster_selection_by_id(monster_id)
 
         weapon_lvl = player.weapon.level
         weapon_lvl_label = '+'+str(weapon_lvl) if weapon_lvl > 0 else ''

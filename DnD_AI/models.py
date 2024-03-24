@@ -50,7 +50,7 @@ class Weapon(models.Model):
         str_is_ranged = 'Ranged' if self.is_ranged else 'Melee'
         str_is_template = 'TEMPLATE' if self.is_template else 'UNIQUE'
         str_level = f'+{self.level}' if self.level != 0 else ''
-        return f'({self.id}) WEAPON{str_level}, {str_is_template}, {self.name}, {str_is_ranged}, {self.weapon_type}, {self.damage_type}, {self.damage}'
+        return f'[{self.id}] WEAPON, {str_is_template}, {self.name}{str_level}, {str_is_ranged}, {self.weapon_type}, {self.damage_type}, {self.damage}'
 
 
 def get_default_weapon(weapon_name:str = None, entity_class:str = 'Warrior', entity:str = 'Character'):
@@ -67,10 +67,7 @@ def get_default_weapon(weapon_name:str = None, entity_class:str = 'Warrior', ent
     """
     if weapon_name == None or weapon_name not in DEFAULT_WEAPON_STATS:
         try:
-            if entity == 'Character':
-                weapon_name = DEFAULT_WEAPON_PER_CLASS[entity_class]
-            else:
-                weapon_name = DEFAULT_WEAPON_PER_RACE[entity_class]
+            weapon_name = DEFAULT_WEAPON_PER_CLASS[entity_class]
         except:
             weapon_name = 'Sword'
 
@@ -107,6 +104,13 @@ def get_bare_hands():
     # if the migrations are not running, comment all this function lines and return None, 
     # then delete the database and all migrations (except __init__) and 
     # run createmigrations, then migrate.
+
+
+def get_default_icon(entity_race:str) -> str:
+    if entity_race in DEFAULT_WEAPON_PER_CLASS.keys():
+        return f'entity/icons/default/{entity_race.lower().replace(' ', '')}.png'
+    else:
+        return 'entity/images/default.png'
 
 
 class Character(models.Model):
@@ -147,7 +151,7 @@ class Character(models.Model):
     story       = models.CharField(max_length=1000, default="DEFAULT_STORY")
 
     physical_description    = models.CharField(max_length=200, default="Masculine, tall, white skin, black clothes")
-    image                   = models.ImageField(upload_to='entity/images/', default='entity/images/default.png')
+    image                   = models.ImageField(upload_to='entity/images/', null=True, blank=True)
 
     # Character description 
     # We will see if the class and race can add a bonus to some statistics
@@ -175,7 +179,7 @@ class Character(models.Model):
 
     x       = models.IntegerField(default=0)
     y       = models.IntegerField(default=0)
-    icon    = models.ImageField(upload_to="entity/icons/", default='entity/icons/default.png')
+    icon    = models.ImageField(upload_to="entity/icons/", null=True, blank=True)
 
     inventory = models.TextField(default=str({'gold': 10, 'health potion': 2}))  # the inventory is a dictionary, but it's saved as a string
 
@@ -295,6 +299,22 @@ class Character(models.Model):
         if not self.character_class:
             self.character_class = self.character_race if self.character_race != 'Human' else 'Warrior'
 
+        if not self.icon and not self.image:
+            self.icon = get_default_icon(self.character_race)
+
+        if self.icon and not self.image:
+            self.image = self.icon
+
+        if self.image and not self.icon:
+            self.icon = self.image
+
+        if not self.weapon:
+            if not self.got_initial_weapon:
+                self.weapon = get_default_weapon(entity_class=self.character_class, entity='Character')
+                self.got_initial_weapon = True
+            else:
+                self.weapon = get_bare_hands()
+
         if not self.name:
             if self.character_race == 'Human':
                 self.name = self.character_class+' '+get_random_name()
@@ -304,17 +324,12 @@ class Character(models.Model):
         if self.health == None:
             self.health = self.max_health
 
-        if not self.weapon:
-            if not self.got_initial_weapon:
-                self.weapon = get_default_weapon(entity_class=self.character_class, entity='Character')
-                self.got_initial_weapon = True
-            else:
-                self.weapon = get_bare_hands()
         super().save(*args, **kwargs)
 
     def __str__(self):
-        str_is_playable = 'PLAYABLE' if self.is_playable else 'NPC'
-        return f'({self.id}) {str_is_playable}, {self.name}, {self.character_race} {self.character_class}, HP: {self.health}, Level: {self.level}, Weapon: [{self.weapon}]'
+        str_is_playable = 'PLAYER' if self.is_playable else 'NPC'
+        raceclass = f'{self.character_race} {self.character_class}' if self.character_race != self.character_class else self.character_class
+        return f'[{self.id}] ({self.x},{self.y}) {str_is_playable}, {self.name}, {raceclass}, HP: {self.health}, Level: {self.level}, Weapon: [{self.weapon}]'
 
 
 class Monster(models.Model):
@@ -347,7 +362,8 @@ class Monster(models.Model):
 
     id      = models.AutoField(primary_key=True) # added here to be seen in the __str__ 
     name    = models.CharField(max_length=30, null=True, blank=True)
-    is_key = models.BooleanField(default=False)
+    is_key  = models.BooleanField(default=False)
+    is_boss = models.BooleanField(default=False)
 
     monster_race  = models.CharField(max_length=30, default="Goblin")
     monster_class = models.CharField(max_length=30, null=True, blank=True)
@@ -372,7 +388,7 @@ class Monster(models.Model):
 
     x       = models.IntegerField(default=2)
     y       = models.IntegerField(default=2)
-    icon    = models.ImageField(upload_to="entity/icons/", default='entity/icons/default.png')
+    icon    = models.ImageField(upload_to="entity/icons/", null=True, blank=True)
 
     inventory = models.TextField(default=str({'gold': 10}))  # the inventory is a dictionary, but it's saved as a string
 
@@ -406,13 +422,16 @@ class Monster(models.Model):
     def kill(self) -> tuple[bool, bool]:
         ''' deletes the monster \n
         returns a tuple. (if was succesful , if was a key monster)'''
-        was_key = True if self.is_key_for_campaign else False
+        was_key = True if self.is_key else False
         self.delete()
         return True, was_key  
     
     def save(self, *args, **kwargs):
         if not self.monster_class:
             self.monster_class = self.monster_race
+
+        if not self.icon:
+            self.icon = get_default_icon(self.monster_race)
 
         if not self.name:
             self.name = self.monster_race+' '+get_random_name()
@@ -429,7 +448,10 @@ class Monster(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'({self.id}) MONSTER, {self.name}, {self.monster_race}, {self.monster_class}, [{self.weapon}]'
+        raceclass = f'{self.monster_race} {self.monster_class}' if self.monster_race != self.monster_class else self.monster_class
+        key_str = 'KEY ' if self.is_key else ''
+        boss_str = 'BOSS' if self.is_boss else 'MONSTER'
+        return f'[{self.id}] ({self.x},{self.y}) {key_str}{boss_str}, {self.name}, {raceclass}, [{self.weapon}]'
     
 
 class Chest(models.Model):
@@ -463,7 +485,7 @@ class Chest(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'({self.id}) CHEST, {self.x}, {self.y}, {self.inventory}'
+        return f'[{self.id}] ({self.x},{self.y}) CHEST, {self.x}, {self.y}, {self.inventory}'
 
     
 
@@ -488,7 +510,7 @@ class History(models.Model):
     date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'({self.id}) [{self.date}] {self.author} ({self.color}): {self.text}'
+        return f'[{self.id}] ({self.date}) {self.author} ({self.color}): {self.text}'
 
 
 # -----------------------------------------------------
