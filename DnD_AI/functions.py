@@ -255,7 +255,7 @@ def create_map(player:Character, objective:Monster, characters, monsters, host:s
     # adding crosshair hover functions, like showing the entities information
     TOOLTIPS = """
                 <div>
-                    <div>
+                    <div style="color: black">
                         <span style="font-size: 17px; font-weight: bold;">$name</span>
                     </div>
                     <div>
@@ -277,18 +277,20 @@ def create_map(player:Character, objective:Monster, characters, monsters, host:s
     
 
     for character in characters:
-        character_x, character_y = character.x, character.y
+        if character.id != player.id:
+            character_x, character_y = character.x, character.y
 
-        character_color = 'blue' if character.is_playable else 'yellow'
-        map.rect(x=character_x+0.5, y=character_y+0.5, width=0.8, height=0.8, line_color=character_color, fill_color=character_color, fill_alpha=0.3, line_width=2, name=character.name)
+            character_color = 'blue' if character.is_playable else 'yellow'
+            map.rect(x=character_x+0.5, y=character_y+0.5, width=0.8, height=0.8, fill_color=character_color, fill_alpha=0.3, line_alpha=0)
 
-        if host:
-            icon_path, weapon_path = character.icon.url, character.weapon.image.url
-        else:
-            icon_path, weapon_path = os.path.join(settings.BASE_DIR, character.icon.url[1:]).replace('\\', '/'), os.path.join(settings.BASE_DIR, character.weapon.image.url[1:]).replace('\\', '/')
+            if host:
+                icon_path, weapon_path = character.icon.url, character.weapon.image.url
+            else:
+                icon_path, weapon_path = os.path.join(settings.BASE_DIR, character.icon.url[1:]).replace('\\', '/'), os.path.join(settings.BASE_DIR, character.weapon.image.url[1:]).replace('\\', '/')
 
-        map.image_url(url=[icon_path], x=character_x+0.1, y=character_y+0.9, h=0.8, w=0.8, name=character.name)
-        map.image_url(url=[weapon_path], x=character_x+0.5, y=character_y+0.5, h=0.4, w=0.4, name=character.weapon.name)
+            map.image_url(url=[icon_path], x=character_x+0.1, y=character_y+0.9, h=0.8, w=0.8, name=character.name)
+            map.image_url(url=[weapon_path], x=character_x+0.5, y=character_y+0.5, h=0.4, w=0.4, name=character.weapon.name)
+            map.rect(x=character_x+0.5, y=character_y+0.5, width=0.8, height=0.8, line_color=character_color, fill_alpha=0, line_width=2, name=character.name)
 
 
     for monster in monsters:
@@ -296,7 +298,7 @@ def create_map(player:Character, objective:Monster, characters, monsters, host:s
 
         monster_line_dash = 'dashed' if monster.is_key else 'solid'
         monster_color = 'deeppink' if monster.is_boss else 'red'
-        map.rect(x=monster_x+0.5, y=monster_y+0.5, width=0.8, height=0.8, line_color=monster_color, line_dash=monster_line_dash, fill_color=monster_color, fill_alpha=0.3, line_width=2, name=monster.name)
+        map.rect(x=monster_x+0.5, y=monster_y+0.5, width=0.8, height=0.8, line_color=monster_color, line_dash=monster_line_dash, fill_color=monster_color, fill_alpha=0.3, line_alpha=0, name=monster.name)
 
         if host:
             icon_path, weapon_path = monster.icon.url, monster.weapon.image.url
@@ -304,14 +306,17 @@ def create_map(player:Character, objective:Monster, characters, monsters, host:s
             icon_path, weapon_path = os.path.join(settings.BASE_DIR, monster.icon.url[1:]).replace('\\', '/'), os.path.join(settings.BASE_DIR, monster.weapon.image.url[1:]).replace('\\', '/')
         map.image_url(url=[icon_path], x=monster_x+0.1, y=monster_y+0.9, h=0.8, w=0.8, name=monster.name)
         map.image_url(url=[weapon_path], x=monster_x+0.5, y=monster_y+0.5, h=0.4, w=0.4, name=monster.weapon.name)
+        map.rect(x=monster_x+0.5, y=monster_y+0.5, width=0.8, height=0.8, line_color=monster_color, line_dash=monster_line_dash, fill_color=monster_color, fill_alpha=0, line_width=2, name=monster.name)
 
     # Player
     player_x, player_y = player.x, player.y
-    map.rect(name=player.name, x=player_x+0.5, y=player_y+0.5, width=0.8, height=0.8, line_color="green", fill_alpha=0.3, line_width=2)
+    #map.rect(name=player.name, x=player_x+0.5, y=player_y+0.5, width=0.8, height=0.8, line_color="green", fill_color='green', fill_alpha=0.3, line_width=2)
+    map.rect(name=player.name, x=player_x+0.5, y=player_y+0.5, width=0.8, height=0.8, line_color="green", fill_color='green', fill_alpha=0.3, line_alpha=0)
     icon_path   = player.icon.url if host else os.path.join(settings.BASE_DIR, player.icon.url[1:]).replace('\\', '/') 
     weapon_path = player.weapon.image.url if host else os.path.join(settings.BASE_DIR, player.weapon.image.url[1:]).replace('\\', '/')
     map.image_url(url=[icon_path], x=player_x+0.1, y=player_y+0.9, h=0.8, w=0.8)
     map.image_url(url=[weapon_path], x=player_x+0.5, y=player_y+0.5, h=0.4, w=0.4)
+    map.rect(name=player.name, x=player_x+0.5, y=player_y+0.5, width=0.8, height=0.8, line_color="green", fill_color='green', fill_alpha=0, line_width=2)
     
  
 
