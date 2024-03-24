@@ -347,7 +347,7 @@ class Monster(models.Model):
 
     id      = models.AutoField(primary_key=True) # added here to be seen in the __str__ 
     name    = models.CharField(max_length=30, null=True, blank=True)
-    is_key_for_campaign = models.BooleanField(default=False)
+    is_key = models.BooleanField(default=False)
 
     monster_race  = models.CharField(max_length=30, default="Goblin")
     monster_class = models.CharField(max_length=30, null=True, blank=True)
@@ -430,6 +430,65 @@ class Monster(models.Model):
 
     def __str__(self):
         return f'({self.id}) MONSTER, {self.name}, {self.monster_race}, {self.monster_class}, [{self.weapon}]'
+    
+
+class Chest(models.Model):
+    """
+    Represents a chest in the game.
+
+    Attributes:
+    - id (AutoField): The unique identifier of the chest.
+    - x (IntegerField): The x-coordinate of the chest.
+    - y (IntegerField): The y-coordinate of the chest.
+    - is_open (BooleanField): Indicates if the chest is open.
+    - inventory (TextField): The inventory of the chest.
+    """
+
+    id = models.AutoField(primary_key=True)
+    is_key = models.BooleanField(default=False)
+    x = models.IntegerField(default=0)
+    y = models.IntegerField(default=0)
+    inventory = models.TextField(default=str({'gold': 10}))
+
+    def get_inventory(self) -> dict:
+        ''' returns the inventory as a dictionary '''
+        inventory_dict = {}
+        try:
+            inventory_dict = eval(self.inventory)
+        except:
+            pass
+        return inventory_dict
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f'({self.id}) CHEST, {self.x}, {self.y}, {self.inventory}'
+
+    
+
+class History(models.Model):
+    """
+    Represents the history of the game.
+
+    Attributes:
+    - id (AutoField): The unique identifier of the history.
+    - author (CharField): The author of the history.
+    - text (CharField): The text of the history.
+    - color (CharField): The color of the history.
+    - date (DateTimeField): The date of the history.
+    """
+
+    id = models.AutoField(primary_key=True)
+    is_key = models.BooleanField(default=False)
+    is_image = models.BooleanField(default=False)
+    author = models.CharField(max_length=50, default="SYSTEM")
+    text = models.CharField(max_length=2000, default="Hi (Default message)")
+    color = models.CharField(max_length=10, default="black")
+    date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'({self.id}) [{self.date}] {self.author} ({self.color}): {self.text}'
 
 
 # -----------------------------------------------------

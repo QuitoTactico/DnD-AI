@@ -298,7 +298,7 @@ def create_map(player:Character, monster:Monster, characters, monsters, host:str
             icon_path, weapon_path = os.path.join(settings.BASE_DIR, monster.icon.url[1:]).replace('\\', '/'), os.path.join(settings.BASE_DIR, monster.weapon.image.url[1:]).replace('\\', '/')
         map.image_url(url=[icon_path], x=monster_x+0.1, y=monster_y+0.9, h=0.8, w=0.8, name=monster.name)
         map.image_url(url=[weapon_path], x=monster_x+0.5, y=monster_y+0.5, h=0.4, w=0.4, name=monster.weapon.name)
-        if monster.is_key_for_campaign:
+        if monster.is_key:
             map.rect(x=monster_x+0.5, y=monster_y+0.5, width=0.8, height=0.8, line_color="purple", fill_alpha=0, line_width=2, name=monster.name)
         else:
             map.rect(x=monster_x+0.5, y=monster_y+0.5, width=0.8, height=0.8, line_color="red", fill_alpha=0, line_width=2, name=monster.name)
