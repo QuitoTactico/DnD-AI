@@ -269,11 +269,14 @@ def create_map(player:Character, objective:Monster, characters, monsters, host:s
                 </div>
             """
     #map.add_tools(HoverTool(tooltips= [("name", "$name"), ('location', '(${$x-(10)}{0.}, $y{0.})')]))
-    map.add_tools(HoverTool(tooltips= TOOLTIPS))
+    #names_list = [character.name for character in characters] + [monster.name for monster in monsters]
+    #hover = 
 
     # setting the initial map center and range. The player will be the center with a visual range of 2.5
     map.x_range = Range1d(start=(player.x)-2.5, end=(player.x)+3.5) # -2, +3
     map.y_range = Range1d(start=(player.y)-2.5, end=(player.y)+3.5) # -2, +3
+
+    map.block(hatch_pattern='cross', hatch_color='black', hatch_alpha=0.5, fill_alpha=0.5, line_alpha=0.5, line_color='black', x=(player.x)-2, y=(player.y)-2, width=5, height=5)
     
 
     for character in characters:
@@ -290,7 +293,8 @@ def create_map(player:Character, objective:Monster, characters, monsters, host:s
 
             map.image_url(url=[icon_path], x=character_x+0.1, y=character_y+0.9, h=0.8, w=0.8, name=character.name)
             map.image_url(url=[weapon_path], x=character_x+0.5, y=character_y+0.5, h=0.4, w=0.4, name=character.weapon.name)
-            map.rect(x=character_x+0.5, y=character_y+0.5, width=0.8, height=0.8, line_color=character_color, fill_alpha=0, line_width=2, name=character.name)
+            borde_characters = map.rect(x=character_x+0.5, y=character_y+0.5, width=0.8, height=0.8, line_color=character_color, fill_alpha=0, line_width=2, name=character.name)
+            borde_characters.tags = ['characters']
 
 
     for monster in monsters:
@@ -306,7 +310,8 @@ def create_map(player:Character, objective:Monster, characters, monsters, host:s
             icon_path, weapon_path = os.path.join(settings.BASE_DIR, monster.icon.url[1:]).replace('\\', '/'), os.path.join(settings.BASE_DIR, monster.weapon.image.url[1:]).replace('\\', '/')
         map.image_url(url=[icon_path], x=monster_x+0.1, y=monster_y+0.9, h=0.8, w=0.8, name=monster.name)
         map.image_url(url=[weapon_path], x=monster_x+0.5, y=monster_y+0.5, h=0.4, w=0.4, name=monster.weapon.name)
-        map.rect(x=monster_x+0.5, y=monster_y+0.5, width=0.8, height=0.8, line_color=monster_color, line_dash=monster_line_dash, fill_color=monster_color, fill_alpha=0, line_width=2, name=monster.name)
+        borde_monsters = map.rect(x=monster_x+0.5, y=monster_y+0.5, width=0.8, height=0.8, line_color=monster_color, line_dash=monster_line_dash, fill_color=monster_color, fill_alpha=0, line_width=2, name=monster.name)
+        borde_monsters.tags = ['monsters']
 
     # Player
     player_x, player_y = player.x, player.y
@@ -316,9 +321,12 @@ def create_map(player:Character, objective:Monster, characters, monsters, host:s
     weapon_path = player.weapon.image.url if host else os.path.join(settings.BASE_DIR, player.weapon.image.url[1:]).replace('\\', '/')
     map.image_url(url=[icon_path], x=player_x+0.1, y=player_y+0.9, h=0.8, w=0.8)
     map.image_url(url=[weapon_path], x=player_x+0.5, y=player_y+0.5, h=0.4, w=0.4)
-    map.rect(name=player.name, x=player_x+0.5, y=player_y+0.5, width=0.8, height=0.8, line_color="green", fill_color='green', fill_alpha=0, line_width=2)
-    
- 
+    borde_player = map.rect(name=player.name, x=player_x+0.5, y=player_y+0.5, width=0.8, height=0.8, line_color="green", fill_color='green', fill_alpha=0, line_width=2)
+    borde_player.tags = ['player']
+
+
+    map.add_tools(HoverTool(renderers=map.select(tags=['player', 'characters', 'monsters']) , tooltips= TOOLTIPS))
+
 
     if show_map:
         map.sizing_mode = 'scale_height'
