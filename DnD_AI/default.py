@@ -403,7 +403,7 @@ POSSIBLE_BOSSES = [
     'Skinwalker',
     'SirenHead',
     'Skibidi Toilet',
-    'Titan Sprakerman',
+    'Titan Speakerman',
     'The End',
     'Bloodbath',
     'Tidal Wave',
@@ -436,6 +436,10 @@ COOL_SORCERY_NAMES = [
     "Qui's Uxiono",
     'Testicular Torsion',
     'Anal Palpitations',
+    'Rats... Take his balls',
+    'The one who moves is gay',
+    'Automatic breathing deactivation',
+    'The Game'
 ]
 
 
@@ -495,3 +499,8 @@ COOL_EVENTS = {
         'El que se come a los niños pero con salsa de tomate y queso rallado y pan tostado con manteca y un vaso de leche con chocolate y un plato de galletitas y un plato de frutas y un plato de verduras y un plato de carne y un plato de pescado y un plato de pastas y un plato de arroz y un plato de sopa y un plato de postre y un plato de helado y un plato de frutas secas y un plato de frutas en almibar y un plato de frutas en almibar con crema y un plato de frutas en almibar con crema y un vaso de jugo'
     ]
 }
+
+'''
+
+
+'''
