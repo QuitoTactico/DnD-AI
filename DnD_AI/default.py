@@ -6,6 +6,16 @@ fake = Faker()
 def get_random_name():
     return fake.first_name()
 
+
+DEFAULT_TREASURE_TYPES = {
+    'Gold': 'gold',
+    'Bag': 'bag',
+    'Discovered Bag': 'bag-discovered',
+    'Chest': 'chest',
+    'Discovered Chest': 'chest-discovered',
+    'Weapon' : 'weapon'
+}
+
 DEFAULT_WEAPON_PER_RACE = {
     'Human': 'Sword',
     'Druid': 'Staff',

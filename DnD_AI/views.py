@@ -124,6 +124,7 @@ def home(request):
         monsters = Monster.objects.all()
         characters = Character.objects.all()
         weapons = Weapon.objects.all()
+        treasures = Treasure.objects.all()
 
 
         # PLAYER SELECTION
@@ -138,7 +139,7 @@ def home(request):
 
         host = request.get_host()
         #map = create_map(player, characters, monsters, show_map = True)  # for map testing
-        map = create_map(player, monster, characters, monsters, host)
+        map = create_map(player, characters, monsters, treasures, monster, host)
         script, div = components(map)
 
         #test = request.GET.get('test')

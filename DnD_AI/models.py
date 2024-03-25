@@ -106,11 +106,22 @@ def get_bare_hands():
     # run createmigrations, then migrate.
 
 
-def get_default_icon(entity_race:str) -> str:
+def get_default_entity_icon(entity_race:str) -> str:
     if entity_race in DEFAULT_WEAPON_PER_CLASS.keys():
         return f'entity/icons/default/{entity_race.lower().replace(' ', '')}.png'
     else:
         return 'entity/images/default.png'
+    
+
+def get_default_treasure_icon(treasure_type:str, discovered:bool=False):
+    discovered_str = 'Discovered ' if discovered else ''
+    discovered_treasure = discovered_str+treasure_type
+    if discovered_treasure in DEFAULT_TREASURE_TYPES.keys():
+        return f'map/default/{DEFAULT_TREASURE_TYPES[discovered_treasure]}.png'
+    elif treasure_type in DEFAULT_TREASURE_TYPES.keys():
+        return f'map/default/{DEFAULT_TREASURE_TYPES[treasure_type]}.png'
+    else:
+        return 'map/default/bag.png'
 
 
 class Character(models.Model):
@@ -300,7 +311,7 @@ class Character(models.Model):
             self.character_class = self.character_race if self.character_race != 'Human' else 'Warrior'
 
         if not self.icon and not self.image:
-            self.icon = get_default_icon(self.character_race)
+            self.icon = get_default_entity_icon(self.character_race)
 
         if self.icon and not self.image:
             self.image = self.icon
@@ -431,7 +442,7 @@ class Monster(models.Model):
             self.monster_class = self.monster_race
 
         if not self.icon:
-            self.icon = get_default_icon(self.monster_race)
+            self.icon = get_default_entity_icon(self.monster_race)
 
         if not self.name:
             self.name = self.monster_race+' '+get_random_name()
@@ -454,23 +465,42 @@ class Monster(models.Model):
         return f'[{self.id}] ({self.x},{self.y}) {key_str}{boss_str}, {self.name}, {raceclass}, [{self.weapon}]'
     
 
-class Chest(models.Model):
+class Treasure(models.Model):
     """
-    Represents a chest in the game.
+    Represents a Treasure in the game.
 
     Attributes:
-    - id (AutoField): The unique identifier of the chest.
-    - x (IntegerField): The x-coordinate of the chest.
-    - y (IntegerField): The y-coordinate of the chest.
-    - is_open (BooleanField): Indicates if the chest is open.
-    - inventory (TextField): The inventory of the chest.
+    - id (AutoField): The unique identifier of the treasure.
+    - is_key (BooleanField): Indicates if the treasure is a key for the campaign.
+    - treasure_type (CharField): The type of the treasure.
+    - discovered (BooleanField): Indicates if the treasure has been discovered.
+    - inventory (TextField): The inventory of the treasure.
+    - x (IntegerField): The x-coordinate of the treasure.
+    - y (IntegerField): The y-coordinate of the treasure.
     """
 
     id = models.AutoField(primary_key=True)
     is_key = models.BooleanField(default=False)
+    treasure_type = models.CharField(max_length=30, default="Bag")
+    weapon = models.ForeignKey(Weapon, on_delete=models.CASCADE, default=None, null=True, blank=True)
+    discovered = models.BooleanField(default=False)
+    inventory = models.TextField(default=str({'gold': 10}))
+
     x = models.IntegerField(default=0)
     y = models.IntegerField(default=0)
-    inventory = models.TextField(default=str({'gold': 10}))
+    icon = models.ImageField(upload_to="map/", null=True, blank=True)
+
+
+    def discover(self):
+        self.discovered = True
+        if self.treasure_type.lower() == 'weapon':
+            try:
+                self.icon = self.weapon.icon.url
+            except:
+                self.icon = get_default_treasure_icon(self.treasure_type, discovered=False)
+        else:
+            self.icon = get_default_treasure_icon(self.treasure_type, discovered=True)
+        self.save()
 
     def get_inventory(self) -> dict:
         ''' returns the inventory as a dictionary '''
@@ -481,11 +511,32 @@ class Chest(models.Model):
             pass
         return inventory_dict
 
+    def take_from_inventory(self, item:str, amount:int = 1, all=False) -> bool:
+        ''' removes an item from the inventory, returns if was succesful '''
+        inventory_dict = self.get_inventory()
+        if item in inventory_dict:
+            if all:
+                amount = inventory_dict[item]
+            inventory_dict[item] -= amount
+            if inventory_dict[item] <= 0:
+                del inventory_dict[item]
+            self.inventory = str(inventory_dict)
+            self.save()
+            return True
+        return False
+
     def save(self, *args, **kwargs):
+        if not self.icon:
+            #discovered_str = 'discovered_' if self.discovered else ''
+            #self.icon = f'map/default/{discovered_str}{self.treasure_type.replace(" ", "_").lower()}.png'
+            self.icon = get_default_treasure_icon(self.treasure_type, discovered=self.discovered)
+
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'[{self.id}] ({self.x},{self.y}) CHEST, {self.x}, {self.y}, {self.inventory}'
+        key_str = 'KEY ' if self.is_key else ''
+        discovered_str = 'DISCOVERED, ' if self.discovered else ''
+        return f'[{self.id}] ({self.x},{self.y}) {key_str}{self.treasure_type}, {discovered_str}{self.inventory}'
 
     
 
@@ -505,7 +556,7 @@ class History(models.Model):
     is_key = models.BooleanField(default=False)
     is_image = models.BooleanField(default=False)
     author = models.CharField(max_length=50, default="SYSTEM")
-    text = models.CharField(max_length=2000, default="Hi (Default message)")
+    text = models.CharField(max_length=3000, default="Hi (Default message)")
     color = models.CharField(max_length=10, default="black")
     date = models.DateTimeField(auto_now_add=True)
 

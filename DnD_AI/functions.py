@@ -216,10 +216,18 @@ def monster_selection_by_id(monster_id):
     return monster
 
 
+def get_monsters_in_range(player:Character, monsters):
+    monsters_in_range = []
+    for monster in monsters:
+        if abs(player.x - monster.x) <= player.weapon.range and abs(player.y - monster.y) <= player.weapon.range:
+            monsters_in_range.append(monster)
+    return monsters_in_range
+
+
 # --------------------------------------------- MAP ---------------------------------------------
 
 
-def create_map(player:Character, objective:Monster, characters, monsters, host:str=None, show_map:bool=False):
+def create_map(player:Character, characters, monsters, treasures, objective:Monster=None, host:str=None, show_map:bool=False):
 
     map = figure(active_scroll='wheel_zoom', 
                  title="", 
@@ -253,7 +261,7 @@ def create_map(player:Character, objective:Monster, characters, monsters, host:s
     map.add_tools(CrosshairTool(overlay=[width, height]))
 
     # adding crosshair hover functions, like showing the entities information
-    TOOLTIPS = """
+    ENTITY_TOOLTIPS = """
                 <div>
                     <div style="color: @color">
                         <center>
@@ -281,12 +289,34 @@ def create_map(player:Character, objective:Monster, characters, monsters, host:s
     map.x_range = Range1d(start=(player.x)-2.5, end=(player.x)+3.5) # -2, +3
     map.y_range = Range1d(start=(player.y)-2.5, end=(player.y)+3.5) # -2, +3
 
-    # player range
-    map.block(hatch_pattern='cross', hatch_color='black', hatch_alpha=0.5, fill_alpha=0.5, line_alpha=0.5, line_color='black', x=(player.x)-(player.weapon.range), y=(player.y)-(player.weapon.range), width=(player.weapon.range*2)+1, height=(player.weapon.range*2)+1)
+    range_color = 'red' if len(get_monsters_in_range(player, monsters)) != 0 else 'gray'
+    
+    map.block(hatch_pattern='diagonal_cross', 
+                hatch_scale=8, 
+                hatch_weight=0.5,
+                hatch_color=range_color, 
+                hatch_alpha=0.65,
+                fill_alpha=0, 
+                line_alpha=0, 
+                line_color=range_color, 
+                x=(player.x)-(player.weapon.range), 
+                y=(player.y)-(player.weapon.range), 
+                width=(player.weapon.range*2)+1, 
+                height=(player.weapon.range*2)+1)
+    
+    # objective highlight
+    if objective is not None:
+        obj_color = 'deeppink' if objective.is_boss else 'red'
+        obj_dash = 'solid' if objective.is_key else 'solid'
+        #map.circle(x=objective.x+0.5, y=objective.y+0.5, radius=1, fill_alpha=0, line_color=obj_color, line_dash=obj_dash, line_width=2)
+        map.circle(x=objective.x+0.5, y=objective.y+0.5, radius=0.7, fill_alpha=0, line_color=obj_color, line_dash=obj_dash, line_width=2)
+
+    # player highlight
+    #map.circle(x=player.x+0.5, y=player.y+0.5, radius=1, fill_alpha=0, line_color='green', line_width=2)
     
     # adding the entities to the map
     entities = list(characters) + list(monsters)
-    data = {
+    entity_data = {
         'x': [entity.x + 0.5 for entity in entities],
         'y': [entity.y + 0.5 for entity in entities],
         'raceclass' : [f'{character.character_race} {character.character_class}' if character.character_race != character.character_class else character.character_class for character in characters] + [f'{monster.monster_race} {monster.monster_class}' if monster.monster_race != monster.monster_class else monster.monster_class for monster in monsters],
@@ -305,11 +335,21 @@ def create_map(player:Character, objective:Monster, characters, monsters, host:s
         'type': ['character' if character.id != player.id else 'player' for character in characters] + ['boss' if monster.is_boss else 'monster' for monster in monsters]
     }
 
-    map.rect(x='x', y='y', width=0.8, height=0.8, fill_color='color', fill_alpha=0.3, line_alpha=0, source=data)  
-    map.image_url(url='icon', x='icon_x', y='icon_y', h=0.8, w=0.8, name='name', source=data)
-    map.image_url(url='weapon_icon', x='x', y='y', h=0.4, w=0.4, name='weapon_name', source=data)
-    entities = map.rect(x='x', y='y', width=0.8, height=0.8, line_color='color', line_dash='dash', fill_alpha=0, line_width=2, name='name', source=data)
+    map.rect(x='x', y='y', width=0.8, height=0.8, fill_color='color', fill_alpha=0.3, line_alpha=0, source=entity_data)  
+    map.image_url(url='icon', x='icon_x', y='icon_y', h=0.8, w=0.8, name='name', source=entity_data)
+    map.image_url(url='weapon_icon', x='x', y='y', h=0.4, w=0.4, name='weapon_name', source=entity_data)
+    entities = map.rect(x='x', y='y', width=0.8, height=0.8, line_color='color', line_dash='dash', fill_alpha=0, line_width=2, name='name', source=entity_data)
     entities.tags = ['entity']
+
+
+    treasure_data = {
+        'x' : [treasure.x +0.1 for treasure in treasures],
+        'y' : [treasure.y +0.9 for treasure in treasures],
+        'icon' : [treasure.icon.url for treasure in treasures],
+        'name': ['Discovered '+treasure.treasure_type if treasure.discovered else treasure.treasure_type for treasure in treasures],
+    }
+
+    map.image_url(url='icon', x='x', y='y', h=0.8, w=0.8, name='name', source=treasure_data)
 
 
     '''
@@ -359,7 +399,7 @@ def create_map(player:Character, objective:Monster, characters, monsters, host:s
     borde_player.tags = ['player']
     '''
 
-    map.add_tools(HoverTool(renderers=map.select(tags=['entity']) , tooltips= TOOLTIPS))
+    map.add_tools(HoverTool(renderers=map.select(tags=['entity']) , tooltips= ENTITY_TOOLTIPS))
 
 
     if show_map:
