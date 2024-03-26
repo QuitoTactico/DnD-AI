@@ -271,7 +271,7 @@ def create_map(player:Character, characters, monsters, treasures, objective:Mons
                     <div>
                         <center>
                         <span style="font-size: 15px; color: @weapon_color; text-align:center; font-weight: bold">@weapon_name</span>
-                        <img src=@weapon_icon height=15>
+                        <img src=@weapon_icon height=20 style="background-color: #212529">
                         <hr/>
                         <div><span style="font-size: 10px; color: #696; text-align:center;">@raceclass</span></div>
                         <div><span style="font-size: 10px; color: #696; text-align:center;">@LVL</span></div>

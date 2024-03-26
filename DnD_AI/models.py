@@ -106,11 +106,17 @@ def get_bare_hands():
     # run createmigrations, then migrate.
 
 
-def get_default_entity_icon(entity_race:str) -> str:
-    if entity_race in DEFAULT_WEAPON_PER_CLASS.keys():
-        return f'entity/icons/default/{entity_race.lower().replace(' ', '')}.png'
+def get_default_entity_icon(entity_race:str, entity_class:str='Warrior') -> str:
+    if entity_race == 'Human':
+        if entity_class in DEFAULT_WEAPON_PER_CLASS.keys():
+            return f'entity/icons/default/{entity_class.lower().replace(' ', '_')}.png'
+        else:
+            return 'entity/images/default.png'
     else:
-        return 'entity/images/default.png'
+        if entity_race in DEFAULT_WEAPON_PER_CLASS.keys():
+            return f'entity/icons/default/{entity_race.lower().replace(' ', '_')}.png'
+        else:
+            return 'entity/images/default.png'
     
 
 def get_default_treasure_icon(treasure_type:str, discovered:bool=False):
@@ -311,7 +317,7 @@ class Character(models.Model):
             self.character_class = self.character_race if self.character_race != 'Human' else 'Warrior'
 
         if not self.icon and not self.image:
-            self.icon = get_default_entity_icon(self.character_race)
+            self.icon = get_default_entity_icon(self.character_race, self.character_class)
 
         if self.icon and not self.image:
             self.image = self.icon
@@ -442,7 +448,7 @@ class Monster(models.Model):
             self.monster_class = self.monster_race
 
         if not self.icon:
-            self.icon = get_default_entity_icon(self.monster_race)
+            self.icon = get_default_entity_icon(self.monster_race, self.monster_class)
 
         if not self.name:
             self.name = self.monster_race+' '+get_random_name()
