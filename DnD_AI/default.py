@@ -13,6 +13,7 @@ DEFAULT_TREASURE_TYPES = {
     'Discovered Bag': 'bag-discovered',
     'Chest': 'chest',
     'Discovered Chest': 'chest-discovered',
+    'Key': 'key',
     'Weapon' : 'weapon'
 }
 

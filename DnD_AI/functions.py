@@ -274,9 +274,27 @@ def create_map(player:Character, characters, monsters, treasures, objective:Mons
                         <img src=@weapon_icon height=15>
                         <hr/>
                         <div><span style="font-size: 10px; color: #696; text-align:center;">@raceclass</span></div>
+                        <div><span style="font-size: 10px; color: #696; text-align:center;">@LVL</span></div>
                         <div><span style="font-size: 10px; color: #696; text-align:center;">HP: @HP/@HP_max</span></div>
                         <div><span style="font-size: 10px; color: #696; text-align:center;">Range: @RNG</span></div>
-                        <div><span style="font-size: 10px; color: #696; text-align:center;">X:@x{0.}, Y:@y{0.}</span></div>
+                        <div><span style="font-size: 10px; color: #696; text-align:center;">X:@real_x{0.}, Y:@real_y{0.}</span></div>
+                        </center>
+                    </div>
+                </div>
+            """
+    
+    TREASURE_TOOLTIPS = """
+                <div>
+                    <div style="color: @color">
+                        <center>
+                        <span style="font-size: 17px; font-weight: bold; text-align:center">@name</span>
+                        </center>
+                    </div>
+                    <div>
+                        <center>
+                        <hr/>
+                        <div><span style="font-size: 10px; color: #696; text-align:center;">@inv</span></div>
+                        <div><span style="font-size: 10px; color: #696; text-align:center;">X:@real_x{0.}, Y:@real_y{0.}</span></div>
                         </center>
                     </div>
                 </div>
@@ -289,13 +307,13 @@ def create_map(player:Character, characters, monsters, treasures, objective:Mons
     map.x_range = Range1d(start=(player.x)-2.5, end=(player.x)+3.5) # -2, +3
     map.y_range = Range1d(start=(player.y)-2.5, end=(player.y)+3.5) # -2, +3
 
-    range_color = 'red' if len(get_monsters_in_range(player, monsters)) != 0 else 'gray'
+    range_color,range_alpha = ('red',0.65) if len(get_monsters_in_range(player, monsters)) != 0 else ('gray',0.5)
     
     map.block(hatch_pattern='diagonal_cross', 
                 hatch_scale=8, 
                 hatch_weight=0.5,
                 hatch_color=range_color, 
-                hatch_alpha=0.65,
+                hatch_alpha=range_alpha, #55, 65
                 fill_alpha=0, 
                 line_alpha=0, 
                 line_color=range_color, 
@@ -320,17 +338,20 @@ def create_map(player:Character, characters, monsters, treasures, objective:Mons
         'x': [entity.x + 0.5 for entity in entities],
         'y': [entity.y + 0.5 for entity in entities],
         'raceclass' : [f'{character.character_race} {character.character_class}' if character.character_race != character.character_class else character.character_class for character in characters] + [f'{monster.monster_race} {monster.monster_class}' if monster.monster_race != monster.monster_class else monster.monster_class for monster in monsters],
+        'LVL': [f'LVL: {character.level}' for character in characters]+['' for _ in monsters],
         'HP': [entity.health for entity in entities],
         'HP_max': [entity.max_health for entity in entities],
         'RNG' : [entity.weapon.range for entity in entities],
         'icon_x': [entity.x +0.1 for entity in entities],
         'icon_y': [entity.y + 0.9 for entity in entities],
+        'real_x': [entity.x for entity in entities],
+        'real_y': [entity.y for entity in entities],
         'name': [entity.name for entity in entities],
         'icon': [entity.icon.url for entity in entities],
         'weapon_icon': [entity.weapon.image.url for entity in entities],
         'weapon_name': [f'{entity.weapon.name}+{entity.weapon.level}' if entity.weapon.level != 0 else entity.weapon.name for entity in entities],
         'weapon_color': ['orange' if entity.weapon.damage_type == 'Physical' else 'cyan' if entity.weapon.damage_type == 'Magical' else 'black' for entity in entities],
-        'color': [('green' if character.id == player.id else 'blue') if character.is_playable else 'yellow' for character in characters] + ['deeppink' if monster.is_boss else 'red' for monster in monsters],
+        'color': [('green' if character.id == player.id else 'blue') if character.is_playable else 'gold' for character in characters] + ['deeppink' if monster.is_boss else 'red' for monster in monsters],
         'dash': ['solid' for _ in characters]+['dashed' if monster.is_key else 'solid' for monster in monsters],
         'type': ['character' if character.id != player.id else 'player' for character in characters] + ['boss' if monster.is_boss else 'monster' for monster in monsters]
     }
@@ -343,13 +364,21 @@ def create_map(player:Character, characters, monsters, treasures, objective:Mons
 
 
     treasure_data = {
-        'x' : [treasure.x +0.1 for treasure in treasures],
-        'y' : [treasure.y +0.9 for treasure in treasures],
+        'x' : [treasure.x + 0.5 for treasure in treasures],
+        'y' : [treasure.y + 0.5 for treasure in treasures],
+        'icon_x' : [treasure.x +0.1 for treasure in treasures],
+        'icon_y' : [treasure.y +0.9 for treasure in treasures],
+        'real_x' : [treasure.x for treasure in treasures],
+        'real_y' : [treasure.y for treasure in treasures],
+        'color' : [('gold' if treasure.treasure_type == 'Gold' else 'dimgray' if treasure.discovered else '#212121') if treasure.treasure_type != 'Weapon' or not treasure.discovered else 'orange' if treasure.weapon.damage_type == 'Physical' else 'cyan' if treasure.weapon.damage_type == 'Magical' else 'black' for treasure in treasures],
+        'inv': [(treasure.inventory[1:-1] if treasure.discovered  else '???') if treasure.treasure_type!='Weapon' else  (f'DMG: {treasure.weapon.damage}, RNG: {treasure.weapon.range}' if treasure.discovered else '') for treasure in treasures],
         'icon' : [treasure.icon.url for treasure in treasures],
-        'name': ['Discovered '+treasure.treasure_type if treasure.discovered else treasure.treasure_type for treasure in treasures],
+        'name': [('Discovered '+treasure.treasure_type if treasure.discovered else treasure.treasure_type if treasure.treasure_type != 'Weapon' else 'Undiscovered Weapon') if treasure.treasure_type!='Weapon' or not treasure.discovered else treasure.weapon.name for treasure in treasures],
     }
 
-    map.image_url(url='icon', x='x', y='y', h=0.8, w=0.8, name='name', source=treasure_data)
+    map.image_url(url='icon', x='icon_x', y='icon_y', h=0.8, w=0.8, name='name', source=treasure_data)
+    treasure = map.rect(x='x', y='y', width=0.8, height=0.8, fill_alpha=0, line_alpha=0, name='name', source=treasure_data)
+    treasure.tags = ['treasure']
 
 
     '''
@@ -400,6 +429,7 @@ def create_map(player:Character, characters, monsters, treasures, objective:Mons
     '''
 
     map.add_tools(HoverTool(renderers=map.select(tags=['entity']) , tooltips= ENTITY_TOOLTIPS))
+    map.add_tools(HoverTool(renderers=map.select(tags=['treasure']) , tooltips= TREASURE_TOOLTIPS))
 
 
     if show_map:

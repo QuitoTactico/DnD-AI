@@ -493,9 +493,9 @@ class Treasure(models.Model):
 
     def discover(self):
         self.discovered = True
-        if self.treasure_type.lower() == 'weapon':
+        if self.treasure_type == 'Weapon':
             try:
-                self.icon = self.weapon.icon.url
+                self.icon = self.weapon.image.url[6:]
             except:
                 self.icon = get_default_treasure_icon(self.treasure_type, discovered=False)
         else:
@@ -529,7 +529,10 @@ class Treasure(models.Model):
         if not self.icon:
             #discovered_str = 'discovered_' if self.discovered else ''
             #self.icon = f'map/default/{discovered_str}{self.treasure_type.replace(" ", "_").lower()}.png'
-            self.icon = get_default_treasure_icon(self.treasure_type, discovered=self.discovered)
+            if self.treasure_type == 'Weapon' and self.discovered:
+                self.icon = self.weapon.image.url[6:]
+            else: 
+                self.icon = get_default_treasure_icon(self.treasure_type, discovered=self.discovered) 
 
         super().save(*args, **kwargs)
 
