@@ -2,56 +2,7 @@ from django.db import models
 from .default import *
 import copy  # to level_up the weapon
 
-# Create your models here.
-
-
-# for default, the characters and monsters use their bare hands 
-class Weapon(models.Model):
-    """
-    Represents a weapon in the game.
-
-    Attributes:
-    - id (AutoField): The unique identifier of the weapon.
-    - is_template (BooleanField): Indicates if the weapon is a template or a unique instance.
-    - name (CharField): The name of the weapon.
-    - is_ranged (BooleanField): Indicates if the weapon is ranged or melee.
-    - weapon_type (CharField): The type of the weapon.
-    - damage_type (CharField): The type of damage the weapon deals.
-    - physical_description (CharField): A description of the physical appearance of the weapon.
-    - image (ImageField): An image of the weapon.
-    - damage (IntegerField): The amount of damage the weapon deals.
-    - range (IntegerField): The range of the weapon.
-    - range_level_points (IntegerField): The number of level points that increase the range of the weapon.
-    - durability (IntegerField): The durability of the weapon.
-    - level (IntegerField): The level of the weapon.
-    """
-
-    id = models.AutoField(primary_key=True) # added here to be seen in the __str__ 
-    # if the weapon is going to be modified, then we'll need to create a new one 
-    # to not modify that weapon template. Set is_template to False
-    is_template = models.BooleanField(default=False) 
-    name        = models.CharField(max_length=30, default="Bare hands")
-    is_ranged   = models.BooleanField(default=False)
-    weapon_type = models.CharField(max_length=15, default="Body part") # type was reserved
-    damage_type = models.CharField(max_length=15, default="Physical")
-
-    physical_description = models.CharField(max_length=100, default="It's using his own hands")
-    image       = models.ImageField(upload_to='weapon/images/', default='weapon/images/default/bare_hands.png')
-
-    # Statistics
-    damage          = models.IntegerField(default=6)
-    range           = models.IntegerField(default=1)
-    range_level_points = models.IntegerField(default=0)   # only for ranged weapons. 3 range level ups -> range +1
-    durability      = models.IntegerField(default=100)
-    level           = models.IntegerField(default=0)
-
-
-    def __str__(self):
-        str_is_ranged = 'Ranged' if self.is_ranged else 'Melee'
-        str_is_template = 'TEMPLATE' if self.is_template else 'UNIQUE'
-        str_level = f'+{self.level}' if self.level != 0 else ''
-        return f'[{self.id}] WEAPON, {str_is_template}, {self.name}{str_level}, {str_is_ranged}, {self.weapon_type}, {self.damage_type}, {self.damage}'
-
+# Necessary functions
 
 def get_default_weapon(weapon_name:str = None, entity_class:str = 'Warrior', entity:str = 'Character'):
     """
@@ -128,6 +79,57 @@ def get_default_treasure_icon(treasure_type:str, discovered:bool=False):
         return f'map/default/{DEFAULT_TREASURE_TYPES[treasure_type]}.png'
     else:
         return 'map/default/bag.png'
+
+
+# ----------------------------------- MODELS -----------------------------------
+
+
+# for default, the characters and monsters use their bare hands 
+class Weapon(models.Model):
+    """
+    Represents a weapon in the game.
+
+    Attributes:
+    - id (AutoField): The unique identifier of the weapon.
+    - is_template (BooleanField): Indicates if the weapon is a template or a unique instance.
+    - name (CharField): The name of the weapon.
+    - is_ranged (BooleanField): Indicates if the weapon is ranged or melee.
+    - weapon_type (CharField): The type of the weapon.
+    - damage_type (CharField): The type of damage the weapon deals.
+    - physical_description (CharField): A description of the physical appearance of the weapon.
+    - image (ImageField): An image of the weapon.
+    - damage (IntegerField): The amount of damage the weapon deals.
+    - range (IntegerField): The range of the weapon.
+    - range_level_points (IntegerField): The number of level points that increase the range of the weapon.
+    - durability (IntegerField): The durability of the weapon.
+    - level (IntegerField): The level of the weapon.
+    """
+
+    id = models.AutoField(primary_key=True) # added here to be seen in the __str__ 
+    # if the weapon is going to be modified, then we'll need to create a new one 
+    # to not modify that weapon template. Set is_template to False
+    is_template = models.BooleanField(default=False) 
+    name        = models.CharField(max_length=30, default="Bare hands")
+    is_ranged   = models.BooleanField(default=False)
+    weapon_type = models.CharField(max_length=15, default="Body part") # type was reserved
+    damage_type = models.CharField(max_length=15, default="Physical")
+
+    physical_description = models.CharField(max_length=100, default="It's using his own hands")
+    image       = models.ImageField(upload_to='weapon/images/', default='weapon/images/default/bare_hands.png')
+
+    # Statistics
+    damage          = models.IntegerField(default=6)
+    range           = models.IntegerField(default=1)
+    range_level_points = models.IntegerField(default=0)   # only for ranged weapons. 3 range level ups -> range +1
+    durability      = models.IntegerField(default=100)
+    level           = models.IntegerField(default=0)
+
+
+    def __str__(self):
+        str_is_ranged = 'Ranged' if self.is_ranged else 'Melee'
+        str_is_template = 'TEMPLATE' if self.is_template else 'UNIQUE'
+        str_level = f'+{self.level}' if self.level != 0 else ''
+        return f'[{self.id}] WEAPON, {str_is_template}, {self.name}{str_level}, {str_is_ranged}, {self.weapon_type}, {self.damage_type}, {self.damage}'
 
 
 class Character(models.Model):

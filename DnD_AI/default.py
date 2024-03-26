@@ -14,7 +14,8 @@ DEFAULT_TREASURE_TYPES = {
     'Chest': 'chest',
     'Discovered Chest': 'chest-discovered',
     'Key': 'key',
-    'Weapon' : 'weapon'
+    'Weapon' : 'weapon',
+    'Tombstone': 'tombstone',
 }
 
 DEFAULT_WEAPON_PER_RACE = {

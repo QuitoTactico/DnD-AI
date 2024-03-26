@@ -325,7 +325,7 @@ def create_map(player:Character, characters, monsters, treasures, objective:Mons
     # objective highlight
     if objective is not None:
         obj_color = 'deeppink' if objective.is_boss else 'red'
-        obj_dash = 'solid' if objective.is_key else 'solid'
+        obj_dash = 'dashed' if objective.is_key else 'solid'
         #map.circle(x=objective.x+0.5, y=objective.y+0.5, radius=1, fill_alpha=0, line_color=obj_color, line_dash=obj_dash, line_width=2)
         map.circle(x=objective.x+0.5, y=objective.y+0.5, radius=0.7, fill_alpha=0, line_color=obj_color, line_dash=obj_dash, line_width=2)
 
