@@ -1,11 +1,14 @@
 from .models import *
-from random import randint
 from .default import *
 
-from bokeh.plotting import figure, show
-from bokeh.models import Range1d, Span, CrosshairTool, HoverTool
-from django.conf import settings
-import os
+from random import randint  # to roll the dice
+
+#from django.conf import settings   # to image access
+#import os          
+
+from bokeh.plotting import figure, show                             # for plotting (map)
+from bokeh.models import Range1d, Span, CrosshairTool, HoverTool    # for plot personalization (map components)
+from bokeh.embed import components                                  # for plot html rendering (for the front-end)
 
 def roll_dice(): 
     return randint(1, 20)
@@ -33,6 +36,9 @@ def level_up_option(level:int) -> str:
         return opcion
 
 
+
+
+# -------------------------------- COMBAT ---------------------------------------
 
 def attack(attacker:Character|Monster, objective:Character|Monster, attacker_dice:int = roll_dice()) -> dict:
     '''### The attack function will calculate the result of an attack from an attacker to an objective. Any of them can be a character or a monster\n
@@ -66,7 +72,7 @@ def attack(attacker:Character|Monster, objective:Character|Monster, attacker_dic
     was_critical_hit = True if attacker_dice == 20 else False
 
     return {'attack': attack, 'damage_dealt': damage_dealt, 'objective_killed': objective_killed, 'was_critical_hit': was_critical_hit}
-    
+
 
 # The combat function will calculate the result of a combat_turn between a player and a monster
 def combat_turn(player:Character, monster:Monster, player_dice:int = roll_dice(), monster_dice:int = roll_dice()) -> dict[dict, dict]:
@@ -148,6 +154,9 @@ def full_combat(player:Character, monster:Monster):
     return {'player_died': player_died, 'monster_died': monster_died, 'combat_results': combat_results}
 
 
+# ---------------------------------------- ENTITY SELECTION ---------------------------------------------
+
+
 def player_selection(player_name):
     if player_name:
         try:
@@ -171,7 +180,7 @@ def player_selection(player_name):
             player.save()
     return player
 
-def monster_selection(monster_name):
+def target_selection_by_name(monster_name):
     if monster_name:
         try:
             monster = Monster.objects.get(name__iexact=monster_name)
@@ -194,7 +203,7 @@ def monster_selection(monster_name):
             monster.save()
     return monster
 
-def monster_selection_by_id(monster_id):
+def target_selection_by_id(monster_id):
     if monster_id:
         try:
             monster = Monster.objects.get(id=monster_id)
@@ -215,7 +224,6 @@ def monster_selection_by_id(monster_id):
             monster.save()
     return monster
 
-
 def get_monsters_in_range(player:Character, monsters):
     monsters_in_range = []
     for monster in monsters:
@@ -224,10 +232,10 @@ def get_monsters_in_range(player:Character, monsters):
     return monsters_in_range
 
 
-# --------------------------------------------- MAP ---------------------------------------------
+# ------------------------------------------------ MAP --------------------------------------------------
 
 
-def create_map(player:Character, characters, monsters, treasures, objective:Monster=None, host:str=None, show_map:bool=False):
+def create_map(player:Character, characters, monsters, treasures, objective:Monster=None, host:str=None, show_map:bool=False) -> tuple:
 
     map = figure(active_scroll='wheel_zoom', 
                  title="", 
@@ -380,8 +388,56 @@ def create_map(player:Character, characters, monsters, treasures, objective:Mons
     treasure = map.rect(x='x', y='y', width=0.8, height=0.8, fill_alpha=0, line_alpha=0, name='name', source=treasure_data)
     treasure.tags = ['treasure']
 
+    map.add_tools(HoverTool(renderers=map.select(tags=['entity']) , tooltips= ENTITY_TOOLTIPS))
+    map.add_tools(HoverTool(renderers=map.select(tags=['treasure']) , tooltips= TREASURE_TOOLTIPS))
 
-    '''
+
+    if show_map:
+        map.sizing_mode = 'scale_height'
+        show(map)
+        map.sizing_mode = 'scale_width'
+
+    map_script, map_div = components(map)
+    return map_script, map_div
+
+
+
+# ---------------------------------------------- RESOURCES ------------------------------------------------
+
+
+'''
+MAP PAST TRIES  (DON'T DELETE, PLEASE)
+
+    #logo_src = ColumnDataSource(dict(url = player.icon.url))
+    #logo_src = ColumnDataSource(player.icon.url)
+    logo_src = ColumnDataSource(data=dict(url=[player.icon.url]))
+    map = figure(width = 500, height = 500, title="")
+    map.toolbar.logo = None
+    map.toolbar_location = None
+    map.x_range=Range1d(start=0, end=1)
+    map.y_range=Range1d(start=0, end=1)
+    #map.xaxis.visible = None
+    #map.yaxis.visible = None
+    #map.xgrid.grid_line_color = None
+    #map.ygrid.grid_line_color = None
+    #map.image_url(url='url', x=0.05, y = 0.85, h=0.7, w=0.9, source=logo_src)
+    map.image_url(url=player.icon.url, x=0.05, y = 0.85, h=0.7, w=0.9, source=logo_src)
+    map.outline_line_alpha = 0 
+    show(map)
+
+    #logo_src = ColumnDataSource(data=dict(url=['/..'+player.icon.url]))
+    #icon_path = PurePath(player.icon.url)
+    #icon_path = icon_path.__str__()
+    #('stretch_width', 'stretch_height', 'stretch_both', 'scale_width', 'scale_height', 'scale_both', 'fixed', 'inherit')
+
+    #map.x_range.start = (player.x)-2
+    #map.image_url(url=['http://127.0.0.1:8000'+player.icon.url], x=0, y=0, h=1, w=1)
+
+    map.aspect_scale = 1
+    map.sizing_mode = 'stretch_both'
+    map.aspect_scale = 1
+
+    
     for character in characters:
         if character.id != player.id:
             character_x, character_y = character.x, character.y
@@ -426,51 +482,6 @@ def create_map(player:Character, characters, monsters, treasures, objective:Mons
     map.image_url(url=[weapon_path], x=player_x+0.5, y=player_y+0.5, h=0.4, w=0.4)
     borde_player = map.rect(name=player.name, x=player_x+0.5, y=player_y+0.5, width=0.8, height=0.8, line_color="green", fill_color='green', fill_alpha=0, line_width=2)
     borde_player.tags = ['player']
-    '''
-
-    map.add_tools(HoverTool(renderers=map.select(tags=['entity']) , tooltips= ENTITY_TOOLTIPS))
-    map.add_tools(HoverTool(renderers=map.select(tags=['treasure']) , tooltips= TREASURE_TOOLTIPS))
-
-
-    if show_map:
-        map.sizing_mode = 'scale_height'
-        show(map)
-        map.sizing_mode = 'scale_width'
-    return map
-
-
-
-'''
-MAP PAST TRIES
-
-    #logo_src = ColumnDataSource(dict(url = player.icon.url))
-    #logo_src = ColumnDataSource(player.icon.url)
-    logo_src = ColumnDataSource(data=dict(url=[player.icon.url]))
-    map = figure(width = 500, height = 500, title="")
-    map.toolbar.logo = None
-    map.toolbar_location = None
-    map.x_range=Range1d(start=0, end=1)
-    map.y_range=Range1d(start=0, end=1)
-    #map.xaxis.visible = None
-    #map.yaxis.visible = None
-    #map.xgrid.grid_line_color = None
-    #map.ygrid.grid_line_color = None
-    #map.image_url(url='url', x=0.05, y = 0.85, h=0.7, w=0.9, source=logo_src)
-    map.image_url(url=player.icon.url, x=0.05, y = 0.85, h=0.7, w=0.9, source=logo_src)
-    map.outline_line_alpha = 0 
-    show(map)
-
-    #logo_src = ColumnDataSource(data=dict(url=['/..'+player.icon.url]))
-    #icon_path = PurePath(player.icon.url)
-    #icon_path = icon_path.__str__()
-    #('stretch_width', 'stretch_height', 'stretch_both', 'scale_width', 'scale_height', 'scale_both', 'fixed', 'inherit')
-
-    #map.x_range.start = (player.x)-2
-    #map.image_url(url=['http://127.0.0.1:8000'+player.icon.url], x=0, y=0, h=1, w=1)
-
-    map.aspect_scale = 1
-    map.sizing_mode = 'stretch_both'
-    map.aspect_scale = 1
 
 
 MAP LABELS

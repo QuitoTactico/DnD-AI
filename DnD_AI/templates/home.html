@@ -31,8 +31,8 @@
       <h1 class="text">HISTORY</h1>
       
       <div class="map">
-        {{ div|safe }}
-        {{ script|safe }}
+        {{ map_div|safe }}
+        {{ map_script|safe }}
       </div>
 
       <br />
@@ -154,7 +154,7 @@
       {% csrf_token %}
 
       <input type="text" name="player_name" placeholder="Player Name" />
-      <input type="text" name="monster_id" placeholder="Monster ID" />
+      <input type="text" name="target_id" placeholder="Target ID">
       Test Page<input type="checkbox" id="test" name="test" />
       Roll Dice<input type="checkbox" id="dice_needed" name="dice_needed" />
 
