@@ -4,6 +4,7 @@ from .models import Character
 from .models import Monster
 from .models import Treasure
 from .models import History
+from .models import Tile
 
 # Register your models here.
 
@@ -12,3 +13,4 @@ admin.site.register(Character)
 admin.site.register(Monster)
 admin.site.register(Treasure)
 admin.site.register(History)
+admin.site.register(Tile)

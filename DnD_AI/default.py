@@ -7,15 +7,26 @@ def get_random_name():
     return fake.first_name()
 
 
+DEFAULT_TILE_TYPES = {
+    'grass':    'ground_grass_gen_07.png',
+    'dirt':     'Dirt_02.png',
+    'path':     '04univ3.png',
+    'dungeon':  'rock_weathered_10.png',
+    'boss':     'desert_cracksv_s.jpg',
+    'god':      '461223113.jpg',
+    'psycho':   '461223182.jpg',
+    'hell':     '461223163.jpg',
+}
+
 DEFAULT_TREASURE_TYPES = {
-    'Gold': 'gold',
-    'Bag': 'bag',
-    'Discovered Bag': 'bag-discovered',
-    'Chest': 'chest',
+    'Gold':             'gold',
+    'Bag':              'bag',
+    'Discovered Bag':   'bag-discovered',
+    'Chest':            'chest',
     'Discovered Chest': 'chest-discovered',
-    'Key': 'key',
-    'Weapon' : 'weapon',
-    'Tombstone': 'tombstone',
+    'Key':              'key',
+    'Weapon' :          'weapon',
+    'Tombstone':        'tombstone',
 }
 
 DEFAULT_WEAPON_PER_RACE = {

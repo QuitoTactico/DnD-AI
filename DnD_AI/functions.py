@@ -178,6 +178,8 @@ def player_selection(player_name):
         except:
             player = Character.objects.create()
             player.save()
+    #res = player.move('up') # for func testing
+    #print(res)
     return player
 
 def target_selection_by_name(monster_name):
@@ -315,8 +317,15 @@ def create_map(player:Character, characters, monsters, treasures, objective:Mons
     map.x_range = Range1d(start=(player.x)-2.5, end=(player.x)+3.5) # -2, +3
     map.y_range = Range1d(start=(player.y)-2.5, end=(player.y)+3.5) # -2, +3
 
+
+    # rendering the map tiles
+    for tile in Tile.objects.all():
+        map.image_url(url=[f'media/map/tiles/{DEFAULT_TILE_TYPES[tile.tile_type]}'], x=tile.x, y=tile.y +1, w=1, h=1)
+        
+
+    # the wepon range of the player will glow red if there are monsters in range, else it will be gray
     range_color,range_alpha = ('red',0.65) if len(get_monsters_in_range(player, monsters)) != 0 else ('gray',0.5)
-    
+
     map.block(hatch_pattern='diagonal_cross', 
                 hatch_scale=8, 
                 hatch_weight=0.5,
@@ -407,6 +416,9 @@ def create_map(player:Character, characters, monsters, treasures, objective:Mons
 
 '''
 MAP PAST TRIES  (DON'T DELETE, PLEASE)
+
+    #tile_color = 'green' if tile.tile_type == 'grass' else 'brown' if tile.tile_type == 'dirt' else 'gray' if tile.tile_type == 'path' else 'black' if tile.tile_type == 'dungeon' else 'red' if tile.tile_type == 'boss' else 'purple' if tile.tile_type == 'god' else 'orange' if tile.tile_type == 'psycho' else 'black'
+
 
     #logo_src = ColumnDataSource(dict(url = player.icon.url))
     #logo_src = ColumnDataSource(player.icon.url)

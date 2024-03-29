@@ -313,6 +313,24 @@ class Character(models.Model):
         ''' deletes the character '''
         self.delete()
         return True  # if was succesful
+    
+    def move(self, direction:str) -> bool:
+        if direction == 'up':
+            pos = (self.x, self.y+1)
+        if direction == 'down':
+            pos = (self.x, self.y-1)
+        if direction == 'right':
+            pos = (self.x+1, self.y)
+        if direction == 'left':
+            pos = (self.x-1, self.y)
+        
+        if Tile.objects.filter(x=pos[0], y=pos[1]).exists():
+            self.x = pos[0]
+            self.y = pos[1]
+            self.save()
+            return True
+        else: 
+            return False
 
     def save(self, *args, **kwargs):
         if not self.character_class:
@@ -573,6 +591,26 @@ class History(models.Model):
 
     def __str__(self):
         return f'[{self.id}] ({self.date}) {self.author} ({self.color}): {self.text}'
+    
+
+class Tile(models.Model):
+    """
+    Represents a tile in the game.
+
+    Attributes:
+    - id (AutoField): The unique identifier of the tile.
+    - tile_type (CharField): The type of the tile.
+    - x (IntegerField): The x-coordinate of the tile.
+    - y (IntegerField): The y-coordinate of the tile.
+    """
+
+    id = models.AutoField(primary_key=True)
+    tile_type = models.CharField(max_length=30, default="grass")
+    x = models.IntegerField(default=0)
+    y = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f'[{self.id}] ({self.x},{self.y}) {self.tile_type}'
 
 
 # -----------------------------------------------------
