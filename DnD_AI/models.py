@@ -2,9 +2,18 @@ from django.db import models
 from .default import *
 import copy  # to level_up the weapon
 
-# Necessary functions
+# - This two functions don't work if they're not here. Because some entities need them to be initialiced.
+# - Also, they need access to the models, so putting them on functions.py would generate a double-way importation.
+# - They can't be defined into the Entity model, because they would access the database while it's starting.
+# - Please don't change the name of get_bare_hands(), or some of the past makemigrations files will raise exceptions.
+# - Don't replace get_bare_hands() with get_default_weapon('bare_hands') on the weapon forean key. Just don't.
+# - If any of this steps is ignored for good practices sake, everything will just die. AGAIN. FOR THE FIFTH TIME.
 
-def get_default_weapon(weapon_name:str = None, entity_class:str = 'Warrior', entity:str = 'Character'):
+# if the migrations are not running (YOU SINNER, I TOLD YOU): 
+    # comment the content of this two functions and return None from both. 
+    # then, delete the database file and all the migrations files manually (except the __init__ file)
+    # run createmigrations, then migrate, then pray, then call me if it didn't work.
+def get_default_weapon(weapon_name:str = None, entity_class:str = 'Warrior'):
     """
     Returns the default weapon for a given entity.
 
@@ -35,50 +44,10 @@ def get_default_weapon(weapon_name:str = None, entity_class:str = 'Warrior', ent
             weapon_type=DEFAULT_WEAPON_STATS[weapon_name]['weapon_type']
     )
     return template_weapon
-    '''
-    return None'''
-    # if the migrations are not running, comment all this function lines and return None, 
-    # then delete the database and all migrations (except __init__) and 
-    # run createmigrations, then migrate.
-
-
-def get_bare_hands():
-    """
-    Returns the default weapon for bare hands.
-
-    Returns:
-    - template_weapon (Weapon): The default weapon for bare hands.
-    """
-    return get_default_weapon(weapon_name='Bare hands')
-    '''
-    return None'''
-    # if the migrations are not running, comment all this function lines and return None, 
-    # then delete the database and all migrations (except __init__) and 
-    # run createmigrations, then migrate.
-
-
-def get_default_entity_icon(entity_race:str, entity_class:str='Warrior') -> str:
-    if entity_race == 'Human':
-        if entity_class in DEFAULT_WEAPON_PER_CLASS.keys():
-            return f'entity/icons/default/{entity_class.lower().replace(' ', '_')}.png'
-        else:
-            return 'entity/images/default.png'
-    else:
-        if entity_race in DEFAULT_WEAPON_PER_CLASS.keys():
-            return f'entity/icons/default/{entity_race.lower().replace(' ', '_')}.png'
-        else:
-            return 'entity/images/default.png'
+    '''return None'''
     
-
-def get_default_treasure_icon(treasure_type:str, discovered:bool=False):
-    discovered_str = 'Discovered ' if discovered else ''
-    discovered_treasure = discovered_str+treasure_type
-    if discovered_treasure in DEFAULT_TREASURE_TYPES.keys():
-        return f'map/default/{DEFAULT_TREASURE_TYPES[discovered_treasure]}.png'
-    elif treasure_type in DEFAULT_TREASURE_TYPES.keys():
-        return f'map/default/{DEFAULT_TREASURE_TYPES[treasure_type]}.png'
-    else:
-        return 'map/default/bag.png'
+def get_bare_hands():
+    return get_default_weapon(weapon_name='Bare hands')
 
 
 # ----------------------------------- MODELS -----------------------------------
@@ -137,6 +106,7 @@ class Entity(models.Model):
     name = models.CharField(max_length=30, null=True, blank=True)
     physical_description  = models.CharField(max_length=200, default="Masculine, tall, black clothes")
 
+                                                         # DON'T CHANGE THIS T-T
     weapon = models.ForeignKey(Weapon, on_delete=models.SET(get_bare_hands), null=True, blank=True)
     got_initial_weapon = models.BooleanField(default=False)
 
@@ -157,6 +127,18 @@ class Entity(models.Model):
 
     # the inventory is a dictionary, but it's saved as a string
     inventory = models.TextField(default=str({'gold': 10, 'health potion': 2}))  
+
+    def get_default_entity_icon(entity_race:str, entity_class:str='Warrior') -> str:
+        if entity_race == 'Human':
+            if entity_class in DEFAULT_WEAPON_PER_CLASS.keys():
+                return f'entity/icons/default/{entity_class.lower().replace(' ', '_')}.png'
+            else:
+                return 'entity/images/default.png'
+        else:
+            if entity_race in DEFAULT_WEAPON_PER_CLASS.keys():
+                return f'entity/icons/default/{entity_race.lower().replace(' ', '_')}.png'
+            else:
+                return 'entity/images/default.png'
 
     def get_inventory(self) -> dict:
         ''' returns the inventory as a dictionary '''
@@ -193,7 +175,7 @@ class Entity(models.Model):
     def disarm(self) -> bool:
         ''' disarms the character, his weapon will be "Bare hands" \n
         returns if was succesful '''
-        self.weapon = get_bare_hands()
+        self.weapon = get_default_weapon(weapon_name='Bare hands')
         self.save()
         return True  # if was succesful
     
@@ -354,7 +336,7 @@ class Character(Entity, models.Model):
             self.character_class = self.character_race if self.character_race != 'Human' else 'Warrior'
 
         if not self.icon and not self.image:
-            self.icon = get_default_entity_icon(self.character_race, self.character_class)
+            self.icon = self.get_default_entity_icon(self.character_race, self.character_class)
 
         if self.icon and not self.image:
             self.image = self.icon
@@ -367,7 +349,7 @@ class Character(Entity, models.Model):
                 self.weapon = get_default_weapon(entity_class=self.character_class, entity='Character')
                 self.got_initial_weapon = True
             else:
-                self.weapon = get_bare_hands()
+                self.disarm()
 
         if not self.name:
             if self.character_race == 'Human':
@@ -428,7 +410,7 @@ class Monster(Entity, models.Model):
             self.monster_class = self.monster_race
 
         if not self.icon:
-            self.icon = get_default_entity_icon(self.monster_race, self.monster_class)
+            self.icon = self.get_default_entity_icon(self.monster_race, self.monster_class)
 
         if not self.name:
             self.name = self.monster_race+' '+get_random_name()
@@ -441,7 +423,7 @@ class Monster(Entity, models.Model):
                 self.weapon = get_default_weapon(entity_class=self.monster_class, entity='Monster')
                 self.got_initial_weapon = True
             else:
-                self.weapon = get_bare_hands()
+                self.weapon = self.disarm()
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -465,6 +447,15 @@ class Treasure(models.Model):
     y = models.IntegerField(default=0)
     icon = models.ImageField(upload_to="map/", null=True, blank=True)
 
+    def get_default_treasure_icon(treasure_type:str, discovered:bool=False):
+        discovered_str = 'Discovered ' if discovered else ''
+        discovered_treasure = discovered_str+treasure_type
+        if discovered_treasure in DEFAULT_TREASURE_TYPES.keys():
+            return f'map/default/{DEFAULT_TREASURE_TYPES[discovered_treasure]}.png'
+        elif treasure_type in DEFAULT_TREASURE_TYPES.keys():
+            return f'map/default/{DEFAULT_TREASURE_TYPES[treasure_type]}.png'
+        else:
+            return 'map/default/bag.png'
 
     def discover(self):
         self.discovered = True
@@ -472,9 +463,9 @@ class Treasure(models.Model):
             try:
                 self.icon = self.weapon.image.url[6:]
             except:
-                self.icon = get_default_treasure_icon(self.treasure_type, discovered=False)
+                self.icon = self.get_default_treasure_icon(self.treasure_type, discovered=False)
         else:
-            self.icon = get_default_treasure_icon(self.treasure_type, discovered=True)
+            self.icon = self.get_default_treasure_icon(self.treasure_type, discovered=True)
         self.save()
 
     def get_inventory(self) -> dict:
@@ -507,7 +498,7 @@ class Treasure(models.Model):
             if self.treasure_type == 'Weapon' and self.discovered:
                 self.icon = self.weapon.image.url[6:]
             else: 
-                self.icon = get_default_treasure_icon(self.treasure_type, discovered=self.discovered) 
+                self.icon = self.get_default_treasure_icon(self.treasure_type, discovered=self.discovered) 
 
         if len(self.get_inventory().keys()) == 0:
             self.delete()
