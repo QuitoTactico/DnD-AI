@@ -57,8 +57,8 @@ a:hover {
   grid-area: weapon;
 }
 
-.monster {
-  grid-area: monster;
+.target {
+  grid-area: target;
 }
 
 .action {grid-area: action;}
@@ -92,8 +92,8 @@ a:hover {
   grid-template:
     'logo logo logo logo about wiki'
     'map map text text player weapon'
-    'map map text text monster monster'
-    'action action action action monster monster'
+    'map map text text target target'
+    'action action action action target target'
     'lvl lvl lvl lvl lvl lvl';
 }
 

@@ -128,6 +128,9 @@ class Entity(models.Model):
     # the inventory is a dictionary, but it's saved as a string
     inventory = models.TextField(default=str({'gold': 10, 'health potion': 2}))  
 
+    def is_in_range(self, target):
+        return True if abs(self.x - target.x) <= self.weapon.range and abs(self.y - target.y) <= self.weapon.range else False
+
     def get_default_entity_icon(entity_race:str, entity_class:str='Warrior') -> str:
         if entity_race == 'Human':
             if entity_class in DEFAULT_WEAPON_PER_CLASS.keys():
@@ -159,6 +162,18 @@ class Entity(models.Model):
         self.inventory = str(inventory_dict)
         self.save()
         return True 
+    
+    def add_all_to_inventory(self, loot:dict) -> bool:
+        inventory_dict = self.get_inventory()
+        for item in loot:
+            if item in inventory_dict:
+                inventory_dict[item] += loot[item]
+            else:
+                inventory_dict[item] = loot[item]
+        self.inventory = str(inventory_dict)
+        self.save()
+        return True 
+
     
     def use_from_inventory(self, item:str, amount:int = 1) -> bool:
         ''' removes an item from the inventory, returns if was succesful '''
@@ -261,6 +276,13 @@ class Character(Entity, models.Model):
     level   = models.IntegerField(default=0)
     exp     = models.IntegerField(default=0)
     exp_top = models.IntegerField(default=30)  # exp until level_up
+
+    def get_monsters_in_range(self):
+        monsters_in_range = []
+        for monster in Monster.objects.all():
+            if abs(self.x - monster.x) <= self.weapon.range and abs(self.y - monster.y) <= self.weapon.range:
+                monsters_in_range.append(monster)
+        return monsters_in_range
 
     def level_up_stat(self, stat:str = 'max_health'):
         ''' levels up the character, you can choose the stat to increace \n
@@ -404,6 +426,13 @@ class Monster(Entity, models.Model):
     monster_class = models.CharField(max_length=30, null=True, blank=True)
 
     exp_drop = models.IntegerField(default=10)
+
+    def get_characters_in_range(self):
+        characters = []
+        for character in Character.objects.all():
+            if abs(self.x - character.x) <= self.weapon.range and abs(self.y - character.y) <= self.weapon.range:
+                characters.append(character)
+        return characters
 
     def save(self, *args, **kwargs):
         if not self.monster_class:

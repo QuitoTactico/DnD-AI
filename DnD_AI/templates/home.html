@@ -82,10 +82,12 @@
         <div>CLASS: {{player.character_class}}</div>
       </div>
 
-      <div class="monster">
-        {{monster.name}} 
-        <img src="{{monster.icon.url}}" width="150" height="150" />
-      </div>
+      {% if target is not None %}
+        <div class="target">
+          {{target.name}} 
+          <img src="{{target.icon.url}}" width="150" height="150" />
+        </div>
+      {% endif %}
 
       <!--
       <script>
@@ -137,6 +139,7 @@
             placeholder="Its time to do it"
           />
           <input type="hidden" name="player_name" value="{{player.name}}" />
+          {% if target is not None %}<input type="hidden" name="target_id" value="{{target.id}}" />{% endif %}
           <input id="font1" class="btnAction" type="submit" value="Act" />
         </form>
       </div>

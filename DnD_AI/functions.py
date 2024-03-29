@@ -40,7 +40,7 @@ def level_up_option(level:int) -> str:
 
 # -------------------------------- COMBAT ---------------------------------------
 
-def attack(attacker:Character|Monster, objective:Character|Monster, attacker_dice:int = roll_dice()) -> dict:
+def attack(attacker:Character|Monster, target:Character|Monster, attacker_dice:int = roll_dice(), attacker_is:str = 'player') -> dict:
     '''### The attack function will calculate the result of an attack from an attacker to an objective. Any of them can be a character or a monster\n
     The attack will be calculated based on the attacker's attack stats, weapon damage, weapon damage type and the objective's defense. The intensity varies depending on the dice result, the higher the result, the higher the damage.\n
     If the dice result is 20, the attack will be a CRITICAL HIT, doubling the damage. \n
@@ -50,28 +50,39 @@ def attack(attacker:Character|Monster, objective:Character|Monster, attacker_dic
     # Each plus point in the stats will increase the damage by 10% of the base damage
     if attacker.weapon.damage_type == 'Physical':
         attack = attacker.weapon.damage + int((attacker.weapon.damage*0.1)*attacker.strength)
-        defense = objective.physical_resistance
+        defense = target.physical_resistance
     elif attacker.weapon.damage_type == 'Magical': 
         attack = attacker.weapon.damage + int((attacker.weapon.damage*0.1)*attacker.intelligence)
-        defense = objective.magical_resistance
+        defense = target.magical_resistance
     else: # the attacker damage will be calculated as item damage
         attack = attacker.weapon.damage + int((attacker.weapon.damage*0.1)*attacker.recursiveness)
-        defense = objective.constitution
+        defense = target.constitution
 
     # The damage will be calculated as the difference between the attack and the defense, multiplied by the dice result
     # The dice result will be used to calculate the damage, the higher the result, the higher the damage
     # a dice result of 20 will double the damage, that's a CRITICAL HIT!
-    damage_dealt = int((attack - defense)*(attacker_dice/20)) if attacker_dice != 20 else (attack - defense)*2
-    objective.health -= damage_dealt
-
-    objective_killed = False
-    if objective.health < 0:
-        objective.kill()
-        objective_killed = True
+    damage_dealt = int((attack - (defense/50)*attack)*(attacker_dice/20)) if attacker_dice != 20 else int((attack - (defense/50)*attack)*2)
+    target.health -= damage_dealt
+  
+    target_killed = False if target.health > 0 else True
 
     was_critical_hit = True if attacker_dice == 20 else False
+    was_critical_hit_str = ' CRITICAL HIT.' if was_critical_hit else ''
 
-    return {'attack': attack, 'damage_dealt': damage_dealt, 'objective_killed': objective_killed, 'was_critical_hit': was_critical_hit}
+    History.objects.create(author='SYSTEM', text=f'D{attacker_dice}. {attacker.name} did {damage_dealt} points of DMG to {target.name}.{was_critical_hit_str}')
+
+    if was_critical_hit:
+        color = 'gold' if attacker_is == 'player' and not attacker.is_playable else 'blue' if attacker_is == 'player' else 'red'
+        History.objects.create(author=attacker.name, text='Take that!', color=color)
+
+    if damage_dealt == 0:
+        color = 'gold' if attacker_is == 'player' and not attacker.is_playable else 'blue' if attacker_is == 'player' else 'red'
+        History.objects.create(author=attacker.name, text='Oh no...', color=color)
+
+    attacker.save()
+    target.save()
+
+    return {'attack': attack, 'damage_dealt': damage_dealt, 'objective_killed': target_killed, 'was_critical_hit': was_critical_hit}
 
 
 # The combat function will calculate the result of a combat_turn between a player and a monster
@@ -87,7 +98,7 @@ def combat_turn(player:Character, monster:Monster, player_dice:int = roll_dice()
     - 'player_result'
     - 'monster_result'\n
     
-    Keys valid for 'player_results' and 'monster_results' dictionaries: 
+    Keys valid for 'player_results' and 'monster_results' dictionaries (if it's not None): 
     - 'attack'
     - 'damage_dealt'
     - 'objective_killed'
@@ -106,21 +117,51 @@ def combat_turn(player:Character, monster:Monster, player_dice:int = roll_dice()
         else: # damn, they have the same dexterity and the same dice result XD, let's make it random
             first = 'player' if randint(0, 1) == 1 else 'monster'
 
-    player_died, monster_died = False, False
+    player_died, monster_died, player_result, monster_result = False, False, None, None
     if first == 'player':
-        player_result = attack(player, monster, player_dice)
-        monster_died = player_result['objective_killed']
-        if not monster_died:
-            monster_result = attack(monster, player, monster_dice)
-            player_died = monster_result['objective_killed']
-    else:
-        monster_result = attack(monster, player, monster_dice)
-        player_died = monster_result['objective_killed']
-        if not player_died:
-            player_result = attack(player, monster, player_dice)
+        if player.is_in_range(monster):
+            player_result = attack(player, monster, player_dice, attacker_is='player')
             monster_died = player_result['objective_killed']
+        if monster_died:
+            player_won_combat(player, monster)
+        else:
+            if monster.is_in_range(player):
+                monster_result = attack(monster, player, monster_dice, attacker_is='monster')
+                player_died = monster_result['objective_killed']
+            if player_died:
+                player_died_in_combat(player, monster)
+    else:
+        if monster.is_in_range(player):
+            monster_result = attack(monster, player, monster_dice, attacker_is='monster')
+            player_died = monster_result['objective_killed']
+        if player_died:
+            player_died_in_combat(player, monster)
+        else:
+            if player.is_in_range(monster):
+                player_result = attack(player, monster, player_dice, attacker_is='player')
+                monster_died = player_result['objective_killed']
+            if monster_died:
+                player_won_combat(player, monster)
 
     return {'player_died': player_died, 'monster_died': monster_died, 'player_result': player_result, 'monster_result': monster_result}
+
+def player_died_in_combat(player:Character, monster:Monster):
+    Treasure.objects.create(treasure_type='Tombstone',
+                                    inventory=player.inventory,
+                                    x=player.x,
+                                    y=player.y,
+                                    discovered=True)
+    History.objects.create(author='SYSTEM', text=f'{player.name} died in combat.')
+    History.objects.create(author=monster.name, text='JA'*randint(5,15), color='red')
+    player.kill()
+
+def player_won_combat(player:Character, monster:Monster):
+    loot = monster.get_inventory()
+    player.add_all_to_inventory(loot)
+    player.exp += monster.exp_drop
+    History.objects.create(author='SYSTEM', text=f'{player.name} killed {monster.name}, got {monster.exp_drop} EXP and {loot}')
+    player.save()
+    monster.kill()
 
 
 # The full_combat function will calculate the result of a full combat between a player and a monster
@@ -158,7 +199,7 @@ def full_combat(player:Character, monster:Monster):
 
 
 def player_selection(player_name):
-    if player_name:
+    if player_name is not None:
         try:
             player = Character.objects.get(name__iexact=player_name)
         except:
@@ -226,13 +267,6 @@ def target_selection_by_id(monster_id):
             monster.save()
     return monster
 
-def get_monsters_in_range(player:Character, monsters):
-    monsters_in_range = []
-    for monster in monsters:
-        if abs(player.x - monster.x) <= player.weapon.range and abs(player.y - monster.y) <= player.weapon.range:
-            monsters_in_range.append(monster)
-    return monsters_in_range
-
 
 # ------------------------------------------------ ACT --------------------------------------------------
 
@@ -242,8 +276,22 @@ def action_interpreter():
 
 
 
-def command_executer(prompt:str, player:Character, target:Monster) -> bool:
+def command_executer(prompt:str, player:Character, target:Monster) -> tuple[bool, dict]:
+    '''
+    Returns
+    - successful : bool
+    - details : dict
+
+    details keys:
+    - 'player_died' : bool
+    - 'new_player'  : Character
+    - 'target_died' : bool
+    - 'new_target'  : Monster
+    
+    '''
     action = prompt.split(' ')
+
+    player_died, target_died, new_player, new_target = False, False, None, None
 
     if action[0] == 'move':
         action[1] = action[1].replace('-','')
@@ -253,8 +301,38 @@ def command_executer(prompt:str, player:Character, target:Monster) -> bool:
         successful = player.move(action[1])
         successful_str = 'successful' if successful else 'unsuccessful'
         History.objects.create(author='SYSTEM', text=f'Moving {action[1]} the player was {successful_str}').save()
+
+    if action[0] == 'attack':
+        try:
+            if len(action) > 1:
+                target_id = action[1]
+                if target_id.isdigit():
+                    target_id = int(target_id)
+                    target = target_selection_by_id(target_id)
+                else:
+                    target = target_selection_by_name(target_id)
+            result = combat_turn(player=player, monster=target, player_dice=roll_dice(), monster_dice=roll_dice())
+            if result['player_died']:
+                new_player = player_selection(None)
+                player_died = True
+            if result['monster_died']:
+                target_died = True
+                try:
+                    new_target = player.get_monsters_in_range()[0]
+                except:
+                    new_target = None
+            else:
+                new_target = target
+            successful = True
+        except:
+            successful = False
     
-    return successful
+    return successful, {
+        'player_died': player_died,
+        'new_player': new_player,
+        'target_died': target_died,
+        'new_target': new_target, 
+    }
 
 
 
@@ -349,7 +427,7 @@ def create_map(player:Character, characters, monsters, treasures, objective:Mons
         
 
     # the wepon range of the player will glow red if there are monsters in range, else it will be gray
-    range_color,range_alpha = ('red',0.65) if len(get_monsters_in_range(player, monsters)) != 0 else ('gray',0.5)
+    range_color,range_alpha = ('red',0.65) if len(player.get_monsters_in_range()) != 0 else ('gray',0.5)
 
     map.block(hatch_pattern='diagonal_cross', 
                 hatch_scale=8, 
