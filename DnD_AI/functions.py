@@ -234,6 +234,31 @@ def get_monsters_in_range(player:Character, monsters):
     return monsters_in_range
 
 
+# ------------------------------------------------ ACT --------------------------------------------------
+
+
+def action_interpreter():
+    pass
+
+
+
+def command_executer(prompt:str, player:Character, target:Monster) -> bool:
+    action = prompt.split(' ')
+
+    if action[0] == 'move':
+        action[1] = action[1].replace('-','')
+        if len(action) > 2:
+            action[1] = action[2]+action[1] if action[2] in ['up','down'] else action[1]+action[2]
+            
+        successful = player.move(action[1])
+        successful_str = 'successful' if successful else 'unsuccessful'
+        History.objects.create(author='SYSTEM', text=f'Moving {action[1]} the player was {successful_str}').save()
+    
+    return successful
+
+
+
+
 # ------------------------------------------------ MAP --------------------------------------------------
 
 

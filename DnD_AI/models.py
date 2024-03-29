@@ -132,7 +132,107 @@ class Weapon(models.Model):
         return f'[{self.id}] WEAPON, {str_is_template}, {self.name}{str_level}, {str_is_ranged}, {self.weapon_type}, {self.damage_type}, {self.damage}'
 
 
-class Character(models.Model):
+# Characters and Monsters share too much things, so this is for good practice
+class Entity(models.Model):
+    name = models.CharField(max_length=30, null=True, blank=True)
+    physical_description  = models.CharField(max_length=200, default="Masculine, tall, black clothes")
+
+    weapon = models.ForeignKey(Weapon, on_delete=models.SET(get_bare_hands), null=True, blank=True)
+    got_initial_weapon = models.BooleanField(default=False)
+
+    # Stats
+    max_health          = models.IntegerField(default=100)  # health limit
+    health              = models.IntegerField(null=True, blank=True)  # if reaches 0, the entity dies
+    strength            = models.IntegerField(default=10)   # plus to physical attacks
+    intelligence        = models.IntegerField(default=10)   # plus to magical attacks
+    recursiveness       = models.IntegerField(default=10)   # plus to item attacks
+    dexterity           = models.IntegerField(default=10)   # decides who attacks first
+    physical_resistance = models.IntegerField(default=10)   # reduces physical damage
+    magical_resistance  = models.IntegerField(default=10)   # reduces magical damage
+    constitution        = models.IntegerField(default=10)   # reduces item damage
+
+    x       = models.IntegerField(default=0)
+    y       = models.IntegerField(default=0)
+    icon    = models.ImageField(upload_to="entity/icons/", null=True, blank=True)
+
+    # the inventory is a dictionary, but it's saved as a string
+    inventory = models.TextField(default=str({'gold': 10, 'health potion': 2}))  
+
+    def get_inventory(self) -> dict:
+        ''' returns the inventory as a dictionary '''
+        inventory_dict = {}
+        try:
+            inventory_dict = eval(self.inventory)
+        except:
+            pass
+        return inventory_dict
+    
+    def add_to_inventory(self, item:str, amount:int = 1) -> bool:
+        ''' adds an item to the inventory, returns if was succesful '''
+        inventory_dict = self.get_inventory()
+        if item in inventory_dict:
+            inventory_dict[item] += amount
+        else:
+            inventory_dict[item] = amount
+        self.inventory = str(inventory_dict)
+        self.save()
+        return True 
+    
+    def use_from_inventory(self, item:str, amount:int = 1) -> bool:
+        ''' removes an item from the inventory, returns if was succesful '''
+        inventory_dict = self.get_inventory()
+        if item in inventory_dict:
+            inventory_dict[item] -= amount
+            if inventory_dict[item] <= 0:
+                del inventory_dict[item]
+            self.inventory = str(inventory_dict)
+            self.save()
+            return True
+        return False
+
+    def disarm(self) -> bool:
+        ''' disarms the character, his weapon will be "Bare hands" \n
+        returns if was succesful '''
+        self.weapon = get_bare_hands()
+        self.save()
+        return True  # if was succesful
+    
+    def kill(self) -> bool:
+        ''' deletes the character '''
+        self.delete()
+        return True  # if was succesful
+
+    def move(self, direction:str) -> bool:
+        if direction == 'up':
+            pos = (self.x, self.y+1)
+        elif direction == 'down':
+            pos = (self.x, self.y-1)
+        elif direction == 'right':
+            pos = (self.x+1, self.y)
+        elif direction == 'left':
+            pos = (self.x-1, self.y)
+        elif direction == 'upright':
+            pos = (self.x+1, self.y+1)
+        elif direction == 'upleft':
+            pos = (self.x-1, self.y+1)
+        elif direction == 'downright':
+            pos = (self.x+1, self.y-1)
+        elif direction == 'downleft':
+            pos = (self.x-1, self.y-1)
+        
+        if Tile.objects.filter(x=pos[0], y=pos[1]).exists() and not Character.objects.filter(x=pos[0], y=pos[1]).exists() and not Monster.objects.filter(x=pos[0], y=pos[1]).exists() and not Treasure.objects.filter(x=pos[0], y=pos[1]).exists():
+            self.x = pos[0]
+            self.y = pos[1]
+            self.save()
+            return True
+        else: 
+            return False
+
+    class Meta:
+        abstract = True
+
+
+class Character(Entity, models.Model):
     """
     Represents a character in the game.
 
@@ -166,10 +266,8 @@ class Character(models.Model):
 
     id          = models.AutoField(primary_key=True) # added here to be seen in the __str__ 
     is_playable = models.BooleanField(default=True) # playable or NPC
-    name        = models.CharField(max_length=30, null=True, blank=True)
     story       = models.CharField(max_length=1000, default="DEFAULT_STORY")
 
-    physical_description    = models.CharField(max_length=200, default="Masculine, tall, white skin, black clothes")
     image                   = models.ImageField(upload_to='entity/images/', null=True, blank=True)
 
     # Character description 
@@ -178,61 +276,9 @@ class Character(models.Model):
     character_race  = models.CharField(max_length=30, default="Human")
     character_class = models.CharField(max_length=30, null=True, blank=True) 
 
-    weapon = models.ForeignKey(Weapon, on_delete=models.SET(get_bare_hands), null=True, blank=True)
-    got_initial_weapon = models.BooleanField(default=False)
-    
-    # Stats
-    max_health      = models.IntegerField(default=100)  # health limit
-    health          = models.IntegerField(null=True, blank=True)  # if reaches 0, the character dies
-    strength        = models.IntegerField(default=10)   # plus to physical attacks
-    intelligence    = models.IntegerField(default=10)   # plus to magical attacks
-    recursiveness   = models.IntegerField(default=10)   # plus to item attacks
-    dexterity       = models.IntegerField(default=10)   # decides who attacks first
-    physical_resistance = models.IntegerField(default=10)   # reduces physical damage
-    magical_resistance  = models.IntegerField(default=10)   # reduces magical damage
-    constitution        = models.IntegerField(default=10)   # reduces item damage
-
     level   = models.IntegerField(default=0)
     exp     = models.IntegerField(default=0)
     exp_top = models.IntegerField(default=30)  # exp until level_up
-
-    x       = models.IntegerField(default=0)
-    y       = models.IntegerField(default=0)
-    icon    = models.ImageField(upload_to="entity/icons/", null=True, blank=True)
-
-    inventory = models.TextField(default=str({'gold': 10, 'health potion': 2}))  # the inventory is a dictionary, but it's saved as a string
-
-    def get_inventory(self) -> dict:
-        ''' returns the inventory as a dictionary '''
-        inventory_dict = {}
-        try:
-            inventory_dict = eval(self.inventory)
-        except:
-            pass
-        return inventory_dict
-    
-    def add_to_inventory(self, item:str, amount:int = 1) -> bool:
-        ''' adds an item to the inventory, returns if was succesful '''
-        inventory_dict = self.get_inventory()
-        if item in inventory_dict:
-            inventory_dict[item] += amount
-        else:
-            inventory_dict[item] = amount
-        self.inventory = str(inventory_dict)
-        self.save()
-        return True
-    
-    def use_from_inventory(self, item:str, amount:int = 1) -> bool:
-        ''' removes an item from the inventory, returns if was succesful '''
-        inventory_dict = self.get_inventory()
-        if item in inventory_dict:
-            inventory_dict[item] -= amount
-            if inventory_dict[item] <= 0:
-                del inventory_dict[item]
-            self.inventory = str(inventory_dict)
-            self.save()
-            return True
-        return False
 
     def level_up_stat(self, stat:str = 'max_health'):
         ''' levels up the character, you can choose the stat to increace \n
@@ -302,35 +348,6 @@ class Character(models.Model):
 
         return leveled_weapon  # if you want to easily show the weapon or something like that
     
-    def disarm(self) -> bool:
-        ''' disarms the character, his weapon will be "Bare hands" \n
-        returns if was succesful '''
-        self.weapon = get_bare_hands()
-        self.save()
-        return True  # if was succesful
-    
-    def kill(self) -> bool:
-        ''' deletes the character '''
-        self.delete()
-        return True  # if was succesful
-    
-    def move(self, direction:str) -> bool:
-        if direction == 'up':
-            pos = (self.x, self.y+1)
-        if direction == 'down':
-            pos = (self.x, self.y-1)
-        if direction == 'right':
-            pos = (self.x+1, self.y)
-        if direction == 'left':
-            pos = (self.x-1, self.y)
-        
-        if Tile.objects.filter(x=pos[0], y=pos[1]).exists():
-            self.x = pos[0]
-            self.y = pos[1]
-            self.save()
-            return True
-        else: 
-            return False
 
     def save(self, *args, **kwargs):
         if not self.character_class:
@@ -369,7 +386,7 @@ class Character(models.Model):
         return f'[{self.id}] ({self.x},{self.y}) {str_is_playable}, {self.name}, {raceclass}, HP: {self.health}, Level: {self.level}, Weapon: [{self.weapon}]'
 
 
-class Monster(models.Model):
+class Monster(Entity, models.Model):
     """
     Represents a monster in the game.
 
@@ -398,71 +415,14 @@ class Monster(models.Model):
     """
 
     id      = models.AutoField(primary_key=True) # added here to be seen in the __str__ 
-    name    = models.CharField(max_length=30, null=True, blank=True)
     is_key  = models.BooleanField(default=False)
     is_boss = models.BooleanField(default=False)
 
     monster_race  = models.CharField(max_length=30, default="Goblin")
     monster_class = models.CharField(max_length=30, null=True, blank=True)
 
-    physical_description = models.CharField(max_length=100, default="Green goblin, small, with no weapon")
-
-    weapon = models.ForeignKey(Weapon, on_delete=models.SET(get_bare_hands), null=True, blank=True)
-    got_initial_weapon = models.BooleanField(default=False)
-
-    # Stats
-    max_health      = models.IntegerField(default=100)  # health limit
-    health          = models.IntegerField(null=True, blank=True)  # if reaches 0, the monster dies
-    strength        = models.IntegerField(default=10)   # plus to physical attacks
-    intelligence    = models.IntegerField(default=10)   # plus to magical attacks
-    recursiveness   = models.IntegerField(default=10)   # plus to item attacks
-    dexterity       = models.IntegerField(default=10)   # decides who attacks first
-    physical_resistance = models.IntegerField(default=10)   # reduces physical damage
-    magical_resistance  = models.IntegerField(default=10)   # reduces magical damage
-    constitution        = models.IntegerField(default=10)   # reduces item damage
-
     exp_drop = models.IntegerField(default=10)
 
-    x       = models.IntegerField(default=2)
-    y       = models.IntegerField(default=2)
-    icon    = models.ImageField(upload_to="entity/icons/", null=True, blank=True)
-
-    inventory = models.TextField(default=str({'gold': 10}))  # the inventory is a dictionary, but it's saved as a string
-
-    def get_inventory(self) -> dict:
-        ''' returns the inventory as a dictionary '''
-        inventory_dict = {}
-        try:
-            inventory_dict = eval(self.inventory)
-        except:
-            pass
-        return inventory_dict
-    
-    def add_to_inventory(self, item:str, amount:int = 1) -> bool:
-        ''' adds an item to the inventory, returns if was succesful '''
-        inventory_dict = self.get_inventory()
-        if item in inventory_dict:
-            inventory_dict[item] += amount
-        else:
-            inventory_dict[item] = amount
-        self.inventory = str(inventory_dict)
-        self.save()
-        return True
-
-    def disarm(self) -> bool:
-        ''' disarms the monster, his weapon will be "Bare hands"\n
-        returns if was succesful '''
-        self.weapon = get_bare_hands()
-        self.save()
-        return True  # if was succesful
-    
-    def kill(self) -> tuple[bool, bool]:
-        ''' deletes the monster \n
-        returns a tuple. (if was succesful , if was a key monster)'''
-        was_key = True if self.is_key else False
-        self.delete()
-        return True, was_key  
-    
     def save(self, *args, **kwargs):
         if not self.monster_class:
             self.monster_class = self.monster_race
@@ -492,18 +452,7 @@ class Monster(models.Model):
     
 
 class Treasure(models.Model):
-    """
-    Represents a Treasure in the game.
-
-    Attributes:
-    - id (AutoField): The unique identifier of the treasure.
-    - is_key (BooleanField): Indicates if the treasure is a key for the campaign.
-    - treasure_type (CharField): The type of the treasure.
-    - discovered (BooleanField): Indicates if the treasure has been discovered.
-    - inventory (TextField): The inventory of the treasure.
-    - x (IntegerField): The x-coordinate of the treasure.
-    - y (IntegerField): The y-coordinate of the treasure.
-    """
+    """Represents a Treasure in the game."""
 
     id = models.AutoField(primary_key=True)
     is_key = models.BooleanField(default=False)
@@ -560,6 +509,9 @@ class Treasure(models.Model):
             else: 
                 self.icon = get_default_treasure_icon(self.treasure_type, discovered=self.discovered) 
 
+        if len(self.get_inventory().keys()) == 0:
+            self.delete()
+
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -570,16 +522,7 @@ class Treasure(models.Model):
     
 
 class History(models.Model):
-    """
-    Represents the history of the game.
-
-    Attributes:
-    - id (AutoField): The unique identifier of the history.
-    - author (CharField): The author of the history.
-    - text (CharField): The text of the history.
-    - color (CharField): The color of the history.
-    - date (DateTimeField): The date of the history.
-    """
+    """Represents an entry in the history of the game. (Provisional name)"""
 
     id = models.AutoField(primary_key=True)
     is_key = models.BooleanField(default=False)
@@ -594,15 +537,7 @@ class History(models.Model):
     
 
 class Tile(models.Model):
-    """
-    Represents a tile in the game.
-
-    Attributes:
-    - id (AutoField): The unique identifier of the tile.
-    - tile_type (CharField): The type of the tile.
-    - x (IntegerField): The x-coordinate of the tile.
-    - y (IntegerField): The y-coordinate of the tile.
-    """
+    """Represents a tile in the map."""
 
     id = models.AutoField(primary_key=True)
     tile_type = models.CharField(max_length=30, default="grass")

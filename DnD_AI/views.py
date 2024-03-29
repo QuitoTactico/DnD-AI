@@ -15,6 +15,8 @@ def home(request):
         - target_id
         - dice_needed
         - prompt
+
+        - map_tiles   # future development, send-receiver loop to reduce backend stress
         '''
 
         # ------------------------- GETTING POST LABELS -----------------------------
@@ -28,24 +30,22 @@ def home(request):
         dice_value = roll_dice() if dice_needed else None
 
         # Adding the action prompt and response to the History model, so it's rendered on the game console
+        command = False
         if 'prompt' in request.POST:
-            prompt = request.POST.get('prompt')
-            response = get_response(prompt)
-            History.objects.create(author=request.POST['player_name'], text=request.POST['prompt'], color='blue').save()
-            History.objects.create(author='SYSTEM', text=response).save()
-            
-        
-        # --------------------- GETTING DATA FROM THE DATABASE -----------------------
-            
-        
-        # Getting all the models
-        characters  = Character.objects.all()
-        players     = Character.objects.filter(is_playable=True)
-        monsters    = Monster.objects.all()
-        weapons     = Weapon.objects.all()
-        treasures   = Treasure.objects.all()
-        history     = History.objects.all()
-            
+            prompt = request.POST['prompt']
+            History.objects.create(author=request.POST['player_name'], text=prompt, color='blue').save()
+
+            if prompt[0] == '/':
+                prompt = prompt[1:]
+                command = True
+            else:
+                response = get_response(prompt)
+                History.objects.create(author='SYSTEM', text=response).save()
+
+
+        # ------------------------- GETTING PLAYER AND TARGET -----------------------------
+                
+
         # If the name of a character is sent, that character will be the actual player
         player_name = None if 'player_name' not in request.POST else request.POST['player_name']
         player = player_selection(player_name)
@@ -57,6 +57,25 @@ def home(request):
             target = target_selection_by_id(target_id)
         else:
             target = target_selection_by_name(target_id)
+
+
+        # --------------------------------- ACTING ----------------------------------
+
+
+        if command:
+            command_executer(prompt, player, target)
+
+        
+        # --------------------- GETTING DATA FROM THE DATABASE -----------------------
+            
+        
+        # Getting all the models
+        characters  = Character.objects.all()
+        players     = Character.objects.filter(is_playable=True)
+        monsters    = Monster.objects.all()
+        weapons     = Weapon.objects.all()
+        treasures   = Treasure.objects.all()
+        history     = History.objects.all()
 
 
         # -------------------------------------- MAP -----------------------------------------
