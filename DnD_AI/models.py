@@ -283,6 +283,18 @@ class Character(Entity, models.Model):
             if abs(self.x - monster.x) <= self.weapon.range and abs(self.y - monster.y) <= self.weapon.range:
                 monsters_in_range.append(monster)
         return monsters_in_range
+    
+    def get_treasures_in_range(self, treasure_to_take:str = 'all', is_weapon:bool = False):
+        treasures_in_range = []
+        if not is_weapon:
+            for treasure in Treasure.objects.all():
+                if abs(self.x - treasure.x) <= 1 and abs(self.y - treasure.y) <= 1 and (treasure_to_take == 'all' or treasure_to_take == treasure.treasure_type.lower()):
+                    treasures_in_range.append(treasure)
+        else:
+            for treasure in Treasure.objects.filter(treasure_type='Weapon'):
+                if abs(self.x - treasure.x) <= 1 and abs(self.y - treasure.y) <= 1 and treasure.weapon.name.lower() == treasure_to_take:
+                    treasures_in_range.append(treasure)
+        return treasures_in_range
 
     def level_up_stat(self, stat:str = 'max_health'):
         ''' levels up the character, you can choose the stat to increace \n
@@ -529,15 +541,20 @@ class Treasure(models.Model):
             else: 
                 self.icon = self.get_default_treasure_icon(self.treasure_type, discovered=self.discovered) 
 
-        if len(self.get_inventory().keys()) == 0:
+        if len(self.get_inventory().keys()) == 0 and self.treasure_type != 'Weapon' and self.discovered:
             self.delete()
+
+        if self.weapon is None and self.treasure_type == 'Weapon':
+            self.weapon = get_default_weapon(entity_class=DEFAULT_WEAPON_PER_CLASS.keys()[randint(0, len(DEFAULT_WEAPON_PER_CLASS.keys()))])
+            self.save()
 
         super().save(*args, **kwargs)
 
     def __str__(self):
         key_str = 'KEY ' if self.is_key else ''
         discovered_str = 'DISCOVERED, ' if self.discovered else ''
-        return f'[{self.id}] ({self.x},{self.y}) {key_str}{self.treasure_type}, {discovered_str}{self.inventory}'
+        loot = self.weapon.name if self.treasure_type == 'Weapon' else self.inventory
+        return f'[{self.id}] ({self.x},{self.y}) {key_str}{self.treasure_type}, {discovered_str}{loot}'
 
     
 

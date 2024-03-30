@@ -293,16 +293,23 @@ def command_executer(prompt:str, player:Character, target:Monster) -> tuple[bool
         action[1] = action[1].replace('-','')
         if len(action) > 2:
             action[1] = action[2]+action[1] if action[2] in ['up','down'] else action[1]+action[2]
-            
+        
         successful = player.move(action[1])
+
+        for treasure in player.get_treasures_in_range():
+            if not treasure.discovered:
+                treasure.discover()
+
         if not successful:
             History.objects.create(author='SYSTEM', text="You can't be there").save()
-        try:
-            new_target = player.get_monsters_in_range()[0]
-        except:
-            new_target = None
 
-    if action[0] == 'attack':
+        if target is None or target not in player.get_monsters_in_range():
+            try:
+                new_target = player.get_monsters_in_range()[0]
+            except:
+                new_target = None
+
+    elif action[0] == 'attack':
         try:
             if len(action) > 1:
                 target_id = action[1]
@@ -326,7 +333,51 @@ def command_executer(prompt:str, player:Character, target:Monster) -> tuple[bool
             successful = True
         except:
             successful = False
-    
+
+    elif action[0] == 'take':
+        treasure_to_take = action[1].lower() if len(action) > 1 else 'all'
+        possible_treasures = player.get_treasures_in_range(treasure_to_take)
+        possible_treasures, treasure_to_take = player.get_treasures_in_range(treasure_to_take, is_weapon=True) if len(possible_treasures) == 0 else possible_treasures, 'weapon' if len(possible_treasures) == 0 else treasure_to_take
+
+        if len(possible_treasures) == 0:
+            treasure_to_take = 'treasures' if treasure_to_take == 'all' else treasure_to_take
+            History.objects.create(author='SYSTEM', text=f"There's no {treasure_to_take} to take here.").save()
+            successful = False
+
+        elif treasure_to_take != 'weapon':
+            for treasure in possible_treasures:
+                if treasure.treasure_type != 'Weapon':
+                    loot = treasure.get_inventory()
+                    History.objects.create(author='SYSTEM', text=f'{player.name} got {loot} from {treasure.treasure_type}.').save()
+                    player.add_all_to_inventory(loot)
+                    treasure.delete()
+        else:
+            for treasure in possible_treasures:
+                loot = treasure.weapon
+                History.objects.create(author='SYSTEM', text=f'{player.name} equipped {loot.name}.').save()
+                player.weapon = loot
+                player.save()
+                treasure.delete()
+        successful = True
+
+    # specifically for weapons
+    elif action[0] == 'equip':
+        treasure_to_take = action[1].lower() if len(action) > 1 else 'all'
+        possible_treasures = player.get_treasures_in_range(treasure_to_take, is_weapon=True)
+        if len(possible_treasures) == 0:
+            treasure_to_take = 'weapons' if treasure_to_take == 'all' else treasure_to_take
+            History.objects.create(author='SYSTEM', text=f"There's no {treasure_to_take} to take here.").save()
+            successful = False
+        else:
+            for treasure in possible_treasures:
+                loot = treasure.weapon
+                History.objects.create(author='SYSTEM', text=f'{player.name} equipped {loot.name}.').save()
+                player.weapon = loot
+                player.save()
+                treasure.delete()
+                break
+        successful = True
+        
     return successful, {
         'player_died': player_died,
         'new_player': new_player,

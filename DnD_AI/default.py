@@ -1,5 +1,6 @@
 #import database of common names
 from faker import Faker
+from random import randint
 
 fake = Faker()
 
