@@ -54,7 +54,7 @@ def home(request):
 
         # If the id or name of a monster is sent, that monster will be the actual target
         target_id = None if 'target_id' not in request.POST else request.POST['target_id']
-        if target_id is not None:
+        if target_id is not None and target_id != '':
             if target_id.isdigit():
                 target_id = int(target_id)
                 target = target_selection_by_id(target_id)
@@ -73,7 +73,7 @@ def home(request):
             if command_details['player_died']:
                 player = command_details['new_player']
             target = command_details['new_target']
-            target_id = target.id
+            target_id = target.id if target is not None else None
 
         
         # --------------------- GETTING DATA FROM THE DATABASE -----------------------

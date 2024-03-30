@@ -64,7 +64,7 @@ def attack(attacker:Character|Monster, target:Character|Monster, attacker_dice:i
     damage_dealt = int((attack - (defense/50)*attack)*(attacker_dice/20)) if attacker_dice != 20 else int((attack - (defense/50)*attack)*2)
     target.health -= damage_dealt
   
-    target_killed = False if target.health > 0 else True
+    target_killed = True if target.health <= 0 else False
 
     was_critical_hit = True if attacker_dice == 20 else False
     was_critical_hit_str = ' CRITICAL HIT.' if was_critical_hit else ''
@@ -82,7 +82,7 @@ def attack(attacker:Character|Monster, target:Character|Monster, attacker_dice:i
     attacker.save()
     target.save()
 
-    return {'attack': attack, 'damage_dealt': damage_dealt, 'objective_killed': target_killed, 'was_critical_hit': was_critical_hit}
+    return {'attack': attack, 'damage_dealt': damage_dealt, 'target_killed': target_killed, 'was_critical_hit': was_critical_hit}
 
 
 # The combat function will calculate the result of a combat_turn between a player and a monster
@@ -101,7 +101,7 @@ def combat_turn(player:Character, monster:Monster, player_dice:int = roll_dice()
     Keys valid for 'player_results' and 'monster_results' dictionaries (if it's not None): 
     - 'attack'
     - 'damage_dealt'
-    - 'objective_killed'
+    - 'target_killed'
     - 'was_critical_hit'\n
     '''
 
@@ -121,36 +121,32 @@ def combat_turn(player:Character, monster:Monster, player_dice:int = roll_dice()
     if first == 'player':
         if player.is_in_range(monster):
             player_result = attack(player, monster, player_dice, attacker_is='player')
-            monster_died = player_result['objective_killed']
+            monster_died = player_result['target_killed']
         if monster_died:
             player_won_combat(player, monster)
         else:
             if monster.is_in_range(player):
                 monster_result = attack(monster, player, monster_dice, attacker_is='monster')
-                player_died = monster_result['objective_killed']
+                player_died = monster_result['target_killed']
             if player_died:
                 player_died_in_combat(player, monster)
     else:
         if monster.is_in_range(player):
             monster_result = attack(monster, player, monster_dice, attacker_is='monster')
-            player_died = monster_result['objective_killed']
+            player_died = monster_result['target_killed']
         if player_died:
             player_died_in_combat(player, monster)
         else:
             if player.is_in_range(monster):
                 player_result = attack(player, monster, player_dice, attacker_is='player')
-                monster_died = player_result['objective_killed']
+                monster_died = player_result['target_killed']
             if monster_died:
                 player_won_combat(player, monster)
 
     return {'player_died': player_died, 'monster_died': monster_died, 'player_result': player_result, 'monster_result': monster_result}
 
 def player_died_in_combat(player:Character, monster:Monster):
-    Treasure.objects.create(treasure_type='Tombstone',
-                                    inventory=player.inventory,
-                                    x=player.x,
-                                    y=player.y,
-                                    discovered=True)
+    Treasure.objects.create(treasure_type='Tombstone', inventory=player.inventory, x=player.x, y=player.y, discovered=False)
     History.objects.create(author='SYSTEM', text=f'{player.name} died in combat.')
     History.objects.create(author=monster.name, text='JA'*randint(5,15), color='red')
     player.kill()
@@ -291,7 +287,7 @@ def command_executer(prompt:str, player:Character, target:Monster) -> tuple[bool
     '''
     action = prompt.split(' ')
 
-    player_died, target_died, new_player, new_target = False, False, None, None
+    player_died, target_died, new_player, new_target = False, False, player, target
 
     if action[0] == 'move':
         action[1] = action[1].replace('-','')
@@ -299,8 +295,12 @@ def command_executer(prompt:str, player:Character, target:Monster) -> tuple[bool
             action[1] = action[2]+action[1] if action[2] in ['up','down'] else action[1]+action[2]
             
         successful = player.move(action[1])
-        successful_str = 'successful' if successful else 'unsuccessful'
-        History.objects.create(author='SYSTEM', text=f'Moving {action[1]} the player was {successful_str}').save()
+        if not successful:
+            History.objects.create(author='SYSTEM', text="You can't be there").save()
+        try:
+            new_target = player.get_monsters_in_range()[0]
+        except:
+            new_target = None
 
     if action[0] == 'attack':
         try:

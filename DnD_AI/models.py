@@ -131,7 +131,7 @@ class Entity(models.Model):
     def is_in_range(self, target):
         return True if abs(self.x - target.x) <= self.weapon.range and abs(self.y - target.y) <= self.weapon.range else False
 
-    def get_default_entity_icon(entity_race:str, entity_class:str='Warrior') -> str:
+    def get_default_entity_icon(self, entity_race:str, entity_class:str='Warrior') -> str:
         if entity_race == 'Human':
             if entity_class in DEFAULT_WEAPON_PER_CLASS.keys():
                 return f'entity/icons/default/{entity_class.lower().replace(' ', '_')}.png'
@@ -368,7 +368,7 @@ class Character(Entity, models.Model):
 
         if not self.weapon:
             if not self.got_initial_weapon:
-                self.weapon = get_default_weapon(entity_class=self.character_class, entity='Character')
+                self.weapon = get_default_weapon(entity_class=self.character_class)
                 self.got_initial_weapon = True
             else:
                 self.disarm()
@@ -449,7 +449,7 @@ class Monster(Entity, models.Model):
 
         if not self.weapon:
             if not self.got_initial_weapon:
-                self.weapon = get_default_weapon(entity_class=self.monster_class, entity='Monster')
+                self.weapon = get_default_weapon(entity_class=self.monster_class)
                 self.got_initial_weapon = True
             else:
                 self.weapon = self.disarm()
@@ -476,7 +476,7 @@ class Treasure(models.Model):
     y = models.IntegerField(default=0)
     icon = models.ImageField(upload_to="map/", null=True, blank=True)
 
-    def get_default_treasure_icon(treasure_type:str, discovered:bool=False):
+    def get_default_treasure_icon(self, treasure_type:str, discovered:bool=False):
         discovered_str = 'Discovered ' if discovered else ''
         discovered_treasure = discovered_str+treasure_type
         if discovered_treasure in DEFAULT_TREASURE_TYPES.keys():
