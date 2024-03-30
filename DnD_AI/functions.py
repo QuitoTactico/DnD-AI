@@ -376,6 +376,37 @@ def command_executer(prompt:str, player:Character, target:Monster) -> tuple[bool
             player.save()
             possible_treasures[0].delete()
             successful = True
+
+    elif action[0] == 'use':
+        player_inventory = player.get_inventory()
+        if len(action) == 1:
+            History.objects.create(author='SYSTEM', text=f'You need to specify the item you want to use. Please replace the spaces with "_" if you have problems using items.<br>For example: health_potion.').save()
+
+            # I don't have a list of possible usable items xd, so
+            #History.objects.create(author='SYSTEM', text=f"There's a list of your items: ").save()
+            if 'health potion' not in player_inventory.keys():
+                History.objects.create(author='SYSTEM', text=f"By the way... You don't have usable items.").save()
+
+            successful = False
+        else:
+            item_to_use = (' '.join(action[1:])).lower().replace('_',' ')
+            if item_to_use not in player_inventory.keys():
+                History.objects.create(author='SYSTEM', text=f"You don't have {item_to_use}s.").save()
+                successful = False
+            else:
+                if item_to_use == 'health potion':
+                    player.health += 50
+                    player.use_from_inventory(item_to_use, amount = 1)
+                    player.save()
+                    History.objects.create(author='SYSTEM', text=f'{player.name} used a health potion.').save()
+                    successful = True
+                #elif item_to_use == 'mana potion':, or something like that for each item
+                # probably is not the best way, it would be better to be implemented on Character.use_from_inventory()
+                # please remember me to create a list of possible usable items an their effects on default.py
+                else:
+                    History.objects.create(author='SYSTEM', text=f"You can't use that.").save()
+                    successful = False
+
         
     return successful, {
         'player_died': player_died,
