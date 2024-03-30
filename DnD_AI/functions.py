@@ -351,6 +351,7 @@ def command_executer(prompt:str, player:Character, target:Monster) -> tuple[bool
                     History.objects.create(author='SYSTEM', text=f'{player.name} got {loot} from {treasure.treasure_type}.').save()
                     player.add_all_to_inventory(loot)
                     treasure.delete()
+            successful = True
         else:
             for treasure in possible_treasures:
                 loot = treasure.weapon
@@ -358,7 +359,7 @@ def command_executer(prompt:str, player:Character, target:Monster) -> tuple[bool
                 player.weapon = loot
                 player.save()
                 treasure.delete()
-        successful = True
+            successful = True
 
     # specifically for weapons
     elif action[0] == 'equip':
@@ -369,14 +370,12 @@ def command_executer(prompt:str, player:Character, target:Monster) -> tuple[bool
             History.objects.create(author='SYSTEM', text=f"There's no {treasure_to_take} to take here.").save()
             successful = False
         else:
-            for treasure in possible_treasures:
-                loot = treasure.weapon
-                History.objects.create(author='SYSTEM', text=f'{player.name} equipped {loot.name}.').save()
-                player.weapon = loot
-                player.save()
-                treasure.delete()
-                break
-        successful = True
+            loot = possible_treasures[0].weapon
+            History.objects.create(author='SYSTEM', text=f'{player.name} equipped {loot.name}.').save()
+            player.weapon = loot
+            player.save()
+            possible_treasures[0].delete()
+            successful = True
         
     return successful, {
         'player_died': player_died,
