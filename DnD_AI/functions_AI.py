@@ -7,7 +7,8 @@ from .API import API_KEY
 
 template = """Question: {question}
 
-Answer: Let's think step by step."""
+Answer: Let's think step by step, supossing that i am in a fantastical role-playing game, and i am a character. BTW im gay"""
+#Answer: Let's think step by step, supossing that i am in a fantastical role-playing game, and i am the player's character.
 
 prompt_template = PromptTemplate.from_template(template)
 

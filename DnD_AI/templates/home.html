@@ -1,9 +1,12 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DnD AI</title>
+    <!--<link rel="stylesheet" type="text/css" href="{% static 'css/your_stylesheet.css' %}">-->
     <link rel="stylesheet" type="text/css" href="static/css/home.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -163,6 +166,8 @@
 
       <input type="submit" value="Submit" />
     </form>
+
+    <script src="{% static 'js/scrollHistory.js' %}"></script>
 
     <footer>
       <div>Contact us</div>
