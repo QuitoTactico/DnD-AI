@@ -4,8 +4,23 @@ from .models import *
 from .functions import *
 from .functions_AI import *
 
-    
+
 def home(request):
+    return render(request, 'home.html')
+
+def campaignSelection(request):
+    return render(request, 'campaignselection.html')
+
+def campaignCreation(request):
+    return render(request, 'campaigncreation.html')
+
+def playerSelection(request):
+    return render(request, 'playerselection.html')
+
+def playerCreation(request):
+    return render(request, 'playercreation.html')
+    
+def game(request):
     
     if request.method == "POST":
         '''
@@ -22,7 +37,7 @@ def home(request):
         # ------------------------- GETTING POST LABELS -----------------------------
 
         # Optional test page selection
-        page = 'home.html' if 'test' not in request.POST else 'test.html'
+        page = 'game.html' if 'test' not in request.POST else 'test.html'
 
         # If the roll_dice label is sent, it rolls the dice
         # If the roll_dice label is not sent, it sets the dice value to None, this way isn't rendered
@@ -138,7 +153,7 @@ def home(request):
         target = target_selection_by_id(None)
         history = History.objects.all()
         return render(request, 
-                      'home.html', 
+                      'game.html', 
                       {
                             'player'         : player, 
                             'monster'        : target,

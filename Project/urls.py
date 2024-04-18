@@ -23,7 +23,12 @@ from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', dnd.home, name='home')
+    path('', dnd.home, name='home'),
+    path('campaignselection', dnd.campaignSelection, name='campaignSelection'),
+    path('campaigncreation', dnd.campaignCreation, name='campaignCreation'),
+    path('playerselection', dnd.playerSelection, name='playerSelection'),
+    path('playercreation', dnd.playerCreation, name='playerCreation'),
+    path('game', dnd.game, name='game'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL , document_root = settings.MEDIA_ROOT)
