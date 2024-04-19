@@ -53,6 +53,32 @@ def get_bare_hands():
 # ----------------------------------- MODELS -----------------------------------
 
 
+# Our game presents the possibility of having multiple campaigns, so we need a model for them. 
+class Campaign(models.Model):
+    """Represents a campaign in the game."""
+
+    id      = models.AutoField(primary_key=True)
+    name    = models.CharField(max_length=50, default="Default Campaign Name")
+
+    size_x  = models.IntegerField(default=100)
+    size_y  = models.IntegerField(default=100)
+
+    initial_context = models.CharField(max_length=3000, default="A fantasy world")
+    start_date      = models.DateTimeField(auto_now_add=True)
+    completion_date = models.DateTimeField(null=True, blank=True)
+    turns           = models.IntegerField(default=0)
+
+    is_completed    = models.BooleanField(default=False)
+    objective_str   = models.CharField(max_length=1000, default="Defeat the key bosses")
+
+    def turn_counter(self):
+        self.turns += 1
+        self.save()
+
+    def __str__(self):
+        return f'[{self.id}] {self.name} ({self.start_date})'
+
+
 # for default, the characters and monsters use their bare hands 
 class Weapon(models.Model):
     """
@@ -103,8 +129,9 @@ class Weapon(models.Model):
 
 # Characters and Monsters share too much things, so this is for good practice
 class Entity(models.Model):
-    name = models.CharField(max_length=30, null=True, blank=True)
-    physical_description  = models.CharField(max_length=200, default="Masculine, tall, black clothes")
+    campaign                = models.ForeignKey(Campaign, on_delete=models.CASCADE, null=True, blank=True)
+    name                    = models.CharField(max_length=30, null=True, blank=True)
+    physical_description    = models.CharField(max_length=200, default="Masculine, tall, black clothes")
 
                                                          # DON'T CHANGE THIS T-T
     weapon = models.ForeignKey(Weapon, on_delete=models.SET(get_bare_hands), null=True, blank=True)
@@ -279,6 +306,7 @@ class Character(Entity, models.Model):
 
     def get_monsters_in_range(self):
         monsters_in_range = []
+        #for monster in Monster.objects.filter(campaign_id=self.campaign.id):
         for monster in Monster.objects.all():
             if abs(self.x - monster.x) <= self.weapon.range and abs(self.y - monster.y) <= self.weapon.range:
                 monsters_in_range.append(monster)
@@ -478,6 +506,8 @@ class Treasure(models.Model):
     """Represents a Treasure in the game."""
 
     id = models.AutoField(primary_key=True)
+    campaign    = models.ForeignKey(Campaign, on_delete=models.CASCADE, null=True, blank=True)
+
     is_key = models.BooleanField(default=False)
     treasure_type = models.CharField(max_length=30, default="Bag")
     weapon = models.ForeignKey(Weapon, on_delete=models.CASCADE, default=None, null=True, blank=True)
@@ -561,13 +591,15 @@ class Treasure(models.Model):
 class History(models.Model):
     """Represents an entry in the history of the game. (Provisional name)"""
 
-    id = models.AutoField(primary_key=True)
-    is_key = models.BooleanField(default=False)
-    is_image = models.BooleanField(default=False)
-    author = models.CharField(max_length=50, default="SYSTEM")
-    text = models.CharField(max_length=3000, default="Hi (Default message)")
-    color = models.CharField(max_length=10, default="black")
-    date = models.DateTimeField(auto_now_add=True)
+    id          = models.AutoField(primary_key=True)
+    campaign    = models.ForeignKey(Campaign, on_delete=models.CASCADE, null=True, blank=True)
+
+    is_key      = models.BooleanField(default=False)
+    is_image    = models.BooleanField(default=False)
+    author      = models.CharField(max_length=50, default="SYSTEM")
+    text        = models.CharField(max_length=3000, default="Hi (Default message)")
+    color       = models.CharField(max_length=10, default="black")
+    date        = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f'[{self.id}] ({self.date}) {self.author} ({self.color}): {self.text}'
@@ -577,15 +609,18 @@ class Tile(models.Model):
     """Represents a tile in the map."""
 
     id = models.AutoField(primary_key=True)
+    #campaign  = models.ForeignKey(Campaign, on_delete=models.CASCADE, null=True, blank=True)
+
     tile_type = models.CharField(max_length=30, default="grass")
-    x = models.IntegerField(default=0)
-    y = models.IntegerField(default=0)
+    x         = models.IntegerField(default=0)
+    y         = models.IntegerField(default=0)
 
     def __str__(self):
         return f'[{self.id}] ({self.x},{self.y}) {self.tile_type}'
-
+    
 
 # -----------------------------------------------------
+
 
 ''' DESCRIPTIONS:
 

@@ -421,7 +421,7 @@ def command_executer(prompt:str, player:Character, target:Monster) -> tuple[bool
 # ------------------------------------------------ MAP --------------------------------------------------
 
 
-def create_map(player:Character, characters, monsters, treasures, objective:Monster=None, host:str=None, show_map:bool=False) -> tuple:
+def create_map(player:Character, characters, monsters, treasures, tiles, target:Monster=None, host:str=None, show_map:bool=False) -> tuple:
 
     map = figure(active_scroll='wheel_zoom', 
                  title="", 
@@ -503,9 +503,12 @@ def create_map(player:Character, characters, monsters, treasures, objective:Mons
 
 
     # rendering the map tiles
-    for tile in Tile.objects.all():
-        map.image_url(url=[f'media/map/tiles/{DEFAULT_TILE_TYPES[tile.tile_type]}'], x=tile.x, y=tile.y +1, w=1, h=1)
-        
+    '''for tile in Tile.objects.all():
+        map.image_url(url=[f'media/map/tiles/{DEFAULT_TILE_TYPES[tile.tile_type]}'], x=tile.x, y=tile.y +1, w=1, h=1)'''
+    urls = [f'media/map/tiles/{DEFAULT_TILE_TYPES[tile.tile_type]}' for tile in tiles]
+    xs = [tile.x for tile in tiles]
+    ys = [tile.y + 1 for tile in tiles]
+    map.image_url(url=urls, x=xs, y=ys, w=1, h=1)
 
     # the wepon range of the player will glow red if there are monsters in range, else it will be gray
     range_color,range_alpha = ('red',0.65) if len(player.get_monsters_in_range()) != 0 else ('gray',0.5)
@@ -524,17 +527,18 @@ def create_map(player:Character, characters, monsters, treasures, objective:Mons
                 height=(player.weapon.range*2)+1)
     
     # objective highlight
-    if objective is not None:
-        obj_color = 'deeppink' if objective.is_boss else 'red'
-        obj_dash = 'dashed' if objective.is_key else 'solid'
+    if target is not None:
+        obj_color = 'deeppink' if target.is_boss else 'red'
+        obj_dash = 'dashed' if target.is_key else 'solid'
         #map.circle(x=objective.x+0.5, y=objective.y+0.5, radius=1, fill_alpha=0, line_color=obj_color, line_dash=obj_dash, line_width=2)
-        map.circle(x=objective.x+0.5, y=objective.y+0.5, radius=0.7, fill_alpha=0, line_color=obj_color, line_dash=obj_dash, line_width=2)
+        map.circle(x=target.x+0.5, y=target.y+0.5, radius=0.7, fill_alpha=0, line_color=obj_color, line_dash=obj_dash, line_width=2)
 
     # player highlight
     #map.circle(x=player.x+0.5, y=player.y+0.5, radius=1, fill_alpha=0, line_color='green', line_width=2)
     
     # adding the entities to the map
     entities = list(characters) + list(monsters)
+    '''
     entity_data = {
         'x': [entity.x + 0.5 for entity in entities],
         'y': [entity.y + 0.5 for entity in entities],
@@ -556,6 +560,41 @@ def create_map(player:Character, characters, monsters, treasures, objective:Mons
         'dash': ['solid' for _ in characters]+['dashed' if monster.is_key else 'solid' for monster in monsters],
         'type': ['character' if character.id != player.id else 'player' for character in characters] + ['boss' if monster.is_boss else 'monster' for monster in monsters]
     }
+    '''
+    entity_data = {
+        'x': [], 'y': [], 'raceclass': [], 'LVL': [], 'HP': [], 'HP_max': [], 'RNG': [],
+        'icon_x': [], 'icon_y': [], 'real_x': [], 'real_y': [], 'name': [], 'icon': [],
+        'weapon_icon': [], 'weapon_name': [], 'weapon_color': [], 'color': [], 'dash': [], 'type': []
+    }
+
+    for entity in entities:
+        entity_data['x'].append(entity.x + 0.5)
+        entity_data['y'].append(entity.y + 0.5)
+        entity_data['HP'].append(entity.health)
+        entity_data['HP_max'].append(entity.max_health)
+        entity_data['RNG'].append(entity.weapon.range)
+        entity_data['icon_x'].append(entity.x + 0.1)
+        entity_data['icon_y'].append(entity.y + 0.9)
+        entity_data['real_x'].append(entity.x)
+        entity_data['real_y'].append(entity.y)
+        entity_data['name'].append(entity.name)
+        entity_data['icon'].append(entity.icon.url)
+        entity_data['weapon_icon'].append(entity.weapon.image.url)
+        entity_data['weapon_name'].append(f'{entity.weapon.name}+{entity.weapon.level}' if entity.weapon.level != 0 else entity.weapon.name)
+        entity_data['weapon_color'].append('orange' if entity.weapon.damage_type == 'Physical' else 'cyan' if entity.weapon.damage_type == 'Magical' else 'black')
+
+        if isinstance(entity, Character):
+            entity_data['raceclass'].append(f'{entity.character_race} {entity.character_class}' if entity.character_race != entity.character_class else entity.character_class)
+            entity_data['LVL'].append(f'LVL: {entity.level}')
+            entity_data['color'].append('green' if entity.id == player.id else 'blue')
+            entity_data['dash'].append('solid')
+            entity_data['type'].append('character' if entity.id != player.id else 'player')
+        elif isinstance(entity, Monster):
+            entity_data['raceclass'].append(f'{entity.monster_race} {entity.monster_class}' if entity.monster_race != entity.monster_class else entity.monster_class)
+            entity_data['LVL'].append('')
+            entity_data['color'].append('deeppink' if entity.is_boss else 'red')
+            entity_data['dash'].append('dashed' if entity.is_key else 'solid')
+            entity_data['type'].append('boss' if entity.is_boss else 'monster')
 
     map.rect(x='x', y='y', width=0.8, height=0.8, fill_color='color', fill_alpha=0.3, line_alpha=0, source=entity_data)  
     map.image_url(url='icon', x='icon_x', y='icon_y', h=0.8, w=0.8, name='name', source=entity_data)

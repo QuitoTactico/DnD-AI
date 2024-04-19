@@ -9,13 +9,27 @@ def home(request):
     return render(request, 'home.html')
 
 def campaignSelection(request):
-    return render(request, 'campaignselection.html')
+    campaigns = Campaign.objects.all()
+    return render(request, 'campaignselection.html', 
+                  {'campaigns': campaigns})
 
 def campaignCreation(request):
     return render(request, 'campaigncreation.html')
 
 def playerSelection(request):
-    return render(request, 'playerselection.html')
+    if request.method == "POST":
+        campaign_id = request.POST['campaign_id']
+    else:
+        campaign_id = Campaign.objects.filter(is_completed=False).first().id
+
+    players = Character.objects.filter(campaign_id=campaign_id, is_playable=True)
+
+    return render(request, 
+                  'playerselection.html', 
+                  {
+                      'players': players, 
+                      'campaign_id': campaign_id
+                      })
 
 def playerCreation(request):
     return render(request, 'playercreation.html')
@@ -25,6 +39,7 @@ def game(request):
     if request.method == "POST":
         '''
         POST LABELS:
+        - campaign_id
         - test
         - player_name
         - target_id
@@ -38,6 +53,11 @@ def game(request):
 
         # Optional test page selection
         page = 'game.html' if 'test' not in request.POST else 'test.html'
+
+        if 'campaign_id' in request.POST:
+            campaign_id = request.POST['campaign_id']
+        else: 
+            campaign_id = Campaign.objects.filter(is_completed=False).first().id
 
         # If the roll_dice label is sent, it rolls the dice
         # If the roll_dice label is not sent, it sets the dice value to None, this way isn't rendered
@@ -101,12 +121,22 @@ def game(request):
         weapons     = Weapon.objects.all()
         treasures   = Treasure.objects.all()
         history     = History.objects.all()
+        tiles       = Tile.objects.all()
 
+        '''
+        characters  = Character.objects.filter(campaign_id=campaign_id)
+        players     = Character.objects.filter(campaign_id=campaign_id, is_playable=True)
+        monsters    = Monster.objects.filter(campaign_id=campaign_id)
+        weapons     = Weapon.objects.filter(campaign_id=campaign_id)
+        treasures   = Treasure.objects.filter(campaign_id=campaign_id)
+        history     = History.objects.filter(campaign_id=campaign_id)
+        tiles       = Tile.objects.filter(campaign_id=campaign_id)
+        '''
 
         # -------------------------------------- MAP -----------------------------------------
-        host = request.get_host()
-        map_script, map_div = create_map(player, characters, monsters, treasures, target, host)
 
+        host = request.get_host()
+        map_script, map_div = create_map(player, characters, monsters, treasures, tiles, target, host)
 
         # --------------------------------- RENDER DETAILS -----------------------------------
 
@@ -121,7 +151,7 @@ def game(request):
 
         return render(request, 
                       page, 
-                        {
+                      {
                                 # Database
                             'characters'    : characters, 
                             'players'       : players, 
@@ -145,7 +175,8 @@ def game(request):
                             'host'              : host,
                             'url_prueba'        : host + player.icon.url,
                             'weapon_lvl_label'  : weapon_lvl_label,
-                        })
+                            'campaign_id'       : campaign_id,
+                            })
     else:
 
         # If there's no POST, then it selects the first character and monster in the database as player and target
