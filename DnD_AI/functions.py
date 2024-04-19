@@ -69,15 +69,15 @@ def attack(attacker:Character|Monster, target:Character|Monster, attacker_dice:i
     was_critical_hit = True if attacker_dice == 20 else False
     was_critical_hit_str = ' CRITICAL HIT.' if was_critical_hit else ''
 
-    History.objects.create(author='SYSTEM', text=f'D{attacker_dice}. {attacker.name} did {damage_dealt} points of DMG to {target.name}.{was_critical_hit_str}')
+    History.objects.create(campaign=attacker.campaign, author='SYSTEM', text=f'D{attacker_dice}. {attacker.name} did {damage_dealt} points of DMG to {target.name}.{was_critical_hit_str}')
 
     if was_critical_hit:
         color = 'gold' if attacker_is == 'player' and not attacker.is_playable else 'blue' if attacker_is == 'player' else 'red'
-        History.objects.create(author=attacker.name, text='Take that!', color=color)
+        History.objects.create(campaign=attacker.campaign, author=attacker.name, text='Take that!', color=color)
 
     if damage_dealt == 0:
         color = 'gold' if attacker_is == 'player' and not attacker.is_playable else 'blue' if attacker_is == 'player' else 'red'
-        History.objects.create(author=attacker.name, text='Oh no...', color=color)
+        History.objects.create(campaign=attacker.campaign, author=attacker.name, text='Oh no...', color=color)
 
     attacker.save()
     target.save()
@@ -146,16 +146,16 @@ def combat_turn(player:Character, monster:Monster, player_dice:int = roll_dice()
     return {'player_died': player_died, 'monster_died': monster_died, 'player_result': player_result, 'monster_result': monster_result}
 
 def player_died_in_combat(player:Character, monster:Monster):
-    Treasure.objects.create(treasure_type='Tombstone', inventory=player.inventory, x=player.x, y=player.y, discovered=False)
-    History.objects.create(author='SYSTEM', text=f'{player.name} died in combat.')
-    History.objects.create(author=monster.name, text='JA'*randint(5,15), color='red')
+    Treasure.objects.create(campaign=player.campaign, treasure_type='Tombstone', inventory=player.inventory, x=player.x, y=player.y, discovered=False)
+    History.objects.create(campaign=player.campaign ,author='SYSTEM', text=f'{player.name} died in combat.')
+    History.objects.create(campaign=player.campaign ,author=monster.name, text='JA'*randint(2,15), color='red')
     player.kill()
 
 def player_won_combat(player:Character, monster:Monster):
     loot = monster.get_inventory()
     player.add_all_to_inventory(loot)
     player.exp += monster.exp_drop
-    History.objects.create(author='SYSTEM', text=f'{player.name} killed {monster.name}, got {monster.exp_drop} EXP and {loot}')
+    History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'{player.name} killed {monster.name}, got {monster.exp_drop} EXP and {loot}')
     player.save()
     monster.kill()
 
@@ -272,7 +272,7 @@ def action_interpreter():
 
 
 
-def command_executer(prompt:str, player:Character, target:Monster) -> tuple[bool, dict]:
+def command_executer(prompt:str|list, player:Character, target:Monster) -> tuple[bool, dict]:
     '''
     Returns
     - successful : bool
@@ -285,11 +285,22 @@ def command_executer(prompt:str, player:Character, target:Monster) -> tuple[bool
     - 'new_target'  : Monster
     
     '''
-    action = prompt.split(' ')
+    
+    # if the prompt is a string, it will be split into a list
+    action = prompt.split(' ') if type(prompt) == str else prompt
 
-    player_died, target_died, new_player, new_target = False, False, player, target
+    # for each action, the turns on the campaign will be increased
+    player.campaign.turn_counter()
 
-    if action[0] == 'move':
+    # change players
+    successful, player_died, target_died, new_player, new_target = False, False, False, player, target
+
+    if len(prompt) == 0 or prompt == '' or prompt == '\n':
+        History.objects.create(campaign=player.campaign, author=player.name, color="blue", text="...").save()
+        History.objects.create(campaign=player.campaign, author='SYSTEM', text="The player stood still").save()
+        successful = False
+
+    elif action[0] == 'move':
         action[1] = action[1].replace('-','')
         if len(action) > 2:
             action[1] = action[2]+action[1] if action[2] in ['up','down'] else action[1]+action[2]
@@ -301,7 +312,7 @@ def command_executer(prompt:str, player:Character, target:Monster) -> tuple[bool
                 treasure.discover()
 
         if not successful:
-            History.objects.create(author='SYSTEM', text="You can't be there").save()
+            History.objects.create(campaign=player.campaign, author='SYSTEM', text="You can't be there").save()
 
         if target is None or target not in player.get_monsters_in_range():
             try:
@@ -341,21 +352,21 @@ def command_executer(prompt:str, player:Character, target:Monster) -> tuple[bool
 
         if len(possible_treasures) == 0:
             treasure_to_take = 'treasures' if treasure_to_take == 'all' else treasure_to_take
-            History.objects.create(author='SYSTEM', text=f"There's no {treasure_to_take} to take here.").save()
+            History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"There's no {treasure_to_take} to take here.").save()
             successful = False
 
         elif treasure_to_take != 'weapon':
             for treasure in possible_treasures:
                 if treasure.treasure_type != 'Weapon':
                     loot = treasure.get_inventory()
-                    History.objects.create(author='SYSTEM', text=f'{player.name} got {loot} from {treasure.treasure_type}.').save()
+                    History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'{player.name} got {loot} from {treasure.treasure_type}.').save()
                     player.add_all_to_inventory(loot)
                     treasure.delete()
             successful = True
         else:
             for treasure in possible_treasures:
                 loot = treasure.weapon
-                History.objects.create(author='SYSTEM', text=f'{player.name} equipped {loot.name}.').save()
+                History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'{player.name} equipped {loot.name}.').save()
                 player.weapon = loot
                 player.save()
                 treasure.delete()
@@ -367,11 +378,11 @@ def command_executer(prompt:str, player:Character, target:Monster) -> tuple[bool
         possible_treasures = player.get_treasures_in_range(treasure_to_take, is_weapon=True)
         if len(possible_treasures) == 0:
             treasure_to_take = 'weapons' if treasure_to_take == 'all' else treasure_to_take
-            History.objects.create(author='SYSTEM', text=f"There's no {treasure_to_take} to take here.").save()
+            History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"There's no {treasure_to_take} to take here.").save()
             successful = False
         else:
             loot = possible_treasures[0].weapon
-            History.objects.create(author='SYSTEM', text=f'{player.name} equipped {loot.name}.').save()
+            History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'{player.name} equipped {loot.name}.').save()
             player.weapon = loot
             player.save()
             possible_treasures[0].delete()
@@ -380,31 +391,31 @@ def command_executer(prompt:str, player:Character, target:Monster) -> tuple[bool
     elif action[0] == 'use':
         player_inventory = player.get_inventory()
         if len(action) == 1:
-            History.objects.create(author='SYSTEM', text=f'You need to specify the item you want to use. Please replace the spaces with "_" if you have problems using items.<br>For example: health_potion.').save()
+            History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'You need to specify the item you want to use. Please replace the spaces with "_" if you have problems using items.<br>For example: health_potion.').save()
 
             # I don't have a list of possible usable items xd, so
-            #History.objects.create(author='SYSTEM', text=f"There's a list of your items: ").save()
+            #History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"There's a list of your items: ").save()
             if 'health potion' not in player_inventory.keys():
-                History.objects.create(author='SYSTEM', text=f"By the way... You don't have usable items.").save()
+                History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"By the way... You don't have usable items.").save()
 
             successful = False
         else:
             item_to_use = (' '.join(action[1:])).lower().replace('_',' ')
             if item_to_use not in player_inventory.keys():
-                History.objects.create(author='SYSTEM', text=f"You don't have {item_to_use}s.").save()
+                History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"You don't have {item_to_use}s.").save()
                 successful = False
             else:
                 if item_to_use == 'health potion':
                     player.health += 50
                     player.use_from_inventory(item_to_use, amount = 1)
                     player.save()
-                    History.objects.create(author='SYSTEM', text=f'{player.name} used a health potion.').save()
+                    History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'{player.name} used a health potion.').save()
                     successful = True
                 #elif item_to_use == 'mana potion':, or something like that for each item
                 # probably is not the best way, it would be better to be implemented on Character.use_from_inventory()
                 # please remember me to create a list of possible usable items an their effects on default.py
                 else:
-                    History.objects.create(author='SYSTEM', text=f"You can't use that.").save()
+                    History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"You can't use that.").save()
                     successful = False
 
         

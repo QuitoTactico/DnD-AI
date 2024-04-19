@@ -245,7 +245,7 @@ class Entity(models.Model):
         elif direction == 'downleft':
             pos = (self.x-1, self.y-1)
         
-        if Tile.objects.filter(x=pos[0], y=pos[1]).exists() and not Character.objects.filter(x=pos[0], y=pos[1]).exists() and not Monster.objects.filter(x=pos[0], y=pos[1]).exists() and not Treasure.objects.filter(x=pos[0], y=pos[1]).exists():
+        if Tile.objects.filter(campaign=self.campaign.id, x=pos[0], y=pos[1]).exists() and not Character.objects.filter(campaign=self.campaign.id, x=pos[0], y=pos[1]).exists() and not Monster.objects.filter(campaign=self.campaign.id, x=pos[0], y=pos[1]).exists() and not Treasure.objects.filter(campaign=self.campaign.id, x=pos[0], y=pos[1]).exists():
             self.x = pos[0]
             self.y = pos[1]
             self.save()
@@ -308,7 +308,7 @@ class Character(Entity, models.Model):
     def get_monsters_in_range(self):
         monsters_in_range = []
         #for monster in Monster.objects.filter(campaign_id=self.campaign.id):
-        for monster in Monster.objects.all():
+        for monster in Monster.objects.filter(campaign_id=self.campaign.id):
             if abs(self.x - monster.x) <= self.weapon.range and abs(self.y - monster.y) <= self.weapon.range:
                 monsters_in_range.append(monster)
         return monsters_in_range
@@ -316,11 +316,11 @@ class Character(Entity, models.Model):
     def get_treasures_in_range(self, treasure_to_take:str = 'all', is_weapon:bool = False):
         treasures_in_range = []
         if not is_weapon:
-            for treasure in Treasure.objects.all():
+            for treasure in Treasure.objects.filter(campaign_id=self.campaign.id):
                 if abs(self.x - treasure.x) <= 1 and abs(self.y - treasure.y) <= 1 and (treasure_to_take == 'all' or treasure_to_take == treasure.treasure_type.lower()):
                     treasures_in_range.append(treasure)
         else:
-            for treasure in Treasure.objects.filter(treasure_type='Weapon'):
+            for treasure in Treasure.objects.filter(campaign_id=self.campaign.id, treasure_type='Weapon'):
                 if abs(self.x - treasure.x) <= 1 and abs(self.y - treasure.y) <= 1 and treasure.weapon.name.lower() == treasure_to_take:
                     treasures_in_range.append(treasure)
         return treasures_in_range
@@ -470,7 +470,7 @@ class Monster(Entity, models.Model):
 
     def get_characters_in_range(self):
         characters = []
-        for character in Character.objects.all():
+        for character in Character.objects.filter(campaign_id=self.campaign.id):
             if abs(self.x - character.x) <= self.weapon.range and abs(self.y - character.y) <= self.weapon.range:
                 characters.append(character)
         return characters

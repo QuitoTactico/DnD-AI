@@ -68,12 +68,20 @@ def game(request):
             prompt = request.POST['prompt']
             History.objects.create(author=request.POST['player_name'], text=prompt, color='blue').save()
 
-            if prompt[0] == '/':
-                prompt = prompt[1:]
+            # If the prompt is empty, it's considered a command (a null command)
+            if len(prompt) == 0 or prompt == '' or prompt is None or prompt == '\n':
+                prompt = ''
                 command = True
+
+            # If the prompt is not empty, it's considered a message that needs to be sent to the AI to become a command
             else:
-                response = get_response(prompt)
-                History.objects.create(author='SYSTEM', text=response).save()
+                # If the prompt starts with a slash, it's considered a command
+                if prompt[0] == '/':
+                    prompt = prompt[1:]
+                    command = True
+                else:
+                    response = get_response(prompt)
+                    History.objects.create(campaign_id=campaign_id, author='SYSTEM', text=response).save()
 
 
         # ------------------------- GETTING PLAYER AND TARGET -----------------------------
