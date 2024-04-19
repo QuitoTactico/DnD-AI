@@ -76,7 +76,8 @@ class Campaign(models.Model):
         self.save()
 
     def __str__(self):
-        return f'[{self.id}] {self.name} ({self.start_date})'
+        completed_str = ' (COMPLETED)' if self.is_completed else ''
+        return f'{{{self.id}}} ({self.size_x}x{self.size_y}) {self.name}{completed_str}, Turns: {self.turns}, Objective: {self.objective_str}'
 
 
 # for default, the characters and monsters use their bare hands 
@@ -427,7 +428,7 @@ class Character(Entity, models.Model):
     def __str__(self):
         str_is_playable = 'PLAYER' if self.is_playable else 'NPC'
         raceclass = f'{self.character_race} {self.character_class}' if self.character_race != self.character_class else self.character_class
-        return f'[{self.id}] ({self.x},{self.y}) {str_is_playable}, {self.name}, {raceclass}, HP: {self.health}, Level: {self.level}, Weapon: [{self.weapon}]'
+        return f'{{{self.campaign.id}}} [{self.id}] ({self.x},{self.y}) {str_is_playable}, {self.name}, {raceclass}, HP: {self.health}, Level: {self.level}, Weapon: [{self.weapon}]'
 
 
 class Monster(Entity, models.Model):
@@ -499,7 +500,7 @@ class Monster(Entity, models.Model):
         raceclass = f'{self.monster_race} {self.monster_class}' if self.monster_race != self.monster_class else self.monster_class
         key_str = 'KEY ' if self.is_key else ''
         boss_str = 'BOSS' if self.is_boss else 'MONSTER'
-        return f'[{self.id}] ({self.x},{self.y}) {key_str}{boss_str}, {self.name}, {raceclass}, [{self.weapon}]'
+        return f'{{{self.campaign.id}}} [{self.id}] ({self.x},{self.y}) {key_str}{boss_str}, {self.name}, {raceclass}, [{self.weapon}]'
     
 
 class Treasure(models.Model):
@@ -584,7 +585,7 @@ class Treasure(models.Model):
         key_str = 'KEY ' if self.is_key else ''
         discovered_str = 'DISCOVERED, ' if self.discovered else ''
         loot = self.weapon.name if self.treasure_type == 'Weapon' else self.inventory
-        return f'[{self.id}] ({self.x},{self.y}) {key_str}{self.treasure_type}, {discovered_str}{loot}'
+        return f'{{{self.campaign.id}}} [{self.id}] ({self.x},{self.y}) {key_str}{self.treasure_type}, {discovered_str}{loot}'
 
     
 
@@ -602,21 +603,21 @@ class History(models.Model):
     date        = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'[{self.id}] ({self.date}) {self.author} ({self.color}): {self.text}'
+        return f'{{{self.campaign.id}}} [{self.id}] {self.author} ({self.color}): {self.text}'
     
 
 class Tile(models.Model):
     """Represents a tile in the map."""
 
     id = models.AutoField(primary_key=True)
-    #campaign  = models.ForeignKey(Campaign, on_delete=models.CASCADE, null=True, blank=True)
+    campaign  = models.ForeignKey(Campaign, on_delete=models.CASCADE, null=True, blank=True)
 
     tile_type = models.CharField(max_length=30, default="grass")
     x         = models.IntegerField(default=0)
     y         = models.IntegerField(default=0)
 
     def __str__(self):
-        return f'[{self.id}] ({self.x},{self.y}) {self.tile_type}'
+        return f'{{{self.campaign.id}}} [{self.id}] ({self.x},{self.y}) {self.tile_type}'
     
 
 # -----------------------------------------------------

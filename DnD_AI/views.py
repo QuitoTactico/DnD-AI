@@ -45,8 +45,6 @@ def game(request):
         - target_id
         - dice_needed
         - prompt
-
-        - map_tiles   # future development, send-receiver loop to reduce backend stress
         '''
 
         # ------------------------- GETTING POST LABELS -----------------------------
@@ -80,12 +78,11 @@ def game(request):
 
         # ------------------------- GETTING PLAYER AND TARGET -----------------------------
                 
+        # ALL OF THIS IS BETA. IT WILL BE CHANGED IN THE FUTURE FOR [(p_id 1, t_id 1), (p_id 2, t_id 2), ...]
 
         # If the name of a character is sent, that character will be the actual player
         player_name = None if 'player_name' not in request.POST else request.POST['player_name']
         player = player_selection(player_name)
-
-        possible_targets = player.get_monsters_in_range()
 
         # If the id or name of a monster is sent, that monster will be the actual target
         target_id = None if 'target_id' not in request.POST else request.POST['target_id']
@@ -96,6 +93,7 @@ def game(request):
             else:
                 target = target_selection_by_name(target_id)
         else:
+            possible_targets = player.get_monsters_in_range()
             target = None if len(possible_targets) == 0 else possible_targets[0]
         
 
@@ -115,6 +113,7 @@ def game(request):
             
         
         # Getting all the models
+        '''
         characters  = Character.objects.all()
         players     = Character.objects.filter(is_playable=True)
         monsters    = Monster.objects.all()
@@ -122,16 +121,16 @@ def game(request):
         treasures   = Treasure.objects.all()
         history     = History.objects.all()
         tiles       = Tile.objects.all()
-
         '''
+
         characters  = Character.objects.filter(campaign_id=campaign_id)
         players     = Character.objects.filter(campaign_id=campaign_id, is_playable=True)
         monsters    = Monster.objects.filter(campaign_id=campaign_id)
-        weapons     = Weapon.objects.filter(campaign_id=campaign_id)
+        #weapons     = Weapon.objects.filter(campaign_id=campaign_id)
         treasures   = Treasure.objects.filter(campaign_id=campaign_id)
         history     = History.objects.filter(campaign_id=campaign_id)
         tiles       = Tile.objects.filter(campaign_id=campaign_id)
-        '''
+        
 
         # -------------------------------------- MAP -----------------------------------------
 
@@ -156,7 +155,7 @@ def game(request):
                             'characters'    : characters, 
                             'players'       : players, 
                             'monsters'      : monsters, 
-                            'weapons'       : weapons, 
+                            #'weapons'       : weapons, 
                             'text_history'  : history,
 
                                 # Combat
