@@ -141,6 +141,7 @@
             name="prompt"
             placeholder="Its time to do it"
           />
+          <input type="hidden" name="campaign_id" value="{{campaign_id}}" />
           <input type="hidden" name="player_name" value="{{player.name}}" />
           {% if target is not None %}<input type="hidden" name="target_id" value="{{target.id}}" />{% endif %}
           <input id="font1" class="btnAction" type="submit" value="Act" />
@@ -163,6 +164,8 @@
       <input type="text" name="target_id" placeholder="Target ID">
       Test Page<input type="checkbox" id="test" name="test" />
       Roll Dice<input type="checkbox" id="dice_needed" name="dice_needed" />
+
+      <input type="hidden" name="campaign_id" value="{{campaign_id}}" />
 
       <input type="submit" value="Submit" />
     </form>

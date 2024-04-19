@@ -66,7 +66,7 @@ def game(request):
         command = False
         if 'prompt' in request.POST:
             prompt = request.POST['prompt']
-            History.objects.create(author=request.POST['player_name'], text=prompt, color='blue').save()
+            History.objects.create(campaign_id=campaign_id, author=request.POST['player_name'], text=prompt, color='blue').save()
 
             # If the prompt is empty, it's considered a command (a null command)
             if len(prompt) == 0 or prompt == '' or prompt is None or prompt == '\n':
