@@ -190,11 +190,13 @@ def game(request):
         player = player_selection(None)
         target = target_selection_by_id(None)
         history = History.objects.all()
+        campaign_id = Campaign.objects.filter(is_completed=False).first().id
         return render(request, 
                       'game.html', 
                       {
                             'player'         : player, 
                             'monster'        : target,
                             'text_history'   : history,
+                            'campaign_id'    : campaign_id,
                        })
     
