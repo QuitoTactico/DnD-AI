@@ -377,7 +377,10 @@ class Character(Entity, models.Model):
             'rng', 'range'
             '''
             
-            History.objects.create(campaign=self.campaign, author='SYSTEM', text=f"Invalid levelup input. {valid_inputs.replace('\n', '<br>')}").save()
+            History.objects.create(campaign=self.campaign, 
+                                   author='SYSTEM', 
+                                   text="Invalid levelup input. " + valid_inputs.replace('\n', '<br/>')
+                                   ).save()
 
             return False  # if the stat was not valid
 

@@ -6,3 +6,4 @@ media/weapon/images/default_beta
 /DnD_AI/API.py
 media/map/tiles_tries
 DnD_AI/pruebas
+DnD_AI/api_keys.env
