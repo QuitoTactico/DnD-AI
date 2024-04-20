@@ -397,9 +397,14 @@ class Character(Entity, models.Model):
         if is a ranged weapon, you can also level up the range, but with a five points accumulation system. \n
         returns if it was successful.
         '''
-        leveled_weapon = copy.deepcopy(self.weapon)  # I create a copy of that weapon
+        if self.weapon.is_template:
+            #leveled_weapon = copy.deepcopy(self.weapon)  # slower. useful for copying relationships
+            leveled_weapon = copy.copy(self.weapon)       # create a copy of that weapon
+            leveled_weapon.pk = None            # set the primary key to None, so it's a new weapon in the database
+            leveled_weapon.is_template = False  # now it's a "unique" weapon (not a template one)
+        else:
+            leveled_weapon = self.weapon
 
-        leveled_weapon.is_template = False  # Change is_template to false, now it's a unique weapon
         leveled_weapon.level += 1
         
         if stat in ['dmg','damage']:
@@ -412,14 +417,18 @@ class Character(Entity, models.Model):
         # else, you only get one more point
         elif stat in ['rng','range']:
             stat = 'range'
+
             if leveled_weapon.is_ranged:
+                leveled_weapon.range_level_points += 1
+                
                 if leveled_weapon.range_level_points >= 5:
                     leveled_weapon.range_level_points = 0
                     leveled_weapon.range += 1
                     History.objects.create(campaign=self.campaign, author='SYSTEM', text=f"{self.name} leveled up his weapon's range!").save()
                 else:
-                    leveled_weapon.range_level_points += 1
                     History.objects.create(campaign=self.campaign, author='SYSTEM', text=f"You obtained 1 range level point. Obtain {5-leveled_weapon.range_level_points} more to level up the weapon's range.").save()
+                
+
             else:
                 leveled_weapon.damage += 1  # dude, that's just only for ranged weapons
                 History.objects.create(campaign=self.campaign, author="SYSTEM", text=f"{self.name} tried to level up the range of a melee weapon, but that's not possible. The damage was leveled up instead.")

@@ -309,7 +309,7 @@ def command_executer(prompt:str|list, player:Character, target:Monster) -> tuple
     elif action[0] == 'take':
         successful = act_take(player, action)
 
-    # specifically for weapons
+    # specifically for weapons on the ground. Take also works but it's more general
     elif action[0] == 'equip':
         successful = act_equip(player, action)
 
