@@ -328,60 +328,110 @@ class Character(Entity, models.Model):
     def level_up_stat(self, stat:str = 'max_health'):
         ''' levels up the character, you can choose the stat to increace \n
         returns if was succesful '''
-        stat = stat.lower().replace('_', ' ')
-        if stat in ['max health', 'maxhealth', 'health', 'hp']:
+
+        stat = stat.lower().replace(' ', '_')
+
+        if stat in ['max_health', 'maxhealth', 'health', 'hp']:
+            stat = 'max health'
             self.max_health += 10
+
         elif stat in ['str', 'strength']:
+            stat = 'strength'
             self.strength += 1
         elif stat in ['int', 'intelligence']:
+            stat = 'intelligence'
             self.intelligence += 1
+        elif stat in ['rec', 'recursiveness']:
+            stat = 'recursiveness'
+            self.recursiveness += 1
+
         elif stat in ['dex', 'dexterity']:
+            stat = 'dexterity'
             self.dexterity += 1
-        elif stat in ['phys res', 'physical resistance']:
+
+        elif stat in ['phy_res', 'physical_resistance', 'phy', 'phyres']:
+            stat = 'physical resistance'
             self.physical_resistance += 1
-        elif stat in ['mag res', 'magical resistance']:
+        elif stat in ['mag_res', 'magical_resistance', 'mag', 'magres']:
+            stat = 'magical resistance'
             self.magical_resistance += 1
         elif stat in ['con', 'constitution']:
+            stat = 'constitution'
             self.constitution += 1
+
+        else:
+            valid_inputs='''VALID INPUTS:
+
+            - For player stats:
+            'max_health', 'maxhealth', 'health', 'hp'
+            'str', 'strength'
+            'int', 'intelligence'
+            'rec', 'recursiveness'
+            'dex', 'dexterity'
+            'phy_res', 'physical_resistance', 'phy', 'phyres'
+            'mag_res', 'magical_resistance', 'mag', 'magres'
+            'con', 'constitution'
+
+            - For weapon stats:
+            'dmg', 'damage', 'wpn', 'weapon'
+            'rng', 'range'
+            '''
+            
+            History.objects.create(campaign=self.campaign, author='SYSTEM', text=f'Invalid levelup input. {valid_inputs.replace('\n', '<br>')}').save()
+
+            return False  # if the stat was not valid
 
         self.level      += 1                        # the level increaces one point
         self.exp        -= self.exp_top             # the experience reduces the top passed
         self.exp_top    += int(self.exp_top*0.2)    # the top increaces by a function
         self.health     = self.max_health           # the health recovers to the max
         self.save()
+
+        History.objects.create(campaign=self.campaign, author='SYSTEM', text=f'{self.name} leveled up his {stat}!').save()
+
         return True   # successful
         
 
-    def level_up_weapon(self, new_name:str = None, stat:str = 'damage'):
+    def level_up_weapon(self, stat:str = 'damage', new_name:str = None):
         ''' levels up the weapon of the character, the damage will be increaced if you choose it. \n
         if is a ranged weapon, you can also level up the range, but with a five points accumulation system. \n
-        returns the leveled up weapon, but now the character has it equipped  .
+        returns if it was successful.
         '''
         leveled_weapon = copy.deepcopy(self.weapon)  # I create a copy of that weapon
 
         leveled_weapon.is_template = False  # Change is_template to false, now it's a unique weapon
         leveled_weapon.level += 1
         
-        if stat == 'damage':
+        if stat in ['dmg','damage']:
+            stat = 'damage'
             leveled_weapon.damage += 1
+            History.objects.create(campaign=self.campaign, author='SYSTEM', text=f"{self.name} leveled up his weapon's damage!").save()
 
         # for ranged weapons, you can also level up the range, but it's a point accumulation system.
         # if you reach five points (range_level_points), then the range is leveled up.
         # else, you only get one more point
-        elif stat == 'range':
+        elif stat in ['rng','range']:
+            stat = 'range'
             if leveled_weapon.is_ranged:
-                if leveled_weapon.range_level_points <= 5:
+                if leveled_weapon.range_level_points >= 5:
                     leveled_weapon.range_level_points = 0
                     leveled_weapon.range += 1
+                    History.objects.create(campaign=self.campaign, author='SYSTEM', text=f"{self.name} leveled up his weapon's range!").save()
                 else:
                     leveled_weapon.range_level_points += 1
+                    History.objects.create(campaign=self.campaign, author='SYSTEM', text=f"You obtained 1 range level point. Obtain {5-leveled_weapon.range_level_points} more to level up the weapon's range.").save()
             else:
                 leveled_weapon.damage += 1  # dude, that's just only for ranged weapons
+                History.objects.create(campaign=self.campaign, author="SYSTEM", text=f"{self.name} tried to level up the range of a melee weapon, but that's not possible. The damage was leveled up instead.")
 
-        
+        else :
+            History.objects.create(campaign=self.campaign, author="SYSTEM", text=f"{self.name} tried to level up the weapon, but the stat was not valid. The damage was leveled up instead.")
+            return False  # if the stat is not valid
+
         # if a new name is sent, that will be the new name of the weapon. 
         if new_name:
             leveled_weapon.name = new_name
+            History.objects.create(campaign=self.campaign, author="SYSTEM", text=f"{self.name}'s weapon renamed to {new_name}")
         
         leveled_weapon.save()
         self.weapon = leveled_weapon                # now the character has the leveled up weapon equipped
@@ -391,7 +441,8 @@ class Character(Entity, models.Model):
         self.health     = self.max_health           # the health recovers to the max
         self.save()
 
-        return leveled_weapon  # if you want to easily show the weapon or something like that
+        #return leveled_weapon  # if you want to easily show the weapon or something like that
+        return True # successful
     
 
     def save(self, *args, **kwargs):

@@ -301,122 +301,23 @@ def command_executer(prompt:str|list, player:Character, target:Monster) -> tuple
         successful = False
 
     elif action[0] == 'move':
-        action[1] = action[1].replace('-','')
-        if len(action) > 2:
-            action[1] = action[2]+action[1] if action[2] in ['up','down'] else action[1]+action[2]
-        
-        successful = player.move(action[1])
-
-        for treasure in player.get_treasures_in_range():
-            if not treasure.discovered:
-                treasure.discover()
-
-        if not successful:
-            History.objects.create(campaign=player.campaign, author='SYSTEM', text="You can't be there").save()
-
-        if target is None or target not in player.get_monsters_in_range():
-            try:
-                new_target = player.get_monsters_in_range()[0]
-            except:
-                new_target = None
+        successful, new_target = act_move(player, target, action)
 
     elif action[0] == 'attack':
-        try:
-            if len(action) > 1:
-                target_id = action[1]
-                if target_id.isdigit():
-                    target_id = int(target_id)
-                    target = target_selection_by_id(target_id)
-                else:
-                    target = target_selection_by_name(target_id)
-            result = combat_turn(player=player, monster=target, player_dice=roll_dice(), monster_dice=roll_dice())
-            if result['player_died']:
-                new_player = player_selection(None)
-                player_died = True
-            if result['monster_died']:
-                target_died = True
-                try:
-                    new_target = player.get_monsters_in_range()[0]
-                except:
-                    new_target = None
-            else:
-                new_target = target
-            successful = True
-        except:
-            successful = False
+        successful, player_died, target_died, new_player, new_target = act_attack(player, target, action)
 
     elif action[0] == 'take':
-        treasure_to_take = action[1].lower() if len(action) > 1 else 'all'
-        possible_treasures = player.get_treasures_in_range(treasure_to_take)
-        possible_treasures, treasure_to_take = player.get_treasures_in_range(treasure_to_take, is_weapon=True) if len(possible_treasures) == 0 else possible_treasures, 'weapon' if len(possible_treasures) == 0 else treasure_to_take
-
-        if len(possible_treasures) == 0:
-            treasure_to_take = 'treasures' if treasure_to_take == 'all' else treasure_to_take
-            History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"There's no {treasure_to_take} to take here.").save()
-            successful = False
-
-        elif treasure_to_take != 'weapon':
-            for treasure in possible_treasures:
-                if treasure.treasure_type != 'Weapon':
-                    loot = treasure.get_inventory()
-                    History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'{player.name} got {loot} from {treasure.treasure_type}.').save()
-                    player.add_all_to_inventory(loot)
-                    treasure.delete()
-            successful = True
-        else:
-            for treasure in possible_treasures:
-                loot = treasure.weapon
-                History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'{player.name} equipped {loot.name}.').save()
-                player.weapon = loot
-                player.save()
-                treasure.delete()
-            successful = True
+        successful = act_take(player, action)
 
     # specifically for weapons
     elif action[0] == 'equip':
-        treasure_to_take = action[1].lower() if len(action) > 1 else 'all'
-        possible_treasures = player.get_treasures_in_range(treasure_to_take, is_weapon=True)
-        if len(possible_treasures) == 0:
-            treasure_to_take = 'weapons' if treasure_to_take == 'all' else treasure_to_take
-            History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"There's no {treasure_to_take} to take here.").save()
-            successful = False
-        else:
-            loot = possible_treasures[0].weapon
-            History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'{player.name} equipped {loot.name}.').save()
-            player.weapon = loot
-            player.save()
-            possible_treasures[0].delete()
-            successful = True
+        successful = act_equip(player, action)
 
     elif action[0] == 'use':
-        player_inventory = player.get_inventory()
-        if len(action) == 1:
-            History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'You need to specify the item you want to use. Please replace the spaces with "_" if you have problems using items.<br>For example: health_potion.').save()
+        successful = act_use(player, action)
 
-            # I don't have a list of possible usable items xd, so
-            #History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"There's a list of your items: ").save()
-            if 'health potion' not in player_inventory.keys():
-                History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"By the way... You don't have usable items.").save()
-
-            successful = False
-        else:
-            item_to_use = (' '.join(action[1:])).lower().replace('_',' ')
-            if item_to_use not in player_inventory.keys():
-                History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"You don't have {item_to_use}s.").save()
-                successful = False
-            else:
-                if item_to_use == 'health potion':
-                    player.health += 50
-                    player.use_from_inventory(item_to_use, amount = 1)
-                    player.save()
-                    History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'{player.name} used a health potion.').save()
-                    successful = True
-                #elif item_to_use == 'mana potion':, or something like that for each item
-                # probably is not the best way, it would be better to be implemented on Character.use_from_inventory()
-                # please remember me to create a list of possible usable items an their effects on default.py
-                else:
-                    History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"You can't use that.").save()
-                    successful = False
+    elif action[0] == 'levelup':
+        successful = act_levelup(player, action)
 
         
     return successful, {
@@ -425,6 +326,154 @@ def command_executer(prompt:str|list, player:Character, target:Monster) -> tuple
         'target_died': target_died,
         'new_target': new_target, 
     }
+
+
+def act_levelup(player:Character, action:list):
+    if action[1] in ['dmg','damage','rng', 'range', 'wpn', 'weapon']:
+        wpn_stat = 'dmg' if action[1] in ['wpn', 'weapon'] else action[1]
+
+        # it means that the player wants to rename his weapon
+        if len(action) > 2:
+            wpn_name = ' '.join(action[2:])
+            successful = player.level_up_weapon(wpn_stat, wpn_name)
+        else: # if not, the weapon name remains the same
+            successful = player.level_up_weapon(wpn_stat)
+        
+    else:
+        stat = action[1]
+        successful = player.level_up_stat(stat)  
+
+    return successful
+
+
+def act_use(player:Character, action:list):
+    player_inventory = player.get_inventory()
+    if len(action) == 1:
+        History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'You need to specify the item you want to use. Please replace the spaces with "_" if you have problems using items.<br>For example: health_potion.').save()
+
+            # I don't have a list of possible usable items xd, so
+            #History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"There's a list of your items: ").save()
+        if 'health potion' not in player_inventory.keys():
+            History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"By the way... You don't have usable items.").save()
+
+        successful = False
+    else:
+        item_to_use = (' '.join(action[1:])).lower().replace('_',' ')
+        if item_to_use not in player_inventory.keys():
+            History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"You don't have {item_to_use}s.").save()
+            successful = False
+        else:
+            if item_to_use in ['health potion', 'potion', 'hp potion', 'hp']:
+                player.health += 50
+                player.use_from_inventory(item_to_use, amount = 1)
+                player.save()
+                History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'{player.name} used a health potion.').save()
+                successful = True
+                #elif item_to_use == 'mana potion':, or something like that for each item
+                # probably is not the best way, it would be better to be implemented on Character.use_from_inventory()
+                # please remember me to create a list of possible usable items an their effects on default.py
+            else:
+                History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"You can't use that.").save()
+                successful = False
+    return successful
+
+def act_equip(player:Character, action:list):
+    treasure_to_take = action[1].lower() if len(action) > 1 else 'all'
+    possible_treasures = player.get_treasures_in_range(treasure_to_take, is_weapon=True)
+    if len(possible_treasures) == 0:
+        treasure_to_take = 'weapons' if treasure_to_take == 'all' else treasure_to_take
+        History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"There's no {treasure_to_take} to take here.").save()
+        successful = False
+    else:
+        loot = possible_treasures[0].weapon
+        History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'{player.name} equipped {loot.name}.').save()
+        player.weapon = loot
+        player.save()
+        possible_treasures[0].delete()
+        successful = True
+    return successful
+
+def act_take(player:Character, action:list):
+    treasure_to_take = action[1].lower() if len(action) > 1 else 'all'
+    possible_treasures = player.get_treasures_in_range(treasure_to_take)
+    possible_treasures, treasure_to_take = player.get_treasures_in_range(treasure_to_take, is_weapon=True) if len(possible_treasures) == 0 else possible_treasures, 'weapon' if len(possible_treasures) == 0 else treasure_to_take
+
+    if len(possible_treasures) == 0:
+        treasure_to_take = 'treasures' if treasure_to_take == 'all' else treasure_to_take
+        History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"There's no {treasure_to_take} to take here.").save()
+        successful = False
+
+    elif treasure_to_take != 'weapon':
+        for treasure in possible_treasures:
+            if treasure.treasure_type != 'Weapon':
+                loot = treasure.get_inventory()
+                History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'{player.name} got {loot} from {treasure.treasure_type}.').save()
+                player.add_all_to_inventory(loot)
+                treasure.delete()
+        successful = True
+    else:
+        for treasure in possible_treasures:
+            loot = treasure.weapon
+            History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'{player.name} equipped {loot.name}.').save()
+            player.weapon = loot
+            player.save()
+            treasure.delete()
+        successful = True
+    return successful
+
+def act_attack(player:Character, target:Monster, action:list):
+    player_died, target_died = False, False
+    new_player, new_target = player, None
+    try:
+        if len(action) > 1:
+            target_id = action[1]
+            if target_id.isdigit():
+                target_id = int(target_id)
+                target = target_selection_by_id(target_id)
+            else:
+                target = target_selection_by_name(target_id)
+
+        result = combat_turn(player=player, monster=target, player_dice=roll_dice(), monster_dice=roll_dice())
+
+        if result['player_died']:
+            new_player = player_selection(None)  ###
+            player_died = True
+        if result['monster_died']:
+            target_died = True
+            try:
+                new_target = player.get_monsters_in_range()[0]
+            except:
+                new_target = None
+        else:
+            new_target = target
+        successful = True
+    except:
+        successful = False
+    return successful, player_died, target_died, new_player, new_target
+
+def act_move(player:Character, target:Monster, action:list):
+    new_target = target
+
+    action[1] = action[1].replace('-','')
+    if len(action) > 2:
+        action[1] = action[2]+action[1] if action[2] in ['up','down'] else action[1]+action[2]
+        
+    successful = player.move(action[1])
+
+    for treasure in player.get_treasures_in_range():
+        if not treasure.discovered:
+            treasure.discover()
+
+    if not successful:
+        History.objects.create(campaign=player.campaign, author='SYSTEM', text="You can't be there").save()
+
+    if target is None or target not in player.get_monsters_in_range():
+        try:
+            new_target = player.get_monsters_in_range()[0]
+        except:
+            new_target = None
+
+    return successful, new_target
 
 
 
