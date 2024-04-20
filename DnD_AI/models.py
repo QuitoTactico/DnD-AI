@@ -162,12 +162,12 @@ class Entity(models.Model):
     def get_default_entity_icon(self, entity_race:str, entity_class:str='Warrior') -> str:
         if entity_race == 'Human':
             if entity_class in DEFAULT_WEAPON_PER_CLASS.keys():
-                return f'entity/icons/default/{entity_class.lower().replace(' ', '_')}.png'
+                return f"entity/icons/default/{entity_class.lower().replace(' ', '_')}.png"
             else:
                 return 'entity/images/default.png'
         else:
             if entity_race in DEFAULT_WEAPON_PER_CLASS.keys():
-                return f'entity/icons/default/{entity_race.lower().replace(' ', '_')}.png'
+                return f"entity/icons/default/{entity_race.lower().replace(' ', '_')}.png"
             else:
                 return 'entity/images/default.png'
 
@@ -377,7 +377,7 @@ class Character(Entity, models.Model):
             'rng', 'range'
             '''
             
-            History.objects.create(campaign=self.campaign, author='SYSTEM', text=f'Invalid levelup input. {valid_inputs.replace('\n', '<br>')}').save()
+            History.objects.create(campaign=self.campaign, author='SYSTEM', text=f"Invalid levelup input. {valid_inputs.replace('\n', '<br>')}").save()
 
             return False  # if the stat was not valid
 
