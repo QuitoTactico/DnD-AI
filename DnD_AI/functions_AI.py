@@ -1,17 +1,19 @@
 import requests
 from PIL import Image
 from io import BytesIO
-
-from .API import API_KEY, gemini_api_key, hf_api_key
 import os
 from random import randint
 
-from models import History
+#from models import History
+
+from .API import API_KEY, gemini_api_key, hf_api_key    
+#from API import API_KEY, gemini_api_key, hf_api_key  #Testing purposes
+    
+from openai import OpenAI as OpenAI
 
 from langchain.chains.llm import LLMChain
 from langchain.prompts import PromptTemplate
 from langchain_openai import OpenAI as llmOpenAI
-from openai import OpenAI as OpenAI
 
 import google.generativeai as genai
 from google.generativeai.types import HarmCategory, HarmBlockThreshold
@@ -20,14 +22,14 @@ from google.generativeai.types import HarmCategory, HarmBlockThreshold
 
 # ================ IMAGE GENERATION ================
 
-illustrations_dir = "/media/illustrations/"
+illustrations_dir = "media\\illustrations\\"
 
 
 # --------------- OPENAI ---------------
 
 client_openai = OpenAI(api_key=API_KEY)
 
-def get_image(prompt):
+def image_generator_DallE(prompt):
     response_dall_e = client_openai.images.generate(
         model="dall-e-3",
         prompt=prompt,
@@ -49,12 +51,13 @@ def get_image(prompt):
             #f.write(image_response.content)
             #return image_data.url
 
-        f = f"/..{illustrations_dir}image_{i}.png"
+        #image_route = f"{illustrations_dir}image_{i}.png"
+        image_dir = f"media\\illustrations\\image_{i}.png"
         image_bytes = image_response.content
         image = Image.open(BytesIO(image_bytes))
-        #image.save(f, "PNG")
-        image.show()
-        return f"{illustrations_dir}image_{i}.png"
+        image.save(image_dir)
+        #image.show()
+        return image_dir.replace('\\', '/')
 
 
 # --------------- HUGGINGFACE ---------------
@@ -67,17 +70,28 @@ def query(payload):
 	response = requests.post(API_URL, headers=headers, json=payload)
 	return response.content
 
-def image_generation_HF(prompt_input):
+def image_generator_HF(prompt_input):
     prompt = f"Epic scene of {prompt_input}"
 
     image_bytes = query({
         "inputs": prompt,
     })
+
+    i = randint(0, 999999999999999999)
+
+    # Obtén la ruta absoluta del directorio de ilustraciones
+    abs_illustrations_dir = os.path.abspath(illustrations_dir)
+
+    # Usa la ruta absoluta al guardar la imagen
+    #image_route = f"{abs_illustrations_dir}\image_{i}.png"
+    #image_route = f"media\\image_{i}.png"
+    image_route = f"media\\illustrations\\image_{i}.png"
     
     image = Image.open(BytesIO(image_bytes))
-    image.save("media/image.png")
+    image.save(image_route)
     #image.show()
-    return image
+    #return image
+    return image_route.replace('\\', '/')
 
 
 
@@ -158,8 +172,24 @@ def action_interpreter(prompt_input):
         return  f"""{response.prompt_feedback}
                     {response.candidates[0].finish_reason}
                     {response.candidates[0].safety_ratings}"""
+    
 
 
+# ==================================== TESTING ====================================
+
+def test():
+    while True:
+        option = input("1. Action Interpreter\n2. Image Generation\n3. Exit\n-> ")
+        if option == "1":
+            action = action_interpreter(input("What do you want to do?"))
+            print(action)
+        elif option == "2":
+            image = image_generator_HF(input("What image do you want to see?"))
+            image.show()
+        else:
+            break
+
+#test()
 
 
 # ==================================== PAST TRIES RESOURCES ====================================

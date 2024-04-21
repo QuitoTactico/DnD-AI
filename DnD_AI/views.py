@@ -82,14 +82,18 @@ def game(request):
                     command = True
                 else:
                     response = get_response(prompt)
-                    image_url = get_image(prompt)
+
                     prompt = action_interpreter(prompt)
+
+                    image_dir_DallE = image_generator_DallE(prompt)
+                    image_dir_HF = image_generator_HF(prompt)
 
                     command = True
 
                     History.objects.create(campaign_id=campaign_id, author='SYSTEM', text=response).save()
                     History.objects.create(campaign_id=campaign_id, author='ACTION', text='['+prompt+']').save()
-                    History.objects.create(campaign_id=campaign_id, author='SYSTEM', is_image = True, text = image_url).save()
+                    History.objects.create(campaign_id=campaign_id, author='SYSTEM', is_image = True, text = image_dir_DallE).save()
+                    History.objects.create(campaign_id=campaign_id, author='SYSTEM', is_image = True, text = image_dir_HF).save()
 
 
         # ------------------------- GETTING PLAYER AND TARGET -----------------------------
