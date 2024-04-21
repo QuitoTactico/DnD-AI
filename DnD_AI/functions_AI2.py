@@ -7,59 +7,97 @@ import numpy as np
 from dotenv import load_dotenv, find_dotenv
 from PIL import Image
 import requests
+from API import API_KEY, gemini_api_key, hf_api_key
 
 import google.generativeai as genai
-
-# Definición de funciones
-def query(payload):
-	response = requests.post(API_URL, headers=headers, json=payload)
-	return response.content
+from google.generativeai.types import HarmCategory, HarmBlockThreshold
 
 # Configuración de API Keys de Gemini y HuggingFace
-_ = load_dotenv('api_keys.env')
+'''
+_ = load_dotenv('/api_keys.env')
 genai.configure(api_key=os.environ.get('gemini_api_key'))
 hf_api_key = os.environ.get('hf_api_key')
-
-# Se carga la lista de películas
-with open('movie_titles.json', 'r') as file:
-    file_content = file.read()
-    movies = json.loads(file_content)
-
-
-# 1. Generación de descripción de las películas
+'''
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = gemini_api_key
+genai.configure(api_key=gemini_api_key)
 model = genai.GenerativeModel('gemini-pro')
-#Se carga la lista de películas de movie_titles.json
-idx_movie = np.random.randint(len(movies)-1)
-movie = movies[idx_movie]
-movie_title = movie["title"]
-print(movie_title)
-
-instruction = "Vas a actuar como un aficionado del cine que sabe describir de forma clara, concisa y precisa \
-cualquier película en menos de 200 palabras. La descripción debe incluir el género de la película y cualquier \
-información adicional que sirva para crear un sistema de recomendación."
-
-prompt = f"{instruction} Has una descripción de la película {movie_title}"
-
-response = model.generate_content(prompt)
-
-print(response.text)
-
-
-#2 Generación de las imágenes de las películas
 
 API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0"
 headers = {"Authorization": f"Bearer {hf_api_key}"}
 
-prompt = f"Carátula de la película {movie_title}"
-
-image_bytes = query({
-	"inputs": prompt,
-})
-# You can access the image with PIL.Image for example
-image = Image.open(BytesIO(image_bytes))
-image.show()
+def query(payload):
+	response = requests.post(API_URL, headers=headers, json=payload)
+	return response.content
 
 
+def action_interpreter(prompt_input):
+    instruction = """I need you to categorize this natural language desired action into a function (act) according to this definitions. And depending on the function, I need its inputs too, all in just a line, no more. Always add the function at the beginning of the line. Never write the inputs name. Just write something like "attack skeleton james". Here are the functions and their inputs:
+    
+    "levelup <stat_or_weaponstat>"
+    "use <item_name>"
+    "equip <weapon_name(optional)>"
+    "take <treasure_name(optional)>"
+    "attack <target(optional)>"
+    "move <direction>"
+
+    valid values for:
+    stat_or_weaponstat: "health", "strength", "intelligence", "recursiveness", "dexterity", "phyres", "magres", "constitution", "damage", "range"
+    item_name: "potion"
+    weapon_name: literally anything, the desired weapon that was said by the player
+    treasure_name: "gold", "bag", "chest", "key", "weapon", "tombstone"
+    target: literally anyone, the desired target that was said by the player
+    direction: "up", "down", "left", "right", "upright", "upleft", "downright", "downleft"
+
+    output examples:
+    "duuude, i want to move up" -> "move up"
+    "attack Dragon Jessica"
+    "attack"
+    "move upleft"
+    "take gold"
+    "take"
+    without saying the function
+    """
+
+    prompt = f"{instruction} So... now categorize this: {prompt_input}"
+
+    response = model.generate_content(prompt,
+                                      safety_settings={
+                                           HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                                           HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                                           HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                                           #HarmCategory.HARM_CATEGORY_VIOLENCE: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                                           #HarmCategory.HARM_CATEGORY_SEXUAL: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                                           #HarmCategory.HARM_CATEGORY_DANGEROUS: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                                           HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                                           #HarmCategory.HARM_CATEGORY_TOXICITY: HarmBlockThreshold.BLOCK_NONE,
+                                           })
+    try:
+        print(response.text)
+    except ValueError:
+        # If the response doesn't contain text, check if the prompt was blocked.
+        print(response.prompt_feedback)
+        # Also check the finish reason to see if the response was blocked.
+        print(response.candidates[0].finish_reason)
+        # If the finish reason was SAFETY, the safety ratings have more details.
+        print(response.candidates[0].safety_ratings)
+
+
+#2 Generación de las imágenes de las películas
+
+def image_generation(prompt_input):
+    prompt = f"Epic scene of {prompt_input}"
+
+    image_bytes = query({
+        "inputs": prompt,
+    })
+    print(image_bytes)
+    print(hf_api_key)
+    # You can access the image with PIL.Image for example
+    image = Image.open(BytesIO(image_bytes))
+    image.show()
+
+
+'''
 #3 Generación de embeddings
 response_emb = genai.embed_content(
     model="models/embedding-001",
@@ -69,3 +107,16 @@ response_emb = genai.embed_content(
 
 # 1 input > 1 vector output
 print(str(response_emb['embedding'])[:50], '... TRIMMED]')
+'''
+
+def test():
+    while True:
+        option = input("1. Action Interpreter\n2. Image Generation\n3. Exit\n-> ")
+        if option == "1":
+            action_interpreter(input("What do you want to do?"))
+        elif option == "2":
+            image_generation(input("What image do you want to see?"))
+        else:
+            break
+
+test()
