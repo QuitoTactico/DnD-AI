@@ -228,6 +228,9 @@ class Entity(models.Model):
         return True  # if was succesful
 
     def move(self, direction:str) -> bool:
+        direction = direction.lower()
+        pos = (self.x, self.y)
+        
         if direction == 'up':
             pos = (self.x, self.y+1)
         elif direction == 'down':

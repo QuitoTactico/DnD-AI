@@ -2,7 +2,7 @@ from django.shortcuts import render
 
 from .models import *
 from .functions import *
-from .functions_AI import *
+from .functions_AI import action_interpreter, get_response
 
 
 def home(request):
@@ -81,19 +81,12 @@ def game(request):
                     prompt = prompt[1:]
                     command = True
                 else:
-                    response = get_response(prompt)
+                    #response = get_response(prompt)
+                    #History.objects.create(campaign_id=campaign_id, author='SYSTEM', text=response).save()
 
                     prompt = action_interpreter(prompt)
-
-                    image_dir_DallE = image_generator_DallE(prompt)
-                    image_dir_HF = image_generator_HF(prompt)
-
                     command = True
-
-                    History.objects.create(campaign_id=campaign_id, author='SYSTEM', text=response).save()
-                    History.objects.create(campaign_id=campaign_id, author='ACTION', text='['+prompt+']').save()
-                    History.objects.create(campaign_id=campaign_id, author='SYSTEM', is_image = True, text = image_dir_DallE).save()
-                    History.objects.create(campaign_id=campaign_id, author='SYSTEM', is_image = True, text = image_dir_HF).save()
+                    History.objects.create(campaign_id=campaign_id, author='ACTION', text=prompt).save()
 
 
         # ------------------------- GETTING PLAYER AND TARGET -----------------------------

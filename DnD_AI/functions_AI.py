@@ -30,10 +30,15 @@ illustrations_dir = "media\\illustrations\\"
 client_openai = OpenAI(api_key=API_KEY)
 
 def image_generator_DallE(prompt):
+    '''Through OpenAI API, uses dall-e-3'''
+
     response_dall_e = client_openai.images.generate(
         model="dall-e-3",
         prompt=prompt,
-        size="1024x1024",
+        size="1024x1024", # the image generation is being too slow
+        #size="512x512",
+        #style="vivid",    # i've found this is possible
+        #style="natural", 
         quality="standard",
         n=1,
     )
@@ -52,7 +57,7 @@ def image_generator_DallE(prompt):
             #return image_data.url
 
         #image_route = f"{illustrations_dir}image_{i}.png"
-        image_dir = f"media\\illustrations\\image_{i}.png"
+        image_dir = f"media\\illustrations\\image_DE_{i}.png"
         image_bytes = image_response.content
         image = Image.open(BytesIO(image_bytes))
         image.save(image_dir)
@@ -62,30 +67,32 @@ def image_generator_DallE(prompt):
 
 # --------------- HUGGINGFACE ---------------
 
-API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0"
+StabDiff_API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0"
 
 headers = {"Authorization": f"Bearer {hf_api_key}"}
 
-def query(payload):
-	response = requests.post(API_URL, headers=headers, json=payload)
+def StabDiff_query(payload):
+	response = requests.post(StabDiff_API_URL, headers=headers, json=payload)
 	return response.content
 
-def image_generator_HF(prompt_input):
+def image_generator_StabDiff(prompt_input):
+    '''Through HuggingFace API, uses stable diffusion x1 1.0'''
+
     prompt = f"Epic scene of {prompt_input}"
 
-    image_bytes = query({
+    image_bytes = StabDiff_query({
         "inputs": prompt,
     })
 
     i = randint(0, 999999999999999999)
 
-    # Obtén la ruta absoluta del directorio de ilustraciones
-    abs_illustrations_dir = os.path.abspath(illustrations_dir)
+    # ruta absoluta del directorio de ilustraciones, no funcionó
+    #abs_illustrations_dir = os.path.abspath(illustrations_dir)
 
-    # Usa la ruta absoluta al guardar la imagen
+    # ruta absoluta al guardar la imagen
     #image_route = f"{abs_illustrations_dir}\image_{i}.png"
     #image_route = f"media\\image_{i}.png"
-    image_route = f"media\\illustrations\\image_{i}.png"
+    image_route = f"media\\illustrations\\image_SD_{i}.png"
     
     image = Image.open(BytesIO(image_bytes))
     image.save(image_route)
@@ -127,7 +134,7 @@ genai.configure(api_key=gemini_api_key)
 gemini_model = genai.GenerativeModel('gemini-pro')
 
 def action_interpreter(prompt_input):
-    instruction = """I need you to categorize this natural language desired action into a function (act) according to this definitions. And depending on the function, I need its inputs too, all in just a line, no more. Always add the function at the beginning of the line. Never write the inputs name. Just write something like "attack skeleton james". Here are the functions and their inputs:
+    instruction = """I need you to categorize this natural language desired action into a function (act) according to this definitions. And depending on the function, I need its inputs too, all in just a line, no more. Always add the function at the beginning of the line. Never write the inputs name. Just write something like "attack skeleton james". For move, use specifically its valid values. Here are the functions and their inputs:
     
     "levelup <stat_or_weaponstat>"
     "use <item_name>"
@@ -138,11 +145,11 @@ def action_interpreter(prompt_input):
 
     valid values for:
     stat_or_weaponstat: "health", "strength", "intelligence", "recursiveness", "dexterity", "phyres", "magres", "constitution", "damage", "range"
-    item_name: "potion"
-    weapon_name: literally anything, the desired weapon that was said by the player
+    direction: "up", "down", "left", "right", "upright", "upleft", "downright", "downleft"
     treasure_name: "gold", "bag", "chest", "key", "weapon", "tombstone"
     target: literally anyone, the desired target that was said by the player
-    direction: "up", "down", "left", "right", "upright", "upleft", "downright", "downleft"
+    weapon_name: literally anything, the desired weapon that was said by the player
+    item_name: "potion"
 
     output examples:
     "duuude, i want to move up" -> "move up"
@@ -184,7 +191,7 @@ def test():
             action = action_interpreter(input("What do you want to do?"))
             print(action)
         elif option == "2":
-            image = image_generator_HF(input("What image do you want to see?"))
+            image = image_generator_StabDiff(input("What image do you want to see?"))
             image.show()
         else:
             break

@@ -10,6 +10,8 @@ from bokeh.plotting import figure, show                             # for plotti
 from bokeh.models import Range1d, Span, CrosshairTool, HoverTool    # for plot personalization (map components)
 from bokeh.embed import components                                  # for plot html rendering (for the front-end)
 
+from .functions_AI import image_generator_DallE, image_generator_StabDiff
+
 def roll_dice(): 
     return randint(1, 20)
 
@@ -280,9 +282,13 @@ def command_executer(prompt:str|list, player:Character, target:Monster) -> tuple
     - 'new_target'  : Monster
     
     '''
-    
+
+    print(prompt)
+
     # if the prompt is a string, it will be split into a list
     action = prompt.split(' ') if type(prompt) == str else prompt
+
+    action_image_generation(prompt, action[0], player, target)
 
     # for each action, the turns on the campaign will be increased
     player.campaign.turn_counter()
@@ -321,6 +327,37 @@ def command_executer(prompt:str|list, player:Character, target:Monster) -> tuple
         'target_died': target_died,
         'new_target': new_target, 
     }
+
+def action_image_generation(prompt:str, action:str, player:Character, target:Monster):
+
+    if action == 'move':
+        image_description = f"{player.character_race} {player.character_class} {player.physical_description} running to the {prompt[4:]}"
+
+    elif action == 'attack':
+        image_description = f"{player.character_race} {player.character_class} {player.physical_description} fighting a {target.monster_race} {target.monster_class} {target.physical_description} with a {player.weapon.weapon_type}"
+
+    elif action == 'equip':
+        weapon_name = 'weapon' if prompt[6:] == "" else prompt[6:]
+        image_description = f"{player.character_race} {player.character_class} {player.physical_description} taking a {weapon_name} from the ground"
+        # holding up a {weapon_name}
+    
+    # take, use, levelup
+    else:
+        #image_description = f"{player.character_race} {player.character_class} {player.physical_description} is {prompt}"
+        image_description = f"{player.character_race} {player.character_class} holding a {player.weapon.weapon_type}, {player.physical_description} is {prompt}"
+
+    # try to generate an image with DallE, if it fails, it will use StabDiff
+    # REASONS TO FAIL:
+    #   - it can fail if the prompt is too long or if the model doesn't understand the prompt
+    #   - maybe the prompt was too violent or sexual
+    #   - maybe the tokens got empty
+    # So, if it fails, it will use StabDiff, which is free
+    try:
+        image_dir_DallE = image_generator_DallE(image_description)
+        History.objects.create(campaign=player.campaign, author='SYSTEM', is_image = True, text = image_dir_DallE).save()
+    except:
+        image_dir_StabDiff = image_generator_StabDiff(image_description)
+        History.objects.create(campaign=player.campaign, author='SYSTEM', is_image = True, text = image_dir_StabDiff).save()
 
 
 def act_levelup(player:Character, action:list):

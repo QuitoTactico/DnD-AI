@@ -43,8 +43,8 @@
 
         {% for entry in text_history %}
           {% if entry.is_image %}
-            <div class="text-center" style="width: 70%;">
-              <img class="text-center" src="{{entry.text}}" style="width: 70%;" /> <!--width="385"-->
+            <div class="text-center" style="width: 100%;">
+              <img class="text-center" src="{{entry.text}}" style="display: block; margin: auto; width: 95%;" /> <!--width="385"-->
             </div>
           {% else %}
             {% if player.name == entry.author %}<div style="color: green">{% else %}<div style="color: {{entry.color}}">{% endif %}
