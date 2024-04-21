@@ -66,8 +66,7 @@ def game(request):
         command = False
         if 'prompt' in request.POST:
             prompt = request.POST['prompt']
-            History.objects.create(campaign_id=campaign_id, author=request.POST['player_name'], text=prompt, color='blue').save()
-
+            
             # If the prompt is empty, it's considered a command (a null command)
             if len(prompt) == 0 or prompt == '' or prompt is None or prompt == '\n':
                 prompt = ''
@@ -75,6 +74,8 @@ def game(request):
 
             # If the prompt is not empty, it's considered a message that needs to be sent to the AI to become a command
             else:
+                History.objects.create(campaign_id=campaign_id, author=request.POST['player_name'], text=prompt, color='blue').save()
+
                 # If the prompt starts with a slash, it's considered a command
                 if prompt[0] == '/':
                     prompt = prompt[1:]
@@ -82,7 +83,12 @@ def game(request):
                 else:
                     response = get_response(prompt)
                     image_url = get_image(prompt)
+                    prompt = action_interpreter(prompt)
+
+                    command = True
+
                     History.objects.create(campaign_id=campaign_id, author='SYSTEM', text=response).save()
+                    History.objects.create(campaign_id=campaign_id, author='ACTION', text='['+prompt+']').save()
                     History.objects.create(campaign_id=campaign_id, author='SYSTEM', is_image = True, text = image_url).save()
 
 

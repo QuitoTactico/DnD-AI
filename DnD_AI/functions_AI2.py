@@ -1,13 +1,14 @@
 import os
-import PIL
-import json
+#import PIL
+#import json
 from PIL import Image
 from io import BytesIO
-import numpy as np
-from dotenv import load_dotenv, find_dotenv
+#import numpy as np
+#from dotenv import load_dotenv, find_dotenv
 from PIL import Image
 import requests
-from API import API_KEY, gemini_api_key, hf_api_key
+from .API import API_KEY, gemini_api_key, hf_api_key
+#from API import API_KEY, gemini_api_key, hf_api_key # for testing purposes
 
 import google.generativeai as genai
 from google.generativeai.types import HarmCategory, HarmBlockThreshold
@@ -62,39 +63,35 @@ def action_interpreter(prompt_input):
 
     response = model.generate_content(prompt,
                                       safety_settings={
-                                           HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-                                           HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-                                           HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-                                           #HarmCategory.HARM_CATEGORY_VIOLENCE: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-                                           #HarmCategory.HARM_CATEGORY_SEXUAL: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-                                           #HarmCategory.HARM_CATEGORY_DANGEROUS: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-                                           HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-                                           #HarmCategory.HARM_CATEGORY_TOXICITY: HarmBlockThreshold.BLOCK_NONE,
+                                           HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
+                                           HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
+                                           HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
+                                           HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
                                            })
     try:
-        print(response.text)
+        return response.text 
     except ValueError:
         # If the response doesn't contain text, check if the prompt was blocked.
-        print(response.prompt_feedback)
         # Also check the finish reason to see if the response was blocked.
-        print(response.candidates[0].finish_reason)
         # If the finish reason was SAFETY, the safety ratings have more details.
-        print(response.candidates[0].safety_ratings)
+        return f"{response.prompt_feedback}\n{response.candidates[0].finish_reason}\n{response.candidates[0].safety_ratings}"
 
 
-#2 Generación de las imágenes de las películas
 
-def image_generation(prompt_input):
+def image_generation_HF(prompt_input):
     prompt = f"Epic scene of {prompt_input}"
 
     image_bytes = query({
         "inputs": prompt,
     })
-    print(image_bytes)
-    print(hf_api_key)
+    #print(image_bytes)
+    #print(hf_api_key)
     # You can access the image with PIL.Image for example
     image = Image.open(BytesIO(image_bytes))
-    image.show()
+    image.save("media/image.png")
+    #image.show()
+    return image
+
 
 
 '''
@@ -113,9 +110,11 @@ def test():
     while True:
         option = input("1. Action Interpreter\n2. Image Generation\n3. Exit\n-> ")
         if option == "1":
-            action_interpreter(input("What do you want to do?"))
+            action = action_interpreter(input("What do you want to do?"))
+            print(action)
         elif option == "2":
-            image_generation(input("What image do you want to see?"))
+            image = image_generation_HF(input("What image do you want to see?"))
+            image.show()
         else:
             break
 

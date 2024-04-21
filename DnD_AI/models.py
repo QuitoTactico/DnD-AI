@@ -661,7 +661,7 @@ class History(models.Model):
     is_key      = models.BooleanField(default=False)
     is_image    = models.BooleanField(default=False)
     author      = models.CharField(max_length=50, default="SYSTEM")
-    text        = models.CharField(max_length=3000, default="Hi (Default message)")
+    text        = models.CharField(max_length=5000, default="Hi (Default message)")
     color       = models.CharField(max_length=10, default="black")
     date        = models.DateTimeField(auto_now_add=True)
 
