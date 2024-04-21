@@ -81,7 +81,9 @@ def game(request):
                     command = True
                 else:
                     response = get_response(prompt)
+                    image_url = get_image(prompt)
                     History.objects.create(campaign_id=campaign_id, author='SYSTEM', text=response).save()
+                    History.objects.create(campaign_id=campaign_id, author='SYSTEM', is_image = True, text = image_url).save()
 
 
         # ------------------------- GETTING PLAYER AND TARGET -----------------------------

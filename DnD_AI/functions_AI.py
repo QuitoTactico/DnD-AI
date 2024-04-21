@@ -1,9 +1,14 @@
 from langchain.chains.llm import LLMChain
 from langchain.prompts import PromptTemplate
-from langchain_openai import OpenAI
+from langchain_openai import OpenAI as llmOpenAI
+from openai import OpenAI as OpenAI
 from .API import API_KEY
+import os
+import requests
 
-# Create your views here.
+client_dall_e = OpenAI(api_key=API_KEY)
+
+image_dir = "/media/illustrations/"
 
 template = """Question: {question}
 
@@ -12,7 +17,7 @@ Answer: Let's think step by step, supossing that i am in a fantastical role-play
 
 prompt_template = PromptTemplate.from_template(template)
 
-llm = OpenAI(openai_api_key=API_KEY)
+llm = llmOpenAI(openai_api_key=API_KEY)
 
 llm_chain = LLMChain(prompt=prompt_template, llm=llm)
 
@@ -21,6 +26,27 @@ def get_response(prompt):
     response = llm_chain.invoke(prompt)
     return response['text'].replace('\n', '<br>')
 
+def get_image(prompt):
+    response_dall_e = client_dall_e.images.generate(
+        model="dall-e-3",
+        prompt=prompt,
+        size="1024x1024",
+        quality="standard",
+        n=1,
+    )
+
+    os.makedirs(image_dir, exist_ok=True)
+
+    for i, image_data in enumerate(response_dall_e.data):
+
+        image_url = image_data.url
+
+        image_response = requests.get(image_url)
+
+        with open(os.path.join(image_dir, f"image_{i}.png"), "wb") as f:
+            f.write(image_response.content)
+            return image_data.url
+    
 
 
 # ------------------------------------ PAST TRIES RESOURCES ------------------------------------
