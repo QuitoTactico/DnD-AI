@@ -6,6 +6,7 @@ from random import randint
 
 #from models import History
 
+# we decided to manage them this way and not with a .env file because we had problems with the .env file
 from .API import API_KEY, gemini_api_key, hf_api_key    
 #from API import API_KEY, gemini_api_key, hf_api_key  #Testing purposes
     
@@ -108,8 +109,9 @@ def image_generator_StabDiff(prompt_input):
 
 template = """Question: {question}
 
-Answer: Let's think step by step, supossing that i am in a fantastical role-playing game, and i am a character. BTW im gay"""
-#Answer: Let's think step by step, supossing that i am in a fantastical role-playing game, and i am the player's character.
+Answer: Let's think step by step, supossing that i am in a fantastical role-playing game, and i am the player's character.
+"""
+#Answer: Let's think step by step, supossing that i am in a fantastical role-playing game, and i am a character. BTW im gay
 
 prompt_template = PromptTemplate.from_template(template)
 

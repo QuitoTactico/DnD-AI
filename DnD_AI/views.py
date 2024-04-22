@@ -2,25 +2,110 @@ from django.shortcuts import render
 
 from .models import *
 from .functions import *
-from .functions_AI import action_interpreter, get_response
+from .functions_AI import action_interpreter #, get_response
 
 
 def home(request):
     return render(request, 'home.html')
+
+
 
 def campaignSelection(request):
     campaigns = Campaign.objects.all()
     return render(request, 'campaignselection.html', 
                   {'campaigns': campaigns})
 
+
+
 def campaignCreation(request):
     return render(request, 'campaigncreation.html')
 
+
+
 def playerSelection(request):
+    '''POST LABELS:
+    - campaign_id   (optional) (default = First not completed)
+    - create_player (optional) (default = None)
+    
+    If the create_player label is sent, it creates a new player with this info sent in the POST request.
+    - name
+    - physical_description
+    - weapon_id
+    - max_health
+    - str
+    - int
+    - rec
+    - dex
+    - phyres
+    - magres
+    - con
+    - gift
+    - story
+    - race
+    - class
+    - icon
+    - image     (optional) (default = icon)
+    '''
+
     if request.method == "POST":
-        campaign_id = request.POST['campaign_id']
+
+        #campaign_id = request.POST['campaign_id'] if 'campaign_id' in request.POST else Campaign.objects.filter(is_completed=False).first().id
+        # Today I've learnt something better than ternary conditional.
+        campaign_id = request.POST.get('campaign_id') or Campaign.objects.filter(is_completed=False).first().id
+
+        # This goes here. After the player selects his character info, the button will redirect the player to this view.
+        # So, the button will send the info to this view and not the other one, to create the character.
+        if 'create_player' in request.POST:
+            name = request.POST.get('name')
+            physical_description = request.POST.get('physical_description')
+
+            weapon_id = request.POST.get('weapon_id')
+            weapon = Weapon.objects.get(id=weapon_id)
+
+            max_health = request.POST.get('max_health')
+            strength = request.POST.get('str')
+            intelligence = request.POST.get('int')
+            recursiveness = request.POST.get('rec')
+            dexterity = request.POST.get('dex')
+            physical_resistance = request.POST.get('phyres')
+            magical_resistance = request.POST.get('magres')
+            constitution = request.POST.get('con')
+
+            gift = request.POST.get('gift')
+            inventory = "{}" if gift is None else f"{{{gift}: 5}}"
+
+            story = request.POST.get('story')
+            
+            character_race = request.POST.get('race')
+            character_class = request.POST.get('class')
+            
+            icon = request.POST.get('icon')
+            image = request.POST.get('image') or icon
+            
+            Character.objects.create(
+                is_playable=True,
+                name=name,
+                physical_description=physical_description,
+                weapon=weapon,
+                max_health=max_health,
+                strength=strength,
+                intelligence=intelligence,
+                recursiveness=recursiveness,
+                dexterity=dexterity,
+                physical_resistance=physical_resistance,
+                magical_resistance=magical_resistance,
+                constitution=constitution,
+                inventory=inventory,
+                story=story,
+                character_race=character_race,
+                character_class=character_class,
+                icon=icon,
+                image=image,
+                campaign_id=campaign_id,
+            ).save()
     else:
         campaign_id = Campaign.objects.filter(is_completed=False).first().id
+    
 
     players = Character.objects.filter(campaign_id=campaign_id, is_playable=True)
 
@@ -31,21 +116,43 @@ def playerSelection(request):
                       'campaign_id': campaign_id
                       })
 
+
+
 def playerCreation(request):
-    return render(request, 'playercreation.html')
+    '''POST LABELS:
+    - campaign_id (optional) (default = First not completed)
+    '''
+
+    campaign_id = request.POST.get('campaign_id') or Campaign.objects.filter(is_completed=False).first().id
+
+    races = DEFAULT_RACES
+    classes = DEFAULT_CLASSES
+    weapons = DEFAULT_WEAPONS
+    weapons_with_stats = DEFAULT_WEAPON_STATS
     
+    return render(request, 'playercreation.html',
+                  {
+                        'campaign_id':campaign_id,
+                        'races':races,
+                        'classes':classes,
+                        'weapons':weapons,
+                        'weapons_with_stats':weapons_with_stats,
+                        })
+    
+
+
 def game(request):
+    '''POST LABELS:
+    - campaign_id   (optional) (default = First not completed)
+    - test          (optional) (default = False)
+    - player_name   (optional) (default = First character in that campaign)
+    - target_id     (optional) (default = None)
+    - dice_needed   (optional) (default = False) (DEPRECATED, DELETE LATER)
+    - prompt        (optional) (default = None)
+    '''
     
     if request.method == "POST":
-        '''
-        POST LABELS:
-        - campaign_id
-        - test
-        - player_name
-        - target_id
-        - dice_needed
-        - prompt
-        '''
+        
 
         # ------------------------- GETTING POST LABELS -----------------------------
 

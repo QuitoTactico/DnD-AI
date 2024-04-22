@@ -72,6 +72,8 @@ DEFAULT_WEAPON_PER_RACE = {
     'Zombie': 'Bare hands',
 }
 
+DEFAULT_RACES = DEFAULT_WEAPON_PER_RACE.keys()
+
 DEFAULT_WEAPON_PER_CLASS = {
     'Alchemist': 'Dagger',
     'Archer': 'Long Bow',
@@ -105,7 +107,9 @@ DEFAULT_WEAPON_PER_CLASS = {
     'Witch': 'Enchanted Book',
     'Wizard': 'Staff',
 }
-#DEFAULT_WEAPON_PER_RACE.update(DEFAULT_WEAPON_PER_CLASS)
+
+DEFAULT_CLASSES = DEFAULT_WEAPON_PER_CLASS.keys()
+
 DEFAULT_WEAPON_PER_CLASS.update(DEFAULT_WEAPON_PER_RACE)
 
 
@@ -345,6 +349,9 @@ DEFAULT_WEAPON_STATS = {
         'damage_type': 'Physical'
     },
 }
+
+DEFAULT_WEAPONS = DEFAULT_WEAPON_STATS.keys()
+
 
 DEFAULT_MONSTER_STATS = {
     'Goblin': {
