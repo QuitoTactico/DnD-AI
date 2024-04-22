@@ -4,5 +4,5 @@
 (run)           winget install graphviz         
 (add to path)   C:\Program Files\Graphviz\bin
 (restart)
-(run)           python manage.py graph_models DnD_AI --dot -o  DnD_AI_models.dot
+(run)           python manage.py graph_models DnD_AI --dot --disable-sort-fields --arrow-shape diamond --rankdir LR -o  DnD_AI_models.dot
 (run)           dot DnD_AI_models.dot -Tpng -o DnD_AI_models.png  
