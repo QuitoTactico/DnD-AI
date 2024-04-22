@@ -221,6 +221,27 @@ def player_selection(player_name):
     #print(res)
     return player
 
+def player_selection_by_id(player_id):
+    if player_id:
+        try:
+            player = Character.objects.get(id=player_id)
+        except:
+            try:
+                # If the id of the character is not found, it selects the first playable character in the database
+                player = Character.objects.filter(is_playable=True).first()
+            except:
+                player = Character.objects.create()
+                player.save()
+    else:
+        # If the player_id label is not sent, it selects the first playable character in the database
+        # We can change this to let the player select the character by himself, but we'll see.
+        try:
+            player = Character.objects.filter(is_playable=True).first()
+        except:
+            player = Character.objects.create()
+            player.save()
+    return player
+
 def target_selection_by_name(monster_name):
     if monster_name:
         try:

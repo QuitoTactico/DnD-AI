@@ -1,0 +1,39 @@
+GET, usa la URL
+<form action="">
+    <input type="text" name="player_name" placeholder="Player Name">
+    <input type="submit" value="Submit">
+</form>
+
+
+POST, usa las COOKIES
+<form action="{% url 'home' %}" method="post">
+    {% csrf_token %}
+
+    <input type="text" name="player_name" placeholder="Player Name">
+    <input type="checkbox" id="test" name="test">
+    <input type="checkbox" id="dice_needed" name="dice_needed">
+
+    <input type="hidden" name="is_true" value="True">
+    <input type="hidden" name="campaign_id" value="{{ campaign_id }}">
+    
+    <input type="submit" value="Submit">
+</form>
+
+
+CONDICIONALES
+{% if player_name %}
+    <h1>{{ player_name }}</h1>
+{% else %}
+    <h1>Player Name</h1>
+{% endif %}
+
+
+
+CICLOS
+{% for player in players %}
+    <h1>{{ player.name }}</h1>
+{% endfor %}
+
+
+
+

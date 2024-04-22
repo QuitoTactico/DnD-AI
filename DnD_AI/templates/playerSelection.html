@@ -1,1 +1,24 @@
-playerSelection
+<body>
+    <h1>playerSelection</h1>
+
+    {% for player in players %}
+        <h2>{{ player.name }} - LVL:{{ player.level }}</h2>
+        <h4>{{ player.race }} {{ player.class }}</h4>
+
+        <form action="{% url 'game' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="player_id" value="{{ player.id }}">
+            <input type="hidden" name="campaign_id" value="{{ player.campaign.id }}">
+            <input type="submit" value="Submit">
+        </form>
+    {% endfor %}
+
+    <hr>
+
+    <h2>Create a new player!</h2>
+    <form action="{% url 'playerCreation' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="campaign_id" value="{{ player.campaign.id }}">
+        <input type="submit" value="Submit">
+    </form>
+</body>

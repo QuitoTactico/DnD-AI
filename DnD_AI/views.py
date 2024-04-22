@@ -11,9 +11,26 @@ def home(request):
 
 
 def campaignSelection(request):
+    '''POST LABELS:
+    - create_campaign (optional) (default = None)
+
+    If the create_campaign label is sent, it creates a new campaign with this info sent in the POST request.
+    - name
+    - description
+    '''
+
+    if request.method == "POST":
+        if 'create_campaign' in request.POST:
+            name = request.POST.get('name')
+            description = request.POST.get('description')
+            Campaign.objects.create(name=name, description=description).save()
+
     campaigns = Campaign.objects.all()
+
     return render(request, 'campaignselection.html', 
-                  {'campaigns': campaigns})
+                  {
+                      'campaigns': campaigns
+                      })
 
 
 
@@ -44,12 +61,12 @@ def playerSelection(request):
     - race
     - class
     - icon
-    - image     (optional) (default = icon)
+    - image         (optional) (default = icon)
     '''
 
     if request.method == "POST":
 
-        #campaign_id = request.POST['campaign_id'] if 'campaign_id' in request.POST else Campaign.objects.filter(is_completed=False).first().id
+        #campaign_id = request.POST['campaign_id'] if 'campaign_id' in request.POST else Campaign.objects.filter(is_completed=False).first().id  # REDUNDANT!
         # Today I've learnt something better than ternary conditional.
         campaign_id = request.POST.get('campaign_id') or Campaign.objects.filter(is_completed=False).first().id
 
@@ -120,7 +137,7 @@ def playerSelection(request):
 
 def playerCreation(request):
     '''POST LABELS:
-    - campaign_id (optional) (default = First not completed)
+    - campaign_id   (optional) (default = First not completed)
     '''
 
     campaign_id = request.POST.get('campaign_id') or Campaign.objects.filter(is_completed=False).first().id
@@ -201,8 +218,17 @@ def game(request):
         # ALL OF THIS IS BETA. IT WILL BE CHANGED IN THE FUTURE FOR [(p_id 1, t_id 1), (p_id 2, t_id 2), ...]
 
         # If the name of a character is sent, that character will be the actual player
-        player_name = None if 'player_name' not in request.POST else request.POST['player_name']
-        player = player_selection(player_name)
+        if 'player_name' in request.POST:
+            player_name = request.POST.get['player_name']
+            player = player_selection(player_name)
+        elif 'player_id' in request.POST:
+            player_id = request.POST['player_id']
+            player = player_selection_by_id(player_id)
+        else:
+            player = player_selection(None)
+
+        player_name = player.name
+        player_id = player.id
 
         # If the id or name of a monster is sent, that monster will be the actual target
         target_id = None if 'target_id' not in request.POST else request.POST['target_id']
@@ -272,9 +298,9 @@ def game(request):
                       page, 
                       {
                                 # Database
-                            'characters'    : characters, 
+                            #'characters'    : characters, 
                             'players'       : players, 
-                            'monsters'      : monsters, 
+                            #'monsters'      : monsters, 
                             #'weapons'       : weapons, 
                             'text_history'  : history,
 
@@ -288,7 +314,8 @@ def game(request):
                             'map_div'       : map_div,
 
                                 # Testing details
-                            'player_name_sent'  : player_name, 
+                            'player_name_sent'  : player_name,
+                            'player_id_sent'    : player_id,
                             'target_id_sent'    : target_id,
                             'dice_needed'       : dice_needed,
                             'host'              : host,
@@ -299,10 +326,22 @@ def game(request):
     else:
 
         # If there's no POST, then it selects the first character and monster in the database as player and target
+        
         player = player_selection(None)
         target = target_selection_by_id(None)
-        history = History.objects.all()
         campaign_id = Campaign.objects.filter(is_completed=False).first().id
+
+        characters  = Character.objects.filter(campaign_id=campaign_id)
+        players     = Character.objects.filter(campaign_id=campaign_id, is_playable=True)
+        monsters    = Monster.objects.filter(campaign_id=campaign_id)
+        treasures   = Treasure.objects.filter(campaign_id=campaign_id)
+        history     = History.objects.filter(campaign_id=campaign_id)
+        tiles       = Tile.objects.filter(campaign_id=campaign_id)
+
+        
+        host = request.get_host()
+        map_script, map_div = create_map(player, characters, monsters, treasures, tiles, target, host)
+
         return render(request, 
                       'game.html', 
                       {
@@ -310,5 +349,7 @@ def game(request):
                             'monster'        : target,
                             'text_history'   : history,
                             'campaign_id'    : campaign_id,
+                            'map_script'     : map_script,
+                            'map_div'        : map_div,
                        })
     

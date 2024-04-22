@@ -1,1 +1,15 @@
-campaignSelection
+<body>
+    <h1>campaignSelection</h1>
+
+    {% for campaign in campaigns %}
+        <h2>{{ campaign.name }}</h2>
+
+        <form action="{% url 'playerSelection' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="campaign_id" value="{{ campaign.id }}">
+            <input type="submit" value="Submit">
+        </form>
+    {% endfor %}
+
+    <a href="{% url 'campaignCreation' %}">Create New Campaign!</a>
+</body>
