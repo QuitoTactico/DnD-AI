@@ -1,6 +1,8 @@
 <body>
     <h1>playerSelection</h1>
 
+    <hr>
+
     {% for player in players %}
         <h2>{{ player.name }} - LVL:{{ player.level }}</h2>
         <h4>{{ player.race }} {{ player.class }}</h4>
@@ -11,9 +13,9 @@
             <input type="hidden" name="campaign_id" value="{{ player.campaign.id }}">
             <input type="submit" value="Submit">
         </form>
-    {% endfor %}
 
-    <hr>
+        <hr>
+    {% endfor %}
 
     <h2>Create a new player!</h2>
     <form action="{% url 'playerCreation' %}" method="post">

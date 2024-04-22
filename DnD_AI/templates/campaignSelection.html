@@ -1,6 +1,8 @@
 <body>
     <h1>campaignSelection</h1>
 
+    <hr>
+
     {% for campaign in campaigns %}
         <h2>{{ campaign.name }}</h2>
 
@@ -9,6 +11,8 @@
             <input type="hidden" name="campaign_id" value="{{ campaign.id }}">
             <input type="submit" value="Submit">
         </form>
+
+        <hr>
     {% endfor %}
 
     <a href="{% url 'campaignCreation' %}">Create New Campaign!</a>
