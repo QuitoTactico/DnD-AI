@@ -227,10 +227,10 @@ def game(request):
 
         # If the name of a character is sent, that character will be the actual player
         if 'player_name' in request.POST:
-            player_name = request.POST.get['player_name']
+            player_name = request.POST.get('player_name')
             player = player_selection(player_name)
         elif 'player_id' in request.POST:
-            player_id = request.POST['player_id']
+            player_id = request.POST.get('player_id')
             player = player_selection_by_id(player_id)
         else:
             player = player_selection(None)
@@ -239,7 +239,7 @@ def game(request):
         player_id = player.id
 
         # If the id or name of a monster is sent, that monster will be the actual target
-        target_id = None if 'target_id' not in request.POST else request.POST['target_id']
+        target_id = None if 'target_id' not in request.POST else request.POST.get('target_id')
         if target_id is not None and target_id != '':
             if target_id.isdigit():
                 target_id = int(target_id)
