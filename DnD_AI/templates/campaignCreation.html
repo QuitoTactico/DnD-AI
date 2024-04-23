@@ -1,1 +1,34 @@
-campaignCreation
+<body>
+    <h1>campaignCreation</h1>
+
+    <hr>
+
+    <form action="{% url 'campaignSelection' %}" method="post">
+    {% csrf_token %}
+
+        <input type="text" name="name" placeholder="Write the name of your campaign.">
+
+        <h2>Choose a initial story</h2>
+        {% for initial_story in initial_stories %}
+            <h3>{{ initial_story }}</h3>
+            <input type="radio" name="initial_story" value="{{ initial_story }}" />
+            <hr>
+        {% endfor %}
+
+        <input type="hidden" name="campaign_id" value="{{ campaign.id }}">
+
+        <input type="hidden" name="create_campaign" value="True">
+        <input type="submit" value="Create campaign">
+    </form>
+
+    <form action="{% url 'campaignCreation' %}" method="post">
+    {% csrf_token %}
+        <input type="text" name="prompt" placeholder="Do you want a specific kind of stories?">
+        <input type="submit" value="Create another three initial story options">
+    </form>
+
+    <!--
+    <a href="{% url 'campaignSelection' %}">[Create Campaign]</a>
+    -->
+
+</body>

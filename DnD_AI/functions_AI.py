@@ -2,13 +2,22 @@ import requests
 from PIL import Image
 from io import BytesIO
 import os
-from random import randint
+from random import randint, choice
 
-#from models import History
+try:
+    try:
+        from DnD_AI.models import *
+    except: 
+        from models import *
+except:
+    pass # Testing purposes
+
 
 # we decided to manage them this way and not with a .env file because we had problems with the .env file
-from .API import API_KEY, gemini_api_key, hf_api_key    
-#from API import API_KEY, gemini_api_key, hf_api_key  #Testing purposes
+try:
+    from .API import API_KEY, gemini_api_key, hf_api_key    
+except:
+    from API import API_KEY, gemini_api_key, hf_api_key  #Testing purposes
     
 from openai import OpenAI as OpenAI
 
@@ -26,7 +35,7 @@ from google.generativeai.types import HarmCategory, HarmBlockThreshold
 illustrations_dir = "media\\illustrations\\"
 
 
-# --------------- OPENAI ---------------
+# --------------- OPENAI (DALL-E) ---------------
 
 client_openai = OpenAI(api_key=API_KEY)
 
@@ -66,7 +75,7 @@ def image_generator_DallE(prompt):
         return image_dir.replace('\\', '/')
 
 
-# --------------- HUGGINGFACE ---------------
+# --------------- HUGGINGFACE (STABLE DIFFUSION) ---------------
 
 StabDiff_API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0"
 
@@ -105,7 +114,7 @@ def image_generator_StabDiff(prompt_input):
 
 # ================ TEXT GENERATION ================
 
-# --------------- OPENAI + LANGCHAIN ---------------
+# --------------- OPENAI (GPT) + LANGCHAIN ---------------
 
 template = """Question: {question}
 
@@ -119,21 +128,48 @@ llm = llmOpenAI(openai_api_key=API_KEY)
 
 llm_chain = LLMChain(prompt=prompt_template, llm=llm)
 
-def get_response(prompt):
+def continue_history_gpt(prompt):
     response = llm_chain.invoke(prompt)
     return response['text'].replace('\n', '<br>')
 
 
-
-# ================== TEXT INTERPRETER ==================
-
-# ------------------ GEMINI ------------------
+# ------------------ GOOGLE (GEMINI) ------------------
 
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = gemini_api_key
 
+gemini_model = genai.GenerativeModel('gemini-pro')
+
 genai.configure(api_key=gemini_api_key)
 
-gemini_model = genai.GenerativeModel('gemini-pro')
+gemini_chat = gemini_model.start_chat(history=[])
+
+safety_settings = {
+    HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
+    HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
+    HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
+    HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
+    }
+
+def create_initial_stories_gemini(prompt:str="", n:int=3) -> list:
+    stories = []
+    world_type = ["fantasy", "sci-fi", "medieval", "cyberpunk", "post-apocalyptic", "steampunk", "futuristic", "dystopian", "utopian", "magical", "mystical", "mythical", "legendary", "historical", "modern"]
+
+    for _ in range(n):
+        story = gemini_model.generate_content(f"Tell me a story about a {choice(world_type)} world where i have to defeat some strong enemies and bosses to win, this is a initial story of a game. Also tell me at least three names of enemies and it's race and class to be defeated, and why i have to defeat them. "+prompt,
+                                              safety_settings=safety_settings)
+        stories.append(story.text)
+    return stories
+
+
+def continue_history_gemini(prompt:str="", campaign_story:str="") -> str:
+    response = gemini_chat.send_message(f"i did this: {prompt}. Progress the story taking in count that i'm in this world: {campaign_story}.",
+                                        safety_settings=safety_settings)
+    return response.text
+
+
+# ================== TEXT INTERPRETER ==================
+
+# ------------------ GOOGLE (GEMINI) ------------------
 
 def action_interpreter(prompt_input):
     instruction = """I need you to categorize this natural language desired action into a function (act) according to this definitions. And depending on the function, I need its inputs too, all in just a line, no more. Always add the function at the beginning of the line. Never write the inputs name. Just write something like "attack skeleton james". For move, use specifically its valid values. Here are the functions and their inputs:
@@ -166,12 +202,7 @@ def action_interpreter(prompt_input):
     prompt = f"{instruction} So... now categorize this: {prompt_input}"
 
     response = gemini_model.generate_content(prompt,
-                                      safety_settings={
-                                           HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
-                                           HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
-                                           HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
-                                           HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
-                                           })
+                                      safety_settings=safety_settings)
     try:
         return response.text 
     except ValueError:
@@ -187,14 +218,52 @@ def action_interpreter(prompt_input):
 # ==================================== TESTING ====================================
 
 def test():
+    initial_story = ""
     while True:
-        option = input("1. Action Interpreter\n2. Image Generation\n3. Exit\n-> ")
+        option = input("""
+                       1. Action Interpreter
+                       2. Image Generation
+                       3. Initial story generation
+                       4. Story progression
+                       Any other. Exit
+                       -> """)
+        
         if option == "1":
             action = action_interpreter(input("What do you want to do?"))
             print(action)
+
         elif option == "2":
-            image = image_generator_StabDiff(input("What image do you want to see?"))
-            image.show()
+            prompt = input("What image do you want to see?")
+            try:
+                print("Dall-E")
+                image = image_generator_DallE(prompt)
+                image = Image.open(image)
+                image.show()
+            except:
+                pass
+
+            try:
+                print("Stable Diffusion")
+                image = image_generator_StabDiff(prompt)
+                image = Image.open(image)
+                image.show()
+            except:
+                pass
+            
+        elif option == "3":
+            initial_stories = create_initial_stories_gemini()
+            for i, story in enumerate(initial_stories):
+                print("\n",i,"-"*20)
+                print(story)
+            
+            selected_story = int(input("Select a story: "))
+            initial_story = initial_stories[selected_story]
+    
+        elif option == "4":
+            prompt = input("What have you done?")
+            story = continue_history_gemini(prompt, initial_story)
+            print(story)
+
         else:
             break
 

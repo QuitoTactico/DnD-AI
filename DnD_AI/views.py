@@ -2,7 +2,7 @@ from django.shortcuts import render
 
 from .models import *
 from .functions import *
-from .functions_AI import action_interpreter #, get_response
+from .functions_AI import action_interpreter, create_initial_stories_gemini #, get_response
 
 
 def home(request):
@@ -16,26 +16,34 @@ def campaignSelection(request):
 
     If the create_campaign label is sent, it creates a new campaign with this info sent in the POST request.
     - name
-    - description
+    - initial_story
     '''
 
     if request.method == "POST":
         if 'create_campaign' in request.POST:
             name = request.POST.get('name')
-            description = request.POST.get('description')
-            Campaign.objects.create(name=name, description=description).save()
+            initial_story = request.POST.get('initial_story')
+            Campaign.objects.create(name=name, initial_context=initial_story).save()
 
     campaigns = Campaign.objects.all()
 
     return render(request, 'campaignselection.html', 
                   {
-                      'campaigns': campaigns
+                      'campaigns': campaigns,
                       })
 
 
 
 def campaignCreation(request):
-    return render(request, 'campaigncreation.html')
+    if request.method == "POST":
+        initial_stories = create_initial_stories_gemini(request.POST.get('prompt'))
+    else:
+        initial_stories = create_initial_stories_gemini()
+
+    return render(request, 'campaigncreation.html',
+                  {
+                      'initial_stories': initial_stories,
+                      })
 
 
 
