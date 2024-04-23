@@ -141,6 +141,8 @@ gemini_model = genai.GenerativeModel('gemini-pro')
 
 genai.configure(api_key=gemini_api_key)
 
+# later, initialice as None, and ask if it's none on the views. If it is None, initialize it with the campaign context. 
+# if it's not None, let's assume that it has already the history of the campaign. 
 gemini_chat = gemini_model.start_chat(history=[])
 
 safety_settings = {
@@ -155,14 +157,20 @@ def create_initial_stories_gemini(prompt:str="", n:int=3) -> list:
     world_type = ["fantasy", "sci-fi", "medieval", "cyberpunk", "post-apocalyptic", "steampunk", "futuristic", "dystopian", "utopian", "magical", "mystical", "mythical", "legendary", "historical", "modern"]
 
     for _ in range(n):
-        story = gemini_model.generate_content(f"Tell me a story about a {choice(world_type)} world where i have to defeat some strong enemies and bosses to win, this is a initial story of a game. Also tell me at least three names of enemies and it's race and class to be defeated, and why i have to defeat them. "+prompt,
+        story = gemini_model.generate_content(f"Tell me a story about a {choice(world_type)} world where i have to defeat some strong enemies and bosses to win, this is a initial story of a game. Also tell me at least three names of key bosses and it's race and class to be defeated, and why i have to defeat them. Don't talk about a protagonist or a specific hero, just leave it like a mission to fulfill for 'anyone' or 'you (talking to the player)'. "+prompt,
                                               safety_settings=safety_settings)
         stories.append(story.text)
     return stories
 
 
-def continue_history_gemini(prompt:str="", campaign_story:str="") -> str:
-    response = gemini_chat.send_message(f"i did this: {prompt}. Progress the story taking in count that i'm in this world: {campaign_story}.",
+def continue_history_gemini(prompt:str="", campaign_story:str="", campaign_achievements:str="") -> str:
+    response = gemini_chat.send_message(f"i did this: {prompt}. Progress the story taking in count that i'm in this world: {campaign_story}. and now my party already achieved this: {campaign_achievements}",
+                                        safety_settings=safety_settings)
+    return response.text
+
+
+def ask_world_info_gemini(prompt:str="about what to do next", campaign_story:str="", campaign_achievements:str="") -> str:
+    response = gemini_chat.send_message(f"Tell me {prompt}. Answer taking in count that i've already achieved this: [{campaign_achievements}].\nIn this world: [{campaign_story}]\n.",
                                         safety_settings=safety_settings)
     return response.text
 
@@ -171,7 +179,7 @@ def continue_history_gemini(prompt:str="", campaign_story:str="") -> str:
 
 # ------------------ GOOGLE (GEMINI) ------------------
 
-def action_interpreter(prompt_input):
+def action_interpreter(prompt_input) -> str:
     instruction = """I need you to categorize this natural language desired action into a function (act) according to this definitions. And depending on the function, I need its inputs too, all in just a line, no more. Always add the function at the beginning of the line. Never write the inputs name. Just write something like "attack skeleton james". For move, use specifically its valid values. Here are the functions and their inputs:
     
     "levelup <stat_or_weaponstat>"
@@ -180,6 +188,7 @@ def action_interpreter(prompt_input):
     "take <treasure_name(optional)>"
     "attack <target(optional)>"
     "move <direction>"
+    "info <question>"
 
     valid values for:
     stat_or_weaponstat: "health", "strength", "intelligence", "recursiveness", "dexterity", "phyres", "magres", "constitution", "damage", "range"
@@ -187,6 +196,7 @@ def action_interpreter(prompt_input):
     treasure_name: "gold", "bag", "chest", "key", "weapon", "tombstone"
     target: literally anyone, the desired target that was said by the player
     weapon_name: literally anything, the desired weapon that was said by the player
+    question: literally anything, the desired information interest that was said by the player
     item_name: "potion"
 
     output examples:
@@ -196,8 +206,10 @@ def action_interpreter(prompt_input):
     "move upleft"
     "take gold"
     "take"
+    "i want to know about where to go next" -> "info where to go next"
     without saying the function
     """
+    #about_what: "player", "enemies", "bosses", "world", "game", "story", "quests", "items", "weapons", "enemies", "bosses", "npcs",
 
     prompt = f"{instruction} So... now categorize this: {prompt_input}"
 

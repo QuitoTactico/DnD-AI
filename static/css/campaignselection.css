@@ -1,0 +1,89 @@
+html {
+	height: 100%;
+	width: 100%;
+	margin: auto;
+}
+
+a {
+	outline: none;
+	text-decoration: none;
+	color: grey;
+}
+
+a:hover {
+	border-style: solid;
+	border-bottom-width: 10px;
+	border: #000000;
+	color: white;
+}
+
+.campaign {
+	display: flex;
+	background-color: #D62828;
+  border: solid;
+	border-width: 5px;
+  border-radius: 10px;
+}
+
+.background {
+	padding-left: 50px;
+	padding-right: 50px;
+	background-color: #212529;
+	color: white;
+}
+
+.btnAction {
+	display: relative;
+	margin-left: 90%;
+	border-style: none;
+	border-radius: 10px;
+	height: 80px;
+	width: 80px;
+	background-color: #D62828;
+	color: white;
+	padding-right: 20px;
+}
+
+.btnAction:hover {
+	background-color: #ff6f6f;
+	color: white;
+}
+
+.campName {
+	font-size: 30px;
+	/-webkit-text-stroke: 1px black;/
+}
+
+#font1 {
+	font-family: "Sixtyfour", sans-serif;
+	font-optical-sizing: auto;
+	font-weight: 400;
+	font-style: normal;
+	font-variation-settings:
+		"BLED" 0,
+		"SCAN" 0;
+}
+
+#font2 {
+	font-family: "Workbench", sans-serif;
+	font-optical-sizing: auto;
+	font-weight: 700;
+	font-style: normal;
+	font-variation-settings:
+		"BLED" 0,
+		"SCAN" 0;
+}
+
+/*
+	brown #462e2e
+	red #ff6f6f
+
+	god ones:
+		black: #333333
+		red: #D62828
+		grey: #8DA1B9
+		#454c54
+		#212529
+		brown: #BCA371
+		green: #21D19F
+*/
