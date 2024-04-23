@@ -362,7 +362,8 @@ def command_executer(prompt:str|list, player:Character, target:Monster) -> tuple
     # if the prompt is a string, it will be split into a list
     action = prompt.split(' ') if type(prompt) == str else prompt
 
-    action_image_generation(prompt, action[0], player, target)
+    if action[0] != 'move':
+        action_image_generation(prompt, action[0], player, target)
 
     # for each action, the turns on the campaign will be increased
     player.campaign.turn_counter()
@@ -409,7 +410,7 @@ def command_executer(prompt:str|list, player:Character, target:Monster) -> tuple
 def act_info(player:Character, action:list):
     if len(action) == 1:
         response = ask_world_info_gemini(campaign_story=player.campaign.initial_story, 
-                              campaign_achievements=player.campaign.achievements)
+                                         campaign_achievements=player.campaign.achievements)
     else:
         response = ask_world_info_gemini(prompt=action[1],
                               campaign_story=player.campaign.initial_story, 
