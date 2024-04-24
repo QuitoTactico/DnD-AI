@@ -447,34 +447,41 @@ def act_levelup(player:Character, action:list):
 
 def act_use(player:Character, action:list):
     player_inventory = player.get_inventory()
+
     if len(action) == 1:
-        History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'You need to specify the item you want to use. Please replace the spaces with "_" if you have problems using items.<br>For example: health_potion.').save()
+        History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'You need to specify the item you want to use.<br>If you have problems using items, then replace the spaces with "_" i.<br>For example: health_potion.').save()
 
             # I don't have a list of possible usable items xd, so
             #History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"There's a list of your items: ").save()
-        if 'health potion' not in player_inventory.keys():
+        #if 'health potion' not in player_inventory.keys():
+        if player_inventory.keys() == ["gold"] or player_inventory.keys() == []:
             History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"By the way... You don't have usable items.").save()
 
-        successful = False
-    else:
-        item_to_use = (' '.join(action[1:])).lower().replace('_',' ')
-        if item_to_use not in player_inventory.keys():
-            History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"You don't have {item_to_use}s.").save()
-            successful = False
+        return False
+    
+
+    item_to_use = (' '.join(action[1:])).lower().replace('_',' ')
+    
+    if item_to_use in ['health potion', 'potion', 'hp potion', 'hp']:
+        item_to_use = 'health potion'
+        player.health += 50
+        successful = player.use_from_inventory(item_to_use, amount = 1)
+        player.save()
+        if successful:
+            History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'{player.name} used a health potion. 50 HP restored!').save()
+            return True
         else:
-            if item_to_use in ['health potion', 'potion', 'hp potion', 'hp']:
-                player.health += 50
-                player.use_from_inventory(item_to_use, amount = 1)
-                player.save()
-                History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'{player.name} used a health potion.').save()
-                successful = True
-                #elif item_to_use == 'mana potion':, or something like that for each item
-                # probably is not the best way, it would be better to be implemented on Character.use_from_inventory()
-                # please remember me to create a list of possible usable items an their effects on default.py
-            else:
-                History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"You can't use that.").save()
-                successful = False
-    return successful
+            History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"You don't have {item_to_use}s.").save()
+            return False
+        
+
+    #elif item_to_use == 'mana potion':, or something like that for each item
+        # probably is not the best way, it would be better to be implemented on Character.use_from_inventory()
+        # please remember me to create a list of possible usable items an their effects on default.py
+    
+    else:
+        History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"You can't use that.").save()
+        return False
 
 def act_equip(player:Character, action:list):
     treasure_to_take = action[1].lower() if len(action) > 1 else 'all'

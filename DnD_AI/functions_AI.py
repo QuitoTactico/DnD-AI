@@ -198,7 +198,7 @@ def action_interpreter(prompt_input) -> str:
     target: literally anyone, the desired target that was said by the player
     weapon_name: literally anything, the desired weapon that was said by the player
     question: literally anything, the desired information interest that was said by the player
-    item_name: "potion"
+    item_name: "health potion"
 
     output examples:
     "duuude, i want to move up" -> "move up"

@@ -1,3 +1,17 @@
+a {
+    outline: none;
+    text-decoration: none;
+    color: grey;
+}
+
+a:hover {
+    border-style: solid;
+    border-bottom-width: 10px;
+    border: #000000;
+    color: white;
+}
+  
+
 .background {
     padding-left: 50px;
     padding-right: 50px;
