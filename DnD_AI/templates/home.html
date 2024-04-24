@@ -7,14 +7,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DnD AI</title>
-    <!--<link rel="stylesheet" type="text/css" href="{% static 'css/your_stylesheet.css' %}">-->
-    <link rel="stylesheet" type="text/css" href="static/css/home.css" />
+    
+    <link rel="stylesheet" type="text/css" href="static/css/home.css?v=2" />
+    <script src="/static/js/home.js?v=2"></script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Jacquarda+Bastarda+9&family=Sixtyfour&family=Workbench&display=swap"
-        rel="stylesheet" />
-    <script src="{% static 'js/home.js' %}"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Jacquarda+Bastarda+9&family=Sixtyfour&family=Workbench&display=swap"rel="stylesheet" />
+
+    <link rel="icon" href="static/dnd_down.png" type="image/x-icon">
 </head>
 
 <body class="background" id="font1">
@@ -38,7 +39,7 @@
         </div>
         <div class="buttons">
             <a href="campaignselection" class="btnSC">Select a campaign!</a>
-            <a href="campaigncreation" class="btnNC" onclick="loading()">Create a new campaign!</a>
+            <a href="#" class="btnNC" onclick="loading('Starting campaign creation')">Create a new campaign!</a>
             <div id="overlay">
                 <div id="loading-popup">
                     <p>Starting campaign creation...</p>
@@ -61,5 +62,7 @@
         <h2>Wanna play?</h2>
         <a href="{% url 'campaignSelection' %}">Select a campaign!</a> or
         <a href="{% url 'campaignCreation' %}">Create a new campaign!</a> -->
+
+    <script src="{% static 'js/home.js?v=2' %}"></script>
 </body>
 </html>

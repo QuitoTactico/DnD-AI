@@ -1,14 +1,15 @@
-function loading() {
+function loading(text) {
     var overlay = document.getElementById('overlay')    
     var loadingText = document.getElementById('loading-popup').getElementsByTagName('p')[0];
     var dots = '';
 
     overlay.style.display = 'block';
+    loadingText.innerHTML = text;
 
     var interval =  setInterval(function() {
         dots += '.';
-        loadingText.innerHTML = 'Iniciando creación de campañas' + dots;
-        if (dots.length > 3){
+        loadingText.innerHTML = text + dots;
+        if (dots.length >= 3){
             dots = '';
         }
     },500)
@@ -16,7 +17,6 @@ function loading() {
     window.addEventListener('load', function() {
         clearInterval(interval);
         overlay.style.display = 'none'
+        window.location.href = 'campaigncreation';
     });
-
-    window.location.href = 'campaigncreation';
 }
