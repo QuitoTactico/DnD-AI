@@ -153,6 +153,7 @@ safety_settings = {
     }
 
 def create_initial_stories_gemini(prompt:str="", n:int=3) -> list:
+    prompt = prompt or ""   # if prompt is None, then it will be an empty string
     stories = []
     world_type = ["fantasy", "sci-fi", "medieval", "cyberpunk", "post-apocalyptic", "steampunk", "futuristic", "dystopian", "utopian", "magical", "mystical", "mythical", "legendary", "historical", "modern"]
 
