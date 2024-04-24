@@ -19,6 +19,12 @@
 </head>
 
 <body class="background" id="font1">
+
+    <div id="overlay">
+        <div id="loading-popup">
+            <p>Starting campaign creation...</p>
+        </div>
+    </div>
     <div class="grid-container">
         <div class="logo">
             <img height="55" src="static/DnD.png" alt="" />
@@ -39,12 +45,8 @@
         </div>
         <div class="buttons">
             <a href="campaignselection" class="btnSC">Select a campaign!</a>
-            <a href="#" class="btnNC" onclick="loading('hola')">Create a new campaign!</a>
-            <div id="overlay">
-                <div id="loading-popup">
-                    <p>Starting campaign creation...</p>
-                </div>
-            </div>            
+            <a href="campaigncreation" class="btnNC" onclick="loading('Creating a new campaign')">Create a new campaign!</a>
+                        
         </div>
     </div>
 
