@@ -1,7 +1,59 @@
-<h1>Home</h1>
+{% load static %}
 
-<hr>
+<!DOCTYPE html>
+<html lang="en">
 
-<h2>Wanna play?</h2>
-<a href="{% url 'campaignSelection' %}">Select a campaign!</a> or
-<a href="{% url 'campaignCreation' %}">Create a new campaign!</a>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DnD AI</title>
+    <!--<link rel="stylesheet" type="text/css" href="{% static 'css/your_stylesheet.css' %}">-->
+    <link rel="stylesheet" type="text/css" href="static/css/p.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Jacquarda+Bastarda+9&family=Sixtyfour&family=Workbench&display=swap"
+        rel="stylesheet" />
+</head>
+
+<body class="background" id="font1">
+    <div class="grid-container">
+        <div class="logo">
+            <img height="55" src="static/DnD.png" alt="" />
+        </div>
+        <div class="wiki">
+            <h1><a href="#">Wiki</a></h1>
+        </div>
+        
+    </div>
+    
+
+    <div class="container">
+        <div class="content">
+            <h1>Welcome to DnD AI!</h1>
+            <br>
+            <h4>Are you ready to embark on the most </h4>
+            <h4>epic and fulfilling adventure of your life!?</h4>
+        </div>
+        <div class="buttons">
+            <a href="{% url 'campaignCreation' %}" class="btnNC">Create a new campaign!</a>
+            <a href="{% url 'campaignCreation' %}" class="btnSC">Select a campaign!</a>
+        </div>
+    </div>
+
+    <!-- <div class="homeCenter" id="font2">
+        <div class="homeLogo"></div>
+        <h4>Are you ready to embark on the most epic and fulfilling adventure of your life!? </h4>
+        <button class="homeBtn">
+            <a href="{% url 'campaignCreation' %}">Create a new campaign!</a>
+        </button>
+    </div>
+
+
+    
+    <hr>
+        <h2>Wanna play?</h2>
+        <a href="{% url 'campaignSelection' %}">Select a campaign!</a> or
+        <a href="{% url 'campaignCreation' %}">Create a new campaign!</a> -->
+</body>
+</html>

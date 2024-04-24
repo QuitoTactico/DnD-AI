@@ -17,7 +17,7 @@ except:
 try:
     from .API import API_KEY, gemini_api_key, hf_api_key    
 except:
-    from API import API_KEY, gemini_api_key, hf_api_key  #Testing purposes
+    from .API import API_KEY, gemini_api_key, hf_api_key  #Testing purposes
     
 from openai import OpenAI as OpenAI
 
