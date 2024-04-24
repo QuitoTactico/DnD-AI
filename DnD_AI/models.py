@@ -1,6 +1,7 @@
 from django.db import models
 from .default import *
 import copy  # to level_up the weapon
+from datetime import datetime # for the campaign initial and completion date
 
 # - This two functions don't work if they're not here. Because some entities need them to be initialiced.
 # - Also, they need access to the models, so putting them on functions.py would generate a double-way importation.
@@ -63,17 +64,31 @@ class Campaign(models.Model):
     size_x  = models.IntegerField(default=100)
     size_y  = models.IntegerField(default=100)
 
-    initial_context = models.CharField(max_length=3000, default="A fantasy world")
+    initial_story   = models.CharField(max_length=4000, default="A fantasy world")
     start_date      = models.DateTimeField(auto_now_add=True)
     completion_date = models.DateTimeField(null=True, blank=True)
     turns           = models.IntegerField(default=0)
 
     is_completed    = models.BooleanField(default=False)
-    objective_str   = models.CharField(max_length=1000, default="Defeat the key bosses")
+    objective_str   = models.CharField(max_length=2000, default="Defeat the key bosses")
+    objectives_remaining = models.IntegerField(default=3)
+    achievements    = models.CharField(max_length=2000, default=".")
 
     def turn_counter(self):
         self.turns += 1
         self.save()
+
+    def objective_completed(self, objective:str) -> bool:
+        self.objectives_remaining -= 1
+        self.achievements += f'{objective}, '
+
+        # the campaign was completed!
+        if self.objectives_remaining <= 0:
+            self.is_completed = True
+            self.completion_date = datetime.now()
+
+        self.save()
+        return self.is_completed
 
     def __str__(self):
         completed_str = ' (COMPLETED)' if self.is_completed else ''

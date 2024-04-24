@@ -10,7 +10,7 @@ from bokeh.plotting import figure, show                             # for plotti
 from bokeh.models import Range1d, Span, CrosshairTool, HoverTool    # for plot personalization (map components)
 from bokeh.embed import components                                  # for plot html rendering (for the front-end)
 
-from .functions_AI import image_generator_DallE, image_generator_StabDiff
+from .functions_AI import image_generator_DallE, image_generator_StabDiff, ask_world_info_gemini, continue_history_gemini
 
 def roll_dice(): 
     return randint(1, 20)
@@ -107,17 +107,22 @@ def combat_turn(player:Character, monster:Monster, player_dice:int = roll_dice()
     - 'was_critical_hit'\n
     '''
 
+    first_by = "By dexterity" 
     if player.dexterity > monster.dexterity:
         first = 'player'
     elif player.dexterity < monster.dexterity:
         first = 'monster'
     else:  # they have the same dexterity
+        first_by = "Same dexterity. By dice result" 
         if player_dice > monster_dice:
             first = 'player'
         elif player_dice < monster_dice:
             first = 'monster'
         else: # damn, they have the same dexterity and the same dice result XD, let's make it random
+            first_by = 'Same dexterity and dice result (god damn...). By "just luck"'
             first = 'player' if randint(0, 1) == 1 else 'monster'
+
+    History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'{first_by}, {player.name if first=="player" else monster.name} attacks first.')
 
     player_died, monster_died, player_result, monster_result = False, False, None, None
     if first == 'player':
@@ -148,16 +153,28 @@ def combat_turn(player:Character, monster:Monster, player_dice:int = roll_dice()
     return {'player_died': player_died, 'monster_died': monster_died, 'player_result': player_result, 'monster_result': monster_result}
 
 def player_died_in_combat(player:Character, monster:Monster):
-    Treasure.objects.create(campaign=player.campaign, treasure_type='Tombstone', inventory=player.inventory, x=player.x, y=player.y, discovered=False)
-    History.objects.create(campaign=player.campaign ,author='SYSTEM', text=f'{player.name} died in combat.')
-    History.objects.create(campaign=player.campaign ,author=monster.name, text='JA'*randint(2,15), color='red')
+    Treasure.objects.create(campaign=player.campaign, treasure_type='Tombstone', inventory=player.inventory, x=player.x, y=player.y, discovered=False).save()
+    History.objects.create(campaign=player.campaign ,author='SYSTEM', text=f'{player.name} died in combat.').save()
+    History.objects.create(campaign=player.campaign ,author=monster.name, text='JA'*randint(2,15), color='red').save()
     player.kill()
 
 def player_won_combat(player:Character, monster:Monster):
     loot = monster.get_inventory()
     player.add_all_to_inventory(loot)
     player.exp += monster.exp_drop
-    History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'{player.name} killed {monster.name}, got {monster.exp_drop} EXP and {loot}')
+    History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'{player.name} killed {monster.name}, got {monster.exp_drop} EXP and {loot}').save()
+
+    if monster.is_key:
+        achievement = f"KEY BOSS {monster.name} WAS SLAIN BY {player.name}."
+        player.campaign.objective_completed(achievement)
+        History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'[ACHIEVEMENT - {achievement}]').save()
+
+        history_progression = continue_history_gemini(achievement=achievement,
+                                                      campaign_story=player.campaign.initial_story, 
+                                                      campaign_achievements=player.campaign.achievements)
+        
+        History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'{history_progression.replace("\n","<br>")}.<br><br>Remaining bosses: {player.campaign.objectives_remaining}').save()
+
     player.save()
     monster.kill()
 
@@ -290,6 +307,42 @@ def target_selection_by_id(monster_id):
 # ------------------------------------------------ ACT --------------------------------------------------
 
 
+def action_image_generation(prompt:str, action:str, player:Character, target:Monster):
+
+    if action == 'move':
+        image_description = f"{player.character_race} {player.character_class} {player.physical_description} running to the {prompt[4:]}"
+
+    elif action == 'attack':
+        image_description = f"{player.character_race} {player.character_class} {player.physical_description} fighting a {target.monster_race} {target.monster_class} {target.physical_description} with a {player.weapon.weapon_type}"
+
+    elif action == 'equip':
+        weapon_name = 'weapon' if prompt[6:] == "" else prompt[6:]
+        image_description = f"{player.character_race} {player.character_class} {player.physical_description} taking a {weapon_name} from the ground"
+        # holding up a {weapon_name}
+    
+    # take, use, levelup, info
+    else:
+        if action == 'info':
+            #prompt = 'asking himself about'+prompt[5:]
+            prompt = 'thinking, reflecting, pondering...'
+
+        #image_description = f"{player.character_race} {player.character_class} {player.physical_description} is {prompt}"
+        image_description = f"{player.character_race} {player.character_class} holding a {player.weapon.weapon_type}, {player.physical_description} is {prompt}"
+
+    # try to generate an image with DallE, if it fails, it will use StabDiff
+    # REASONS TO FAIL:
+    #   - it can fail if the prompt is too long or if the model doesn't understand the prompt
+    #   - maybe the prompt was too violent or sexual
+    #   - maybe the tokens got empty
+    # So, if it fails, it will use StabDiff, which is free
+    try:
+        image_dir_DallE = image_generator_DallE(image_description)
+        History.objects.create(campaign=player.campaign, author='SYSTEM', is_image = True, text = image_dir_DallE).save()
+    except:
+        image_dir_StabDiff = image_generator_StabDiff(image_description)
+        History.objects.create(campaign=player.campaign, author='SYSTEM', is_image = True, text = image_dir_StabDiff).save()
+
+
 def command_executer(prompt:str|list, player:Character, target:Monster) -> tuple[bool, dict]:
     '''
     Returns
@@ -309,7 +362,8 @@ def command_executer(prompt:str|list, player:Character, target:Monster) -> tuple
     # if the prompt is a string, it will be split into a list
     action = prompt.split(' ') if type(prompt) == str else prompt
 
-    action_image_generation(prompt, action[0], player, target)
+    if action[0] != 'move':
+        action_image_generation(prompt, action[0], player, target)
 
     # for each action, the turns on the campaign will be increased
     player.campaign.turn_counter()
@@ -341,6 +395,9 @@ def command_executer(prompt:str|list, player:Character, target:Monster) -> tuple
     elif action[0] == 'levelup':
         successful = act_levelup(player, action)
 
+    elif action[0] == 'info':
+        successful = act_info(player, action)
+
         
     return successful, {
         'player_died': player_died,
@@ -349,36 +406,25 @@ def command_executer(prompt:str|list, player:Character, target:Monster) -> tuple
         'new_target': new_target, 
     }
 
-def action_image_generation(prompt:str, action:str, player:Character, target:Monster):
 
-    if action == 'move':
-        image_description = f"{player.character_race} {player.character_class} {player.physical_description} running to the {prompt[4:]}"
-
-    elif action == 'attack':
-        image_description = f"{player.character_race} {player.character_class} {player.physical_description} fighting a {target.monster_race} {target.monster_class} {target.physical_description} with a {player.weapon.weapon_type}"
-
-    elif action == 'equip':
-        weapon_name = 'weapon' if prompt[6:] == "" else prompt[6:]
-        image_description = f"{player.character_race} {player.character_class} {player.physical_description} taking a {weapon_name} from the ground"
-        # holding up a {weapon_name}
-    
-    # take, use, levelup
+def act_info(player:Character, action:list):
+    if len(action) == 1:
+        response = ask_world_info_gemini(campaign_story=player.campaign.initial_story, 
+                                         campaign_achievements=player.campaign.achievements)
     else:
-        #image_description = f"{player.character_race} {player.character_class} {player.physical_description} is {prompt}"
-        image_description = f"{player.character_race} {player.character_class} holding a {player.weapon.weapon_type}, {player.physical_description} is {prompt}"
+        response = ask_world_info_gemini(prompt=action[1],
+                              campaign_story=player.campaign.initial_story, 
+                              campaign_achievements=player.campaign.achievements)
+    History.objects.create(campaign=player.campaign, author='NARRATOR', text=response.replace("\n", "<br>")).save()
 
-    # try to generate an image with DallE, if it fails, it will use StabDiff
-    # REASONS TO FAIL:
-    #   - it can fail if the prompt is too long or if the model doesn't understand the prompt
-    #   - maybe the prompt was too violent or sexual
-    #   - maybe the tokens got empty
-    # So, if it fails, it will use StabDiff, which is free
     try:
-        image_dir_DallE = image_generator_DallE(image_description)
+        image_dir_DallE = image_generator_DallE(response)
         History.objects.create(campaign=player.campaign, author='SYSTEM', is_image = True, text = image_dir_DallE).save()
     except:
-        image_dir_StabDiff = image_generator_StabDiff(image_description)
+        image_dir_StabDiff = image_generator_StabDiff(response)
         History.objects.create(campaign=player.campaign, author='SYSTEM', is_image = True, text = image_dir_StabDiff).save()
+
+    return True
 
 
 def act_levelup(player:Character, action:list):
