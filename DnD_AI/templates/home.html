@@ -8,12 +8,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DnD AI</title>
     <!--<link rel="stylesheet" type="text/css" href="{% static 'css/your_stylesheet.css' %}">-->
-    <link rel="stylesheet" type="text/css" href="static/css/p.css" />
+    <link rel="stylesheet" type="text/css" href="static/css/home.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
         href="https://fonts.googleapis.com/css2?family=Jacquarda+Bastarda+9&family=Sixtyfour&family=Workbench&display=swap"
         rel="stylesheet" />
+    <script src="{% static 'js/home.js' %}"></script>
 </head>
 
 <body class="background" id="font1">
@@ -36,8 +37,13 @@
             <h4>epic and fulfilling adventure of your life!?</h4>
         </div>
         <div class="buttons">
-            <a href="{% url 'campaignCreation' %}" class="btnNC">Create a new campaign!</a>
             <a href="{% url 'campaignCreation' %}" class="btnSC">Select a campaign!</a>
+            <a href="#" class="btnNC" onclick="loading()">Create a new campaign!</a>
+            <div id="overlay">
+                <div id="loading-popup">
+                    <p>Iniciando creación de campañas...</p>
+                </div>
+            </div>            
         </div>
     </div>
 

@@ -1,185 +1,128 @@
-html {
-  height: 100%;
-  width: 100%;
-  margin: auto;
-}
-
-a {
-  outline: none;
-  text-decoration: none;
-  color: grey;
-}
-
-a:hover {
-  border-style: solid;
-  border-bottom-width: 10px;
-  border: #000000;
-  color: white;
-}
-
 .background {
-  padding-left: 50px;
-  padding-right: 50px;
-  background-color: #212529;
-  color: white;
-}
-
-.homeCenter {
-  justify-content: center;
-}
-
-.homeLogo {
-  background-image: '/DnD.png';
-  background-size: 100%;
-  height: 96px;
-  width: 557px;
-}
-
-.homeBtn {
-  /* Estilos generales del botón */
-  display: inline-block;
-  padding: 10px 20px;
-  background-color: #007bff;
-  color: #fff;
-  text-decoration: none;
-  border: none;
-  border-radius: 5px;
-  font-size: 18px;
-}
-
-.logo {grid-area: logo;}
-
-.about {
-  grid-area: about;
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
-}
-
-.wiki {
-  grid-area: wiki;
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
-}
-
-.text {grid-area: text;}
-
-.map {
-  height: 400px;
-  grid-area: map;
-}
-
-.player {
-  width: 200px;
-  grid-area: player;
-}
-
-.weapon {
-  width: 200px;
-  grid-area: weapon;
-}
-
-.target {
-  grid-area: target;
-}
-
-.action {grid-area: action;}
-
-.lvl {
-  grid-area: lvl;
-  display: relative;
-  border-radius: 10px;
-  background-color: #BCA371;
-  height: 40px;
-}
-
-.number {
-  
-}
-
-.experience {
-  height: 100%;
-  width: 20%;
-  border-radius: 10px;
-  background-color: aquamarine;
-}
-
-.maxExperience {
-  
+    padding-left: 50px;
+    padding-right: 50px;
+    background-color: #212529;
+    color: white;
 }
 
 .grid-container {
-  display: grid;
-  grid-gap: 10px;
-  grid-template:
-    'logo logo logo logo about wiki'
-    'map map text text player weapon'
-    'map map text text target target'
-    'action action action action target target'
-    'lvl lvl lvl lvl lvl lvl';
+    display: grid;
+    grid-gap: 10px;
+    grid-template:
+      'logo logo logo logo about wiki'
+      'map map text text player weapon'
+      'map map text text target target'
+      'action action action action target target'
+      'lvl lvl lvl lvl lvl lvl';
+    
 }
 
-.history {
-  height: 400px;
-  background-color: #ffffff;
-  color: #000000;
-  border-radius: 10px;
-  padding: 1%;
-  overflow-y: auto;
-  font-size: 20px;
+.container {
+    margin-top: 0x;
+    padding-top: 0px;
+    position: relative;
 }
 
-.history::-webkit-scrollbar {
-  display: none;
+.container::before {
+    content: ''; /* Pseudo-element to create the blur */
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 100%; /* Takes the entirety of the container */
+    height: calc(100vh - 140px); 
+    background-image: url(''); 
+    background-size: cover; /* Ajusta el tamaño de la imagen de fondo */
+    background-position: center;
+    /* filter: blur(0.7px); Applies the blur */
+    opacity: 0.4;
+    z-index: -1; /* Puts the blur behind */
 }
 
-.txtAction {
-  border-style: none;
-  border-radius: 10px;
-  height: 40px;
-  width: 77.8%;
+.content {
+    padding: 150px;
+    text-align: center;
+    margin-bottom: -80px;
 }
 
-.btnAction {
-  width: 19%;
-  border-style: none;
-  border-radius: 10px;
-  height: 40px;
-  background-color: #D62828;
-  color: white;
+.buttons {
+    display: flex;
+    justify-content: center;
+}
+
+.btnNC {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #D62828;
+    color: #fff;
+    text-decoration: none;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    margin-right: 10px;
+}
+
+.btnSC {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: forestgreen;
+    color: #fff;
+    text-decoration: none;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    margin-right: 10px;
+}
+
+.btn:last-child {
+    margin-right: 0;
+}
+
+.wiki {
+    grid-area: wiki;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    color: #D62828;
+}
+
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.95); /* Subtransparent color */
+    z-index: 9999; /* Puts the overlay over everything */
+    display: none; /* Initially hidden */
+}
+
+#loading-popup {
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #0000; /* Background color of the popup */
+    padding: 100px;
+    border-radius: 10px;
+    text-align: center;
+    color: #fff;
 }
 
 #font1 {
-  font-family: "Sixtyfour", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 400;
-  font-style: normal;
-  font-variation-settings:
-    "BLED" 0,
-    "SCAN" 0;
-}
-
-#font2 {
-  font-family: "Workbench", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 700;
-  font-style: normal;
-  font-variation-settings:
-    "BLED" 0,
-    "SCAN" 0;
-}
-
-/*
-  brown #462e2e
-  red #ff6f6f
+    font-family: "Sixtyfour", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    font-variation-settings:
+        "BLED" 0,
+        "SCAN" 0;
+  }
   
-  god ones:
-    black: #333333
-    red: #D62828
-    grey: #8DA1B9
-    #454c54
-    #212529
-    brown: #BCA371
-    green: #21D19F
-*/
+#font2 {
+    font-family: "Workbench", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-style: normal;
+    font-variation-settings:
+        "BLED" 0,
+        "SCAN" 0;
+}
