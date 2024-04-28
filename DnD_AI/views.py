@@ -23,7 +23,13 @@ def campaignSelection(request):
         if 'create_campaign' in request.POST:
             name = request.POST.get('name')
             initial_story = request.POST.get('initial_story')
-            Campaign.objects.create(name=name, initial_story=initial_story).save()
+            size_x = request.POST.get('size_x')
+            size_y = request.POST.get('size_y')
+            
+            Campaign.objects.create(name=name, 
+                                    initial_story=initial_story,
+                                    size_x=size_x,
+                                    size_y=size_y).save()
 
     campaigns = Campaign.objects.all()
 

@@ -12,41 +12,66 @@
 
 <body class="background" id="font1">
 		<h1>Campaign Creation</h1>
+        <h4>Create your own story, if you dare...</h4>
 
 		<hr>
-
+        <br>
+        
 		<form action="{% url 'campaignSelection' %}" method="post">
 		{% csrf_token %}
-				<h2>Choose an epic name</h2>
-				<input class="textInput" id="font2" type="text" name="name" placeholder="Write the name of your campaign.">
-			
-				<hr>
-			
-				<h2>Choose a initial story</h2>
-				<div class="initialStory">
-						{% for initial_story in initial_stories %}
-								<div class="story">
-										<h3>{{ initial_story|safe }}</h3>
-										<input type="radio" name="initial_story" value="{{ initial_story }}" />
-								</div>
-						{% endfor %}
-				</div>
+				<h2>1. Choose an epic name</h2>
+				<input class="textInput" id="font2" type="text" name="name" placeholder="Write the name of your campaign." required>
 			
 				<br>
-				<input type="hidden" name="campaign_id" value="{{ campaign.id }}">
+			
+				<h2>2. Choose a initial story</h2>
+				<div class="initialStory">
+					{% for initial_story in initial_stories %}
+                        <div class="story">
+                            <label>
+                                <h3>{{ initial_story|safe }}</h3>
+                                <input type="radio" name="initial_story" value="{{ initial_story }}" />
+                            </label>
+                        </div>
+					{% endfor %}
+				</div>
+                
+                <br>
+
+                <h2>3. Set the map dimensions</h2>
+                <div>
+                    <div class="mapDimensions">
+                        <div class="mapDimension">
+                            <input class="textInput" id="font2" type="number" name="size_x" placeholder="Width" min="10" max="500" step="1" required> 
+                        </div>
+                        <div class="mapX">
+                            <h3>x</h3>
+                        </div>
+                        <div class="mapDimension">
+                            <input class="textInput" id="font2" type="number" name="size_y" placeholder="Height" min="10" max="500" step="1" required>
+                    </div>
+                </div>
+
+				<br>
+
+                <h2>4. That's all!</h2>
 				<input type="hidden" name="create_campaign" value="True">
-				<input class="btnSubmit" id="font1" type="submit" value="Create campaign">
+				<input class="btnSubmit" id="font1" type="submit" value="Create campaign!">
 			
 		</form>
-
+        
+        <br>
+        <br>
         <hr>
+        <br>
+        <h2>But if you didn't like those stories...</h2>
 		<form action="{% url 'campaignCreation' %}" method="post">
 		{% csrf_token %}
 				<input class="textInput" id="font2" type="text" name="prompt" placeholder="Do you want a specific kind of stories?">
                 <br> <br>
-				<input class="btnSubmit" id="font1" type="submit" value="Create your own story, if you dare...">
+				<input class="btnSubmit" id="font1" type="submit" value="Change the topics of the initial stories">
 		</form>
-
+        <br>
 </body>
 
 <!--
