@@ -1,0 +1,98 @@
+html {
+	height: 100%;
+	width: 100%;
+	margin: auto;
+}
+
+a {
+	outline: none;
+	text-decoration: none;
+	color: grey;
+}
+
+a:hover {
+	border-style: solid;
+	border-bottom-width: 10px;
+	border: #000000;
+	color: white;
+}
+
+.background {
+	padding-left: 50px;
+	padding-right: 50px;
+	background-color: #212529;
+	color: white;
+}
+
+.btnSubmit {
+	text-align: center;
+	border-style: none;
+	border-radius: 10px;
+	height: 80px;
+	width: 100%;
+	background-color: #D62828;
+	color: white;
+	padding-right: 20px;
+	font-size: 20px;
+}
+
+.btnSmall {
+	text-align: center;
+	border-style: none;
+	border-radius: 10px;
+	height: 40px;
+	width: 200px;
+	background-color: #D62828;
+	color: white;
+	padding-right: 20px;
+	font-size: 20px;
+}
+
+.btnSubmit:hover {
+	background-color: #ff6f6f;
+	color: white;
+}
+
+.textInput {
+	border-style: none;
+	border-radius: 10px;
+	height: 40px;
+	width: 100%;
+	padding-left: 10px;
+	font-size: 25px;
+}
+
+.initialStory {
+	display: flex;
+}
+
+.story {
+	background-color: #D62828;
+	border: solid;
+    margin-left: 10px;
+    width: 33.33%;
+	border-width: 0px;
+	border-radius: 10px;
+	padding: 5px;
+	box-shadow: 0px 10px 20px rgba(255, 255, 255, 0.1);
+}
+
+#font1 {
+	font-family: "Sixtyfour", sans-serif;
+	font-optical-sizing: auto;
+	font-weight: 400;
+	font-style: normal;
+	font-variation-settings:
+		"BLED" 0,
+		"SCAN" 0;
+}
+
+#font2 {
+	font-family: "Workbench", sans-serif;
+	font-optical-sizing: auto;
+	font-weight: 700;
+	font-style: normal;
+	font-variation-settings:
+		"BLED" 0,
+		"SCAN" 0;
+}

@@ -158,20 +158,22 @@ def create_initial_stories_gemini(prompt:str="", n:int=3) -> list:
     world_type = ["fantasy", "sci-fi", "medieval", "cyberpunk", "post-apocalyptic", "steampunk", "futuristic", "dystopian", "utopian", "magical", "mystical", "mythical", "legendary", "historical", "modern"]
 
     for _ in range(n):
-        story = gemini_model.generate_content(f"Tell me a story about a {choice(world_type)} world where i have to defeat some strong enemies and bosses to win, this is a initial story of a game. Also tell me at least three names of key bosses and it's race and class to be defeated, and why i have to defeat them. Don't talk about a protagonist or a specific hero, just leave it like a mission to fulfill for 'anyone' or 'you (talking to the player)'. "+prompt,
+        story = gemini_model.generate_content(f"Tell me a story about a {choice(world_type)} world where i have to defeat some strong enemies and bosses to win, this is a initial story of a game. Also tell me at least three names of key bosses and it's race and class to be defeated, and why i have to defeat them. Don't talk about a protagonist or a specific hero, just leave it like a mission to fulfill for 'anyone' or 'you (talking to the player)'. "+prompt+"Use the html tag for underline instead of **",
                                               safety_settings=safety_settings)
-        stories.append(story.text)
+        
+        initial_story = story.text.replace("\n", "<br>")
+        stories.append(initial_story)
     return stories
 
 
 def continue_history_gemini(prompt:str="", campaign_story:str="", campaign_achievements:str="") -> str:
-    response = gemini_chat.send_message(f"i did this: {prompt}. Progress the story taking in count that i'm in this world: {campaign_story}. and now my party already achieved this: {campaign_achievements}",
+    response = gemini_chat.send_message(f"i did this: {prompt}. Progress the story taking in count that i'm in this world: {campaign_story}. and now my party already achieved this: {campaign_achievements}"+"Use the html tag for underline instead of **",
                                         safety_settings=safety_settings)
     return response.text
 
 
 def ask_world_info_gemini(prompt:str="about what to do next", campaign_story:str="", campaign_achievements:str="") -> str:
-    response = gemini_chat.send_message(f"Tell me {prompt}. Answer taking in count that i've already achieved this: [{campaign_achievements}].\nIn this world: [{campaign_story}]\n.",
+    response = gemini_chat.send_message(f"Tell me {prompt}. Answer taking in count that i've already achieved this: [{campaign_achievements}].\nIn this world: [{campaign_story}]\n."+"Use the html tag for underline instead of **",
                                         safety_settings=safety_settings)
     return response.text
 
