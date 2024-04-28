@@ -98,6 +98,30 @@ a:hover {
 	width: 4%;
 }
 
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.95); /* Subtransparent color */
+    z-index: 9999; /* Puts the overlay over everything */
+    display: none; /* Initially hidden */
+}
+
+#loading-popup {
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #0000; /* Background color of the popup */
+    padding: 100px;
+    border-radius: 10px;
+    text-align: center;
+    color: #fff;
+	white-space: nowrap;
+}
+
 #font1 {
 	font-family: "Sixtyfour", sans-serif;
 	font-optical-sizing: auto;
