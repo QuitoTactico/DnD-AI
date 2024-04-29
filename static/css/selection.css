@@ -78,6 +78,51 @@ a:hover {
 	color: white;
 }
 
+.btnCampaign {
+	display: relative;
+	/*margin-left: 90%;*/
+	border-style: none;
+	border-radius: 10px;
+	height: fit-content;
+	width: 100%;
+	background-color: #D62828;
+	color: white;
+	padding-left: 20px;
+	text-align: left;
+	position: relative; 
+    z-index: 1;  
+}
+
+.player-count {
+    position: relative;
+    right: 0;  
+    z-index: 2; 
+	padding-right: 20px; 
+}
+
+/*
+.player-count {
+    position: relative;
+    right: 0;  
+    display: none;  
+    z-index: 2;  
+}
+
+.btnCampaign:hover .player-count {
+    display: block;  
+}
+*/
+
+.campaign-title {
+    display: flex;
+    justify-content: space-between;
+}
+
+.btnCampaign:hover {
+    background-color: #ff6f6f;
+    z-index: 3;  /* añade esto para asegurarte de que el botón se muestre por encima de los otros elementos cuando se haga hover sobre él */
+}
+
 .campName {
 	font-size: 30px;
     /**/

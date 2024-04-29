@@ -16,18 +16,38 @@
     <hr>
     
     {% for campaign in campaigns %}
-    <div class="campaign">
-        <h2>{{ campaign.name }}</h2>
-
         <form action="{% url 'playerSelection' %}" method="post">
-            {% csrf_token %}
+        {% csrf_token %}
             <input type="hidden" name="campaign_id" value="{{ campaign.id }}">
-            <button type="submit" class="btnAction">
+            
+            <button type="submit" class="btnCampaign">
+                
+                <div class="campaign-title">
+                    <h1 id="font1">{{ campaign.name }}</h1>
+
+                    <h2 id="font1" class="player-count">{{ campaign.player_counter }} players</h2>
+                </div>
+                
+                <ul>
+                    <li><h3 id="font1">{{ campaign.objectives_remaining }} objectives remaining</h3></li>
+                    <li><h3 id="font1">{{ campaign.turns }} turns</h3></li>
+                    <li><h3 id="font1">{{ campaign.size_x }}x{{ campaign.size_y }} map</h3></li>
+                    
+                </ul>
+                
+                <!-- HOVER EFFECT EXAMPLE
+                <div class="player-count">
+                    <h2 id="font1">{{ campaign.player_counter }} players</h2>
+                </div>
+                -->
+
+                <!--
                 <i style="font-size: 60px;" class="fa-solid fa-play"></i>
+                -->
             </button>
+            
         </form>
-    </div>
-    <br>
+
     {% endfor %}
     
     <hr>

@@ -78,6 +78,9 @@ class Campaign(models.Model):
         self.turns += 1
         self.save()
 
+    def player_counter(self):
+        return self.character_set.filter(is_playable=True).count()
+
     def objective_completed(self, objective:str) -> bool:
         self.objectives_remaining -= 1
         self.achievements += f'{objective}, '
