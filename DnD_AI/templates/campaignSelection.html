@@ -10,7 +10,15 @@
 
 <link rel="stylesheet" type="text/css" href="static/css/selection.css" />
 
+<script src="/static/js/home.js"></script>
+
 <body class="background" id="font1">
+    <div id="overlay">
+        <div id="loading-popup">
+            <p>Creating initial stories...</p>
+        </div>
+    </div>
+
     <h1>Campaign Selection</h1>
 
     <hr>
@@ -18,16 +26,16 @@
     {% for campaign in campaigns %}
         <form action="{% url 'playerSelection' %}" method="post">
         {% csrf_token %}
+
             <input type="hidden" name="campaign_id" value="{{ campaign.id }}">
             
             <button type="submit" class="btnCampaign">
-                
                 <div class="campaign-title">
-                    <h1 id="font1">{{ campaign.name }}</h1>
+                    <h1 id="font1" style="margin-bottom:0px">{{ campaign.name }}</h1>
 
                     <h2 id="font1" class="player-count">{{ campaign.player_counter }} players</h2>
                 </div>
-                
+
                 <ul>
                     <li><h3 id="font1">{{ campaign.objectives_remaining }} objectives remaining</h3></li>
                     <li><h3 id="font1">{{ campaign.turns }} turns</h3></li>
@@ -53,7 +61,7 @@
     <hr>
     <form action="{% url 'campaignCreation' %}" method="post">
     {% csrf_token %}
-        <button type="submit" class="btnActionWide">
+        <button type="submit" class="btnActionWide" onclick="loading('Creating initial stories','campaignselection')">
             <h2 id="font1">Create New Campaign!</h2>
         </button>
     </form>

@@ -31,7 +31,7 @@ def campaignSelection(request):
                                     size_x=size_x,
                                     size_y=size_y).save()
 
-    campaigns = Campaign.objects.all()
+    campaigns = Campaign.objects.all().order_by('is_completed', '-turns')
 
     return render(request, 'campaignselection.html', 
                   {
@@ -138,7 +138,7 @@ def playerSelection(request):
         campaign_id = Campaign.objects.filter(is_completed=False).first().id
     
 
-    players = Character.objects.filter(campaign_id=campaign_id, is_playable=True)
+    players = Character.objects.filter(campaign_id=campaign_id, is_playable=True).order_by('-level')
 
     return render(request, 
                   'playerselection.html', 
