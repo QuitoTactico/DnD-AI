@@ -83,7 +83,7 @@
         {% csrf_token %}
         
         <input type="hidden" name="campaign_id" value="{{ player.campaign.id }}">
-        <button type="submit" class="btnActionWide">
+        <button type="submit" class="btnActionWide" onclick="loading('Loading player creation','playercreation')">
             <h2 id="font1">Create a new player!</h2>
             <!--<i style="font-size: 60px;" class="fa-solid fa-play"></i>-->
         </button>

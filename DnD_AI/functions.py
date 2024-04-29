@@ -313,7 +313,8 @@ def action_image_generation(prompt:str, action:str, player:Character, target:Mon
         image_description = f"{player.character_race} {player.character_class} {player.physical_description} running to the {prompt[4:]}"
 
     elif action == 'attack':
-        image_description = f"{player.character_race} {player.character_class} {player.physical_description} fighting a {target.monster_race} {target.monster_class} {target.physical_description} with a {player.weapon.weapon_type}"
+        image_description = f"{player.character_race} {player.character_class} {player.physical_description} using a{player.weapon.weapon_type}, fighting a {target.monster_race} {target.monster_class} {target.physical_description} who's using a {target.weapon.weapon_type}"
+        #image_description = f"{player.character_race} {player.character_class} {player.physical_description} fighting a {target.monster_race} {target.monster_class} {target.physical_description} with a {player.weapon.weapon_type}"
 
     elif action == 'equip':
         weapon_name = 'weapon' if prompt[6:] == "" else prompt[6:]
@@ -362,7 +363,7 @@ def command_executer(prompt:str|list, player:Character, target:Monster) -> tuple
     # if the prompt is a string, it will be split into a list
     action = prompt.split(' ') if type(prompt) == str else prompt
 
-    if action[0] != 'move':
+    if action[0] not in ['move','attack']:
         action_image_generation(prompt, action[0], player, target)
 
     # for each action, the turns on the campaign will be increased
@@ -539,12 +540,15 @@ def act_attack(player:Character, target:Monster, action:list):
             else:
                 target = target_selection_by_name(target_id)
 
+        action_image_generation('', action[0], player, target)
+
         result = combat_turn(player=player, monster=target, player_dice=roll_dice(), monster_dice=roll_dice())
 
         if result['player_died']:
             new_player = player_selection(None)  ###
             player_died = True
         if result['monster_died']:
+            target.delete()     # por si algo, me tiene mamao' que no se borre el monstruo
             target_died = True
             try:
                 new_target = player.get_monsters_in_range()[0]
