@@ -127,6 +127,11 @@ a:hover {
   color: white;
 }
 
+.btnAction:hover {
+	background-color: #ff6f6f;
+	color: white;
+}
+
 
 #overlay {
   position: fixed;
