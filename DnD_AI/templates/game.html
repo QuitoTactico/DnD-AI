@@ -2,6 +2,10 @@
 
 {% load static %}
 
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/game.css' %}" />
+{% endblock css %}
+
 {% block content %}
     <!-- Overlay -->
     <div id="overlay">
@@ -12,19 +16,6 @@
 
     <!-- Grid Container -->
     <div class="grid-container">
-        <!-- Logo -->
-        <div class="logo">
-            <img height="55" src="{% static 'DnD.png' %}" alt="" />
-            <hr />
-        </div>
-
-        <!-- About and Wiki -->
-        <div class="about">
-            <h1><a href="#">ABOUT</a></h1>
-        </div>
-        <div class="wiki">
-            <h1><a href="#">WIKI</a></h1>
-        </div>
 
         <!-- History -->
         <h1 class="text">HISTORY</h1>
