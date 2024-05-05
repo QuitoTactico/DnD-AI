@@ -37,11 +37,13 @@
 
 .text {
   grid-area: text;
+  margin-top: 12px;
 }
 
 .map {
   height: 400px;
   grid-area: map;
+  margin-top: 10px;
 }
 
 @keyframes marquee {
@@ -87,11 +89,23 @@
 }
 
 .target {
+  width: 200px;
   grid-area: target;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.targeticon {
+  grid-area: targeticon;
 }
 
 .action {
   grid-area: action;
+  display: inline-block;
+}
+
+.action form {
+  display: flex;
 }
 
 .lvl {
@@ -121,10 +135,10 @@
   display: grid;
   grid-gap: 10px;
   grid-template:
-    'logo logo logo logo about wiki'
     'map map text text player weapon'
     'map map text text player weapon'
-    'action action action action target target'
+    'map map text text target targeticon'
+    'action action action action target targeticon'
     'lvl lvl lvl lvl lvl lvl'
 }
 
@@ -143,19 +157,24 @@
 }
 
 .txtAction {
+  padding-left: 5px;
   border-style: none;
-  border-radius: 10px;
-  height: 40px;
-  width: 77.8%;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  height: 38px;
+  width: 80%;
+  margin: 0px;
 }
 
 .btnAction {
-  width: 19%;
+  width: 20%;
   border-style: none;
-  border-radius: 10px;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
   height: 40px;
   background-color: #D62828;
   color: white;
+  margin: 0px;
 }
 
 .btnAction:hover {

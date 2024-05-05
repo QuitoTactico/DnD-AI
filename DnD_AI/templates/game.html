@@ -53,11 +53,16 @@
 
             <img src="{{ player.image.url }}" width="150" height="150" />
 
-            <div>HP: &nbsp;{{ player.health }}/{{ player.max_health }}</div>
-            <div>STR: {{ player.strength }}</div>
-            <div>INT: {{ player.intelligence }}</div>
+            <div>{{ player.character_race }} {{ player.character_class }}</div>
+            
+            <div>HP: &nbsp;{% if player.health < 10 %}<span style="color: #FF4444">{{ player.health }}</span>{% else %}{{ player.health }}{% endif %}/{{ player.max_health }}</div>
+
+            <div>
+                RES:
+                <span style="color: orange">{{ player.physical_resistance }}</span>/<span style="color: cyan">{{ player.magical_resistance }}</span>
+            </div>
+            
             <div>DEX: {{ player.dexterity }}</div>
-            <div>RACE: {{ player.character_race }}</div>
         </div>
 
         <!-- Weapon -->
@@ -68,20 +73,47 @@
 
             <img src="{{ player.weapon.image.url }}" width="150" height="150" />
 
-            <div>DMG: {{ player.weapon.damage }}</div>
-            <div>RNG: {{ player.weapon.range }}</div>
+            <div>STR: {{ player.strength }}</div>
+            <div>INT: {{ player.intelligence }}</div>
+
             <div>
-                RES:
-                <span style="color: orange">{{ player.physical_resistance }}</span>/<span style="color: cyan">{{ player.magical_resistance }}</span>
+                DMG:
+                {% if player.weapon.damage_type == "Physical" %}
+                    <span style="color: orange">{{ player.weapon.damage }}</span>
+                {% else %}
+                    <span style="color: cyan">{{ player.weapon.damage }}</span>
+                {% endif %}
             </div>
-            <div>CON: {{ player.constitution }}</div>
-            <div>CLASS: {{ player.character_class }}</div>
+            <div>
+                RNG: {{ player.weapon.range }}{% if player.weapon.range_level_points != 0 %}<span style="color:gray">+{{ player.weapon.range_level_points}}P</span> {% endif %}
+            </div>
         </div>
 
         <!-- Target -->
         {% if target %}
             <div class="target">
-                {{ target.name }}
+                <div style="margin:0px">
+                    <h3 class="text_animation">{{ target.name }}</h3>
+                </div>
+                <div>{{ target.monster_race }} {{ target.monster_class }}</div>
+                <div>HP: &nbsp;{% if target.health < 10 %}<span style="color: #FF4444">{{ target.health }}</span>{% else %}{{ target.health }}{% endif %}/{{ target.max_health }}</div>
+                <div>
+                    RES:
+                    <span style="color: orange">{{ target.physical_resistance }}</span>/<span style="color: cyan">{{ target.magical_resistance }}</span>
+                </div>
+                <div>DEX: {{ target.dexterity }}</div>
+                <div>
+                    DMG:
+                    {% if target.weapon.damage_type == "Physical" %}
+                        <span style="color: orange">{{ target.weapon.damage }}</span>
+                    {% else %}
+                        <span style="color: cyan">{{ target.weapon.damage }}</span>
+                    {% endif %}
+                </div>
+                <div>RNG: {{ target.weapon.range }}</div>
+            </div>
+
+            <div class="targeticon">
                 <img src="{{ target.icon.url }}" width="150" height="150" />
             </div>
         {% endif %}
@@ -90,14 +122,15 @@
         <div class="action">
             <form action="{% url 'game' %}" method="post">
                 {% csrf_token %}
-                <label class="" for="action">What do you want to do:</label>
-                <br />
-                <br />
-                <input id="font1" class="txtAction" type="text" name="prompt" placeholder="Its time to do it" />
+                
+                <input id="font1" class="txtAction" type="text" name="prompt" placeholder="What do you want to do?" />
+
+                <input id="font1" class="btnAction" type="submit" value="Act" onclick="loading('Loading','game')" />
+
                 <input type="hidden" name="campaign_id" value="{{ campaign_id }}" />
+
                 <input type="hidden" name="player_name" value="{{ player.name }}" />
                 {% if target %}<input type="hidden" name="target_id" value="{{ target.id }}" />{% endif %}
-                <input id="font1" class="btnAction" type="submit" value="Act" onclick="loading('Loading','game')" />
             </form>
         </div>
 
