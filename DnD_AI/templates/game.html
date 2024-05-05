@@ -1,187 +1,136 @@
+{% extends "base.html" %}
+
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DnD AI</title>
-    <!--<link rel="stylesheet" type="text/css" href="{% static 'css/your_stylesheet.css' %}">-->
-    <link rel="stylesheet" type="text/css" href="static/css/game.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Jacquarda+Bastarda+9&family=Sixtyfour&family=Workbench&display=swap"
-      rel="stylesheet"
-    />
-    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-3.4.0.min.js" crossorigin="anonymous"></script>
-    <script src="/static/js/home.js"></script>
-  </head>
-
-  <body class="background" id="font1">
+{% block content %}
+    <!-- Overlay -->
     <div id="overlay">
-      <div id="loading-popup">
-          <p>Loading...</p>
-      </div>
+        <div id="loading-popup">
+            <p>Loading...</p>
+        </div>
     </div>
 
+    <!-- Grid Container -->
     <div class="grid-container">
-      <div class="logo">
-        <img height="55" src="static/DnD.png" alt="" />
-        <hr />
-      </div>
-
-      <div class="about">
-        <h1><a href="#">ABOUT</a></h1>
-      </div>
-      <div class="wiki">
-        <h1><a href="#">WIKI</a></h1>
-      </div>
-
-      <h1 class="text">HISTORY</h1>
-      
-      <div class="map">
-        {{ map_div|safe }}
-        {{ map_script|safe }}
-      </div>
-
-      <br />
-      <div class="history text" id="font2">
-
-        {% for entry in text_history %}
-          {% if entry.is_image %}
-            <div class="text-center" style="width: 100%;">
-              <img class="text-center" src="{{entry.text}}" style="display: block; margin: auto; width: 95%;" /> <!--width="385"-->
-            </div>
-          {% else %}
-            {% if player.name == entry.author %}<div style="color: green">{% else %}<div style="color: {{entry.color}}">{% endif %}
-              <p>{{entry.author}}: {{ entry.text|safe }}</p>
-            </div>
-          {% endif %}
-          
-        {% endfor %}
-
-      </div>
-      
-      <br />
-      <div class="player">
-        <h3>{{player.name}}</h3>
-
-        <img src="{{player.image.url}}" width="150" height="150" />
-
-        <div>HP: {{player.health}}/{{player.max_health}}</div>
-        <div>STR: {{player.strength}}</div>
-        <div>INT: {{player.intelligence}}</div>
-        <div>DEX: {{player.dexterity}}</div>
-        <div>RACE: {{player.character_race}}</div>
-      </div>
-
-      <div class="weapon">
-        <h3>{{player.weapon.name}}{{weapon_lvl_label}}</h3>
-
-        <img src="{{player.weapon.image.url}}" width="150" height="150" />
-
-        <div>DMG: {{player.weapon.damage}}</div>
-        <div>RNG: {{player.weapon.range}}</div>
-        <div>
-          RES:
-          <span style="color: orange">{{player.physical_resistance}}</span
-          >/<span style="color: cyan">{{player.magical_resistance}}</span>
+        <!-- Logo -->
+        <div class="logo">
+            <img height="55" src="{% static 'DnD.png' %}" alt="" />
+            <hr />
         </div>
-        <div>CON: {{player.constitution}}</div>
-        <div>CLASS: {{player.character_class}}</div>
-      </div>
 
-      {% if target is not None %}
-        <div class="target">
-          {{target.name}} 
-          <img src="{{target.icon.url}}" width="150" height="150" />
+        <!-- About and Wiki -->
+        <div class="about">
+            <h1><a href="#">ABOUT</a></h1>
         </div>
-      {% endif %}
+        <div class="wiki">
+            <h1><a href="#">WIKI</a></h1>
+        </div>
 
-      <!--
-      <script>
-        $(document).ready(function() { 
-            
-          $('actButton').click(function(event) { 
-            event.preventDefault(); 
-            $('form').submit(); 
-          }); 
+        <!-- History -->
+        <h1 class="text">HISTORY</h1>
 
-          $('form').on('submit', function(event) { 
-            event.preventDefault(); 
-            var prompt = $('#prompt').val(); 
+        <!-- Map -->
+        <div class="map">
+            {{ map_div|safe }}
+            {{ map_script|safe }}
+        </div>
 
-            // Add the prompt to the response div 
-            $('#response').append('<p>' + prompt + '</p>'); 
-            //Clear the prompt 
-            $('#prompt').val(''); 
+        <br />
 
-            // Send the prompt to the server
-            $.ajax({ 
-              url: '/', 
-              type: 'POST', 
-              data: {prompt: prompt}, 
-              dataType: 'json', 
-              success: function(data) { 
-                $('#font2').append('<p>' + data.response + '</p>'); 
-              },
-              error: function(jqXHR, textStatus, errorThrown){
-                console.error('Error:', textStatus,errorThrown)
-              } 
-            }); 
-          }); 
-        }); 
-      </script>
-      -->
+        <!-- Text History -->
+        <div class="history text" id="font2">
+            {% for entry in text_history %}
+                {% if entry.is_image %}
+                    <div class="text-center" style="width: 100%;">
+                        <img class="text-center" src="{{ entry.text }}" style="display: block; margin: auto; width: 95%;" />
+                    </div>
+                {% else %}
+                    <div style="color: {% if player.name == entry.author %}green{% else %}{{ entry.color }}{% endif %}">
+                        <p>{{ entry.author }}: {{ entry.text|safe }}</p>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
 
-      <div class="action">
-        <form action="{% url 'game' %}" method="post">
-          {% csrf_token %}
-          <label class="" for="action">What do you want to do:</label>
-          <br />
-          <br />
-          <input
-            id="font1"
-            class="txtAction"
-            type="text"
-            name="prompt"
-            placeholder="Its time to do it"
-          />
-          <input type="hidden" name="campaign_id" value="{{campaign_id}}" />
-          <input type="hidden" name="player_name" value="{{player.name}}" />
-          {% if target is not None %}<input type="hidden" name="target_id" value="{{target.id}}" />{% endif %}
-          <input id="font1" class="btnAction" type="submit" value="Act" onclick="loading('Loading','game')"/>
-        </form>
-      </div>
+        <br />
 
-      <div class="lvl">
-        <div class="number">LVL: {{player.level}}</div>
-        <div class="experience">EXP: {{player.exp}}</div>
-        <div class="maxExperience">EXP TOP: {{player.exp_top}}</div>
-      </div>
+        <!-- Player -->
+        <div class="player">
+            <h3>{{ player.name }}</h3>
+
+            <img src="{{ player.image.url }}" width="150" height="150" />
+
+            <div>HP: {{ player.health }}/{{ player.max_health }}</div>
+            <div>STR: {{ player.strength }}</div>
+            <div>INT: {{ player.intelligence }}</div>
+            <div>DEX: {{ player.dexterity }}</div>
+            <div>RACE: {{ player.character_race }}</div>
+        </div>
+
+        <!-- Weapon -->
+        <div class="weapon">
+            <h3>{{ player.weapon.name }}{{ weapon_lvl_label }}</h3>
+
+            <img src="{{ player.weapon.image.url }}" width="150" height="150" />
+
+            <div>DMG: {{ player.weapon.damage }}</div>
+            <div>RNG: {{ player.weapon.range }}</div>
+            <div>
+                RES:
+                <span style="color: orange">{{ player.physical_resistance }}</span>
+                /<span style="color: cyan">{{ player.magical_resistance }}</span>
+            </div>
+            <div>CON: {{ player.constitution }}</div>
+            <div>CLASS: {{ player.character_class }}</div>
+        </div>
+
+        <!-- Target -->
+        {% if target %}
+            <div class="target">
+                {{ target.name }}
+                <img src="{{ target.icon.url }}" width="150" height="150" />
+            </div>
+        {% endif %}
+
+        <!-- Action -->
+        <div class="action">
+            <form action="{% url 'game' %}" method="post">
+                {% csrf_token %}
+                <label class="" for="action">What do you want to do:</label>
+                <br />
+                <br />
+                <input id="font1" class="txtAction" type="text" name="prompt" placeholder="Its time to do it" />
+                <input type="hidden" name="campaign_id" value="{{ campaign_id }}" />
+                <input type="hidden" name="player_name" value="{{ player.name }}" />
+                {% if target %}<input type="hidden" name="target_id" value="{{ target.id }}" />{% endif %}
+                <input id="font1" class="btnAction" type="submit" value="Act" onclick="loading('Loading','game')" />
+            </form>
+        </div>
+
+        <!-- Level -->
+        <div class="lvl">
+            <div class="number">LVL: {{ player.level }}</div>
+            <div class="experience">EXP: {{ player.exp }}</div>
+            <div class="maxExperience">EXP TOP: {{ player.exp_top }}</div>
+        </div>
     </div>
 
-    <hr />
+    <hr>
 
+    <!-- Test Form -->
     <form action="{% url 'game' %}" method="post">
-      {% csrf_token %}
+        {% csrf_token %}
 
-      <input type="text" name="player_name" placeholder="Player Name" />
-      <input type="text" name="target_id" placeholder="Target ID">
-      Test Page<input type="checkbox" id="test" name="test" />
-      Roll Dice<input type="checkbox" id="dice_needed" name="dice_needed" />
+        <input type="text" name="player_name" placeholder="Player Name" />
+        <input type="text" name="target_id" placeholder="Target ID">
+        Test Page<input type="checkbox" id="test" name="test" />
+        Roll Dice<input type="checkbox" id="dice_needed" name="dice_needed" />
 
-      <input type="hidden" name="campaign_id" value="{{campaign_id}}" />
+        <input type="hidden" name="campaign_id" value="{{ campaign_id }}" />
 
-      <input type="submit" value="Submit" />
+        <input type="submit" value="Submit" />
     </form>
 
     <script src="{% static 'js/scrollHistory.js' %}"></script>
 
-    <footer>
-      <div>Contact us</div>
-      <div>Number</div>
-    </footer>
-  </body>
-</html>
+{% endblock content %}
