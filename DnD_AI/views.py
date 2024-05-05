@@ -8,6 +8,11 @@ from .functions_AI import action_interpreter, create_initial_stories_gemini #, g
 def home(request):
     return render(request, 'home.html')
 
+def about(request):
+    return render(request, 'about.html')
+
+def guide(request):
+    return render(request, 'guide.html')
 
 
 def campaignSelection(request):

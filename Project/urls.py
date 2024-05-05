@@ -24,6 +24,9 @@ from django.conf import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', dnd.home, name='home'),
+    path('home', dnd.home, name='home'),
+    path('about', dnd.about, name='about'),
+    path('guide', dnd.guide, name='guide'),
     path('campaignselection', dnd.campaignSelection, name='campaignSelection'),
     path('campaigncreation', dnd.campaignCreation, name='campaignCreation'),
     path('playerselection', dnd.playerSelection, name='playerSelection'),
