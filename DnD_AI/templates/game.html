@@ -47,11 +47,13 @@
 
         <!-- Player -->
         <div class="player">
-            <h3>{{ player.name }}</h3>
+            <div style="margin:0px">
+                <h3 class="text_animation">{{ player.name }}</h3>
+            </div>
 
             <img src="{{ player.image.url }}" width="150" height="150" />
 
-            <div>HP: {{ player.health }}/{{ player.max_health }}</div>
+            <div>HP: &nbsp;{{ player.health }}/{{ player.max_health }}</div>
             <div>STR: {{ player.strength }}</div>
             <div>INT: {{ player.intelligence }}</div>
             <div>DEX: {{ player.dexterity }}</div>
@@ -60,7 +62,9 @@
 
         <!-- Weapon -->
         <div class="weapon">
-            <h3>{{ player.weapon.name }}{{ weapon_lvl_label }}</h3>
+            <div style="margin:0px">
+                <h3 class="text_animation">{{ player.weapon.name }}{{ weapon_lvl_label }}</h3>
+            </div>
 
             <img src="{{ player.weapon.image.url }}" width="150" height="150" />
 
@@ -68,8 +72,7 @@
             <div>RNG: {{ player.weapon.range }}</div>
             <div>
                 RES:
-                <span style="color: orange">{{ player.physical_resistance }}</span>
-                /<span style="color: cyan">{{ player.magical_resistance }}</span>
+                <span style="color: orange">{{ player.physical_resistance }}</span>/<span style="color: cyan">{{ player.magical_resistance }}</span>
             </div>
             <div>CON: {{ player.constitution }}</div>
             <div>CLASS: {{ player.character_class }}</div>
@@ -123,5 +126,6 @@
     </form>
 
     <script src="{% static 'js/scrollHistory.js' %}"></script>
+    <script src="{% static 'js/overflowAnimation.js' %}" defer></script>
 
 {% endblock content %}

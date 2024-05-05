@@ -1,24 +1,3 @@
-a {
-    outline: none;
-    text-decoration: none;
-    color: grey;
-}
-
-a:hover {
-    border-style: solid;
-    border-bottom-width: 10px;
-    border: #000000;
-    color: white;
-}
-  
-
-.background {
-    padding-left: 50px;
-    padding-right: 50px;
-    background-color: #212529;
-    color: white;
-}
-
 .grid-container {
     display: grid;
     grid-gap: 10px;
@@ -32,19 +11,36 @@ a:hover {
 }
 
 .container {
-    margin-top: 0x;
+    margin-top: 0px;
     padding-top: 0px;
     position: relative;
 }
 
+/*
 .container::before {
+    content: ''; 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: calc(100vh - 140px); 
+    background-image: url('/static/Background.png'); 
+    background-size: cover; 
+    background-position: center;
+    opacity: 0.4;
+    z-index: -1; 
+}
+*/
+
+.background::before {
+    background-color: black;
     content: ''; /* Pseudo-element to create the blur */
     position: absolute; 
     top: 0; 
     left: 0; 
     width: 100%; /* Takes the entirety of the container */
-    height: calc(100vh - 140px); 
-    background-image: url(''); 
+    height: 100vh; 
+    background-image: url('/static/Background.png'); 
     background-size: cover; /* Ajusta el tamaño de la imagen de fondo */
     background-position: center;
     /* filter: blur(0.7px); Applies the blur */
@@ -89,55 +85,4 @@ a:hover {
 
 .btn:last-child {
     margin-right: 0;
-}
-
-.wiki {
-    grid-area: wiki;
-    display: flex;
-    align-items: flex-end;
-    justify-content: flex-end;
-    color: #D62828;
-}
-
-#overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    background-color: rgba(0, 0, 0, 0.95); /* Subtransparent color */
-    z-index: 9999; /* Puts the overlay over everything */
-    display: none; /* Initially hidden */
-}
-
-#loading-popup {
-    position: absolute;
-    top: 45%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #0000; /* Background color of the popup */
-    padding: 100px;
-    border-radius: 10px;
-    text-align: center;
-    color: #fff;
-}
-
-#font1 {
-    font-family: "Sixtyfour", sans-serif;
-    font-optical-sizing: auto;
-    font-weight: 400;
-    font-style: normal;
-    font-variation-settings:
-        "BLED" 0,
-        "SCAN" 0;
-  }
-  
-#font2 {
-    font-family: "Workbench", sans-serif;
-    font-optical-sizing: auto;
-    font-weight: 700;
-    font-style: normal;
-    font-variation-settings:
-        "BLED" 0,
-        "SCAN" 0;
 }

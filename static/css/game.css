@@ -1,30 +1,25 @@
-html {
-  height: 100%;
-  width: 100%;
-  margin: auto;
+.background::before {
+  content: ''; /* Pseudo-element to create the blur */
+  position: fixed; 
+  top: 0; 
+  left: 0; 
+  width: 100%; /* Takes the entirety of the container */
+  height: 100%; 
+  background-image: url('/static/marco_blanco_2.png'); 
+  background-size: cover; /* Ajusta el tamaño de la imagen de fondo */
+  background-position: center;
+  /* filter: blur(0.7px); Applies the blur */
+  opacity: 0.4;
+  z-index: -1; /* Puts the blur behind */
 }
 
-a {
-  outline: none;
-  text-decoration: none;
-  color: grey;
+.background{
+  margin: 0px;
 }
 
-a:hover {
-  border-style: solid;
-  border-bottom-width: 10px;
-  border: #000000;
-  color: white;
+.logo {
+  grid-area: logo;
 }
-
-.background {
-  padding-left: 50px;
-  padding-right: 50px;
-  background-color: #212529;
-  color: white;
-}
-
-.logo {grid-area: logo;}
 
 .about {
   grid-area: about;
@@ -40,28 +35,64 @@ a:hover {
   justify-content: flex-end;
 }
 
-.text {grid-area: text;}
+.text {
+  grid-area: text;
+}
 
 .map {
   height: 400px;
   grid-area: map;
 }
 
+@keyframes marquee {
+  /*además de transform, existe text-indent*/
+  0% { transform: translateX(0); }
+  5% { transform: translateX(0); }
+  45% { transform: translateX(calc(-100% + 200px)); }
+  55% { transform: translateX(calc(-100% + 200px)); }
+  95% { transform: translateX(0); }
+  100% { transform: translateX(0); }
+}
+
+.animate {
+  display: inline-block; 
+  /*
+  se puede cubic-bezier en vez de linea
+  cubic-bezier(0.2, 0.1, 0.8, 0.9)
+  cubic-bezier(0.1, 0.2, 0.2, 0.1)
+  cubic-bezier(0.25, 0.1, 0.75, 1)
+  */
+  animation: marquee 10s linear infinite;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.text_animation {
+  
+}
+
 .player {
   width: 200px;
   grid-area: player;
+  overflow: hidden;
+  white-space: nowrap;
 }
+
 
 .weapon {
   width: 200px;
   grid-area: weapon;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .target {
   grid-area: target;
 }
 
-.action {grid-area: action;}
+.action {
+  grid-area: action;
+}
 
 .lvl {
   grid-area: lvl;
@@ -92,9 +123,9 @@ a:hover {
   grid-template:
     'logo logo logo logo about wiki'
     'map map text text player weapon'
-    'map map text text target target'
+    'map map text text player weapon'
     'action action action action target target'
-    'lvl lvl lvl lvl lvl lvl';
+    'lvl lvl lvl lvl lvl lvl'
 }
 
 .history {
@@ -131,62 +162,3 @@ a:hover {
 	background-color: #ff6f6f;
 	color: white;
 }
-
-
-#overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  background-color: rgba(0, 0, 0, 0.95); /* Subtransparent color */
-  z-index: 9999; /* Puts the overlay over everything */
-  display: none; /* Initially hidden */
-}
-
-#loading-popup {
-  position: absolute;
-  top: 45%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: #0000; /* Background color of the popup */
-  padding: 100px;
-  border-radius: 10px;
-  text-align: center;
-  color: #fff;
-white-space: nowrap;
-}
-
-#font1 {
-  font-family: "Sixtyfour", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 400;
-  font-style: normal;
-  font-variation-settings:
-    "BLED" 0,
-    "SCAN" 0;
-}
-
-#font2 {
-  font-family: "Workbench", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 700;
-  font-style: normal;
-  font-variation-settings:
-    "BLED" 0,
-    "SCAN" 0;
-}
-
-/*
-  brown #462e2e
-  red #ff6f6f
-  
-  god ones:
-    black: #333333
-    red: #D62828
-    grey: #8DA1B9
-    #454c54
-    #212529
-    brown: #BCA371
-    green: #21D19F
-*/
