@@ -18,3 +18,25 @@ footer {
     text-align: center;
     width: 100%;
 }
+
+/* Esto aplica a toda la barra de desplazamiento */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* Ruta de la barra de desplazamiento */
+::-webkit-scrollbar-track {
+    background: transparent; /* Hace que la ruta de la barra de desplazamiento sea transparente */
+}
+ 
+/* Handle de la barra de desplazamiento */
+::-webkit-scrollbar-thumb {
+    background: #888; 
+    border: 2px solid #212529; /* Añade un borde de color #212529 */
+    border-radius: 5px; /* Añade bordes redondeados al handle de la barra de desplazamiento */
+}
+
+/* Handle de la barra de desplazamiento al pasar el mouse */
+::-webkit-scrollbar-thumb:hover {
+    background: #555; 
+}
