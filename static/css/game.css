@@ -17,24 +17,6 @@
   margin: 0px;
 }
 
-.logo {
-  grid-area: logo;
-}
-
-.about {
-  grid-area: about;
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
-}
-
-.wiki {
-  grid-area: wiki;
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
-}
-
 .text {
   grid-area: text;
   margin-top: 12px;
@@ -105,7 +87,10 @@
 }
 
 .targeticon {
+  width: 200px;
   grid-area: targeticon;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .action {
@@ -119,21 +104,39 @@
 
 .lvl {
   grid-area: lvl;
-  display: relative;
-  border-radius: 10px;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 30px;
   background-color: #BCA371;
-  height: 40px;
-}
-
-.number {
-  
-}
-
-.experience {
-  height: 100%;
-  width: 20%;
   border-radius: 10px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.level {
+  position: absolute;
+  right: 10px;
+  z-index: 3;
+}
+
+.experience-bar {
+  position: absolute;
+  left: 0;
+  height: 100%;
   background-color: aquamarine;
+  border-radius: 10px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.experience-text {
+  padding-left: 10px;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .maxExperience {
@@ -143,12 +146,14 @@
 .grid-container {
   display: grid;
   grid-gap: 10px;
-  grid-template:
+  grid-template-rows: repeat(5, auto);
+  grid-template-areas:
     'map map text text player weapon'
     'map map text text player weapon'
     'map map text text target targeticon'
     'action action action action target targeticon'
-    'lvl lvl lvl lvl lvl lvl'
+    'lvl lvl lvl lvl lvl lvl';
+  grid-auto-rows: 0;
 }
 
 .history {

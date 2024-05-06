@@ -308,6 +308,7 @@ def game(request):
         # A detail for the weapon, this will be placed in another file later.
         weapon_lvl = player.weapon.level
         weapon_lvl_label = '+'+str(weapon_lvl) if weapon_lvl > 0 else ''
+        exp_bar = min((player.exp / player.exp_top) * 100, 100)
 
 
         # ------------------------------------ RENDERING -------------------------------------
@@ -341,6 +342,7 @@ def game(request):
                             'url_prueba'        : host + player.icon.url,
                             'weapon_lvl_label'  : weapon_lvl_label,
                             'campaign_id'       : campaign_id,
+                            'exp_bar'           : exp_bar,
                             })
     else:
 

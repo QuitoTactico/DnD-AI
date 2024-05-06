@@ -126,6 +126,8 @@
             <div class="targeticon">
                 <img src="{{ target.icon.url }}" width="150" height="150" style="border-radius: 10px"/>
             </div>
+        {% else %}
+            <!-- Target icon -->
         {% endif %}
 
         <!-- Action -->
@@ -146,15 +148,17 @@
 
         <!-- Level -->
         <div class="lvl">
-            <div class="number">LVL: {{ player.level }}</div>
-            <div class="experience">EXP: {{ player.exp }}</div>
-            <div class="maxExperience">EXP TOP: {{ player.exp_top }}</div>
+            <div class="experience-bar" style="width: {{ exp_bar }}%;">
+                <div class="experience-text">EXP:{{ player.exp }}/{{ player.exp_top }}</div>
+            </div>
+            <div class="level">LVL:{{ player.level }}</div>
         </div>
     </div>
 
+    <!--
+
     <hr>
 
-    <!-- Test Form -->
     <form action="{% url 'game' %}" method="post">
         {% csrf_token %}
 
@@ -167,6 +171,8 @@
 
         <input type="submit" value="Submit" />
     </form>
+
+    -->
 
     <script src="{% static 'js/scrollHistory.js' %}"></script>
     <script src="{% static 'js/overflowAnimation.js' %}" defer></script>
