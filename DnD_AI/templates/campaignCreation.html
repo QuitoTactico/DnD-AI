@@ -1,18 +1,12 @@
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link
-		href="https://fonts.googleapis.com/css2?family=Jacquarda+Bastarda+9&family=Sixtyfour&family=Workbench&display=swap"
-		rel="stylesheet"
-/>
-<script src="https://cdn.bokeh.org/bokeh/release/bokeh-3.4.0.min.js" crossorigin="anonymous"></script>
+{% extends "base.html" %}
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+{% load static %}
 
-<link href="static/css/campaigncreation.css" rel="stylesheet" type="text/css" />
+{% block css %}
+    <link href="{% static 'css/campaigncreation.css' %}" rel="stylesheet" type="text/css" />
+{% endblock css %}
 
-<script src="/static/js/home.js"></script>
-
-<body class="background" id="font1">
+{% block content %}
 
     <div id="overlay">
         <div id="loading-popup">
@@ -20,9 +14,10 @@
         </div>
     </div>
 
-	<h1>Campaign Creation</h1>
-    <h4>Create your own story, if you dare...</h4>
-	<hr>
+	<div style="text-align: center;">
+        <h1>Campaign Creation</h1>
+        <h4>Create your own story, if you dare...</h4>
+    </div>
     <br>
     
 	<form action="{% url 'campaignSelection' %}" method="post" id="campaigninfo">
@@ -55,7 +50,7 @@
                     <input class="textInput" id="font2" type="number" name="size_x" placeholder="Width" min="10" max="500" step="1" required> 
                 </div>
                 <div class="mapX">
-                    <h3>x</h3>
+                    <h3>&nbsp; x</h3>
                 </div>
                 <div class="mapDimension">
                     <input class="textInput" id="font2" type="number" name="size_y" placeholder="Height" min="10" max="500" step="1" required>
@@ -72,7 +67,7 @@
         
     <br><br><hr><br>
 
-    <h2>But if you didn't like those stories...</h2>
+    <h4>But if you didn't like those stories...</h4>
 	<form action="{% url 'campaignCreation' %}" method="post">
 	{% csrf_token %}
 		<input class="textInput" id="font2" type="text" name="prompt" placeholder="Do you want a specific kind of stories?">
@@ -82,42 +77,4 @@
 		<input class="btnSubmit" id="font1" type="submit" value="Change the topics of the initial stories" onclick="loading('Creating new initial stories')">
 	</form>
     <br>
-</body>
-
-<!--
-<body>
-    <h1>campaignCreation</h1>
-
-    <hr>
-
-    <form action="{% url 'campaignSelection' %}" method="post">
-    {% csrf_token %}
-
-        <input type="text" name="name" placeholder="Write the name of your campaign.">
-
-        <h2>Choose a initial story</h2>
-        {% for initial_story in initial_stories %}
-            <h3>{{ initial_story }}</h3>
-            <input type="radio" name="initial_story" value="{{ initial_story }}" />
-            <hr>
-        {% endfor %}
-
-        <input type="hidden" name="campaign_id" value="{{ campaign.id }}">
-        <input type="hidden" name="create_campaign" value="True">
-        <input type="submit" value="Create campaign">
-    </form>
-
-    <form action="{% url 'campaignCreation' %}" method="post">
-    {% csrf_token %}
-        <input type="text" name="prompt" placeholder="Do you want a specific kind of stories?">
-        <input type="submit" value="Create another three initial story options">
-    </form>
-
-    
-
-</body>
--->
-
-<!--
-    <a href="{% url 'campaignSelection' %}">[Create Campaign]</a>
--->
+{% endblock content %}

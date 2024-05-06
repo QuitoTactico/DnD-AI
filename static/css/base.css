@@ -1,7 +1,10 @@
 body {
     display: flex;       /* Usa Flexbox */
     flex-direction: column; /* Orientación vertical */
-    min-height: 97vh;   /* Asegura que el cuerpo tenga al menos la altura de la ventana */
+    min-height: 100vh;   /* Asegura que el cuerpo tenga al menos la altura de la ventana */
+    margin: 0;           
+    padding-top: 0;
+    padding-bottom: 0;
 }
 
 html {

@@ -1,32 +1,29 @@
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link
-    href="https://fonts.googleapis.com/css2?family=Jacquarda+Bastarda+9&family=Sixtyfour&family=Workbench&display=swap"
-    rel="stylesheet"
-/>
-<script src="https://cdn.bokeh.org/bokeh/release/bokeh-3.4.0.min.js" crossorigin="anonymous"></script>
+{% extends "base.html" %}
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+{% load static %}
 
-<link rel="stylesheet" type="text/css" href="static/css/selection.css" />
+{% block css %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/selection.css' %}"/>
+    <script src="{% static 'js/home.js' %}"></script>
+{% endblock css %}
 
-<script src="/static/js/home.js"></script>
-
-<body class="background" id="font1">
+{% block content %}
     <div id="overlay">
         <div id="loading-popup">
             <p>Starting game...</p>
         </div>
     </div>
-
-    <h1>Player Selection</h1>
-
-    <hr>
-
+    
+    <div style="text-align: center;">
+        <h1>Player Selection</h1>
+        <h4>Who is the hero that the legends will tell about?</h4>
+    </div>
+    <br>
+    
     {% for player in players %}
         <form action="{% url 'game' %}" method="post">
-            {% csrf_token %}
-            
+        {% csrf_token %}
             <input type="hidden" name="player_id" value="{{ player.id }}">
             <input type="hidden" name="campaign_id" value="{{ player.campaign.id }}">
             
@@ -36,7 +33,6 @@
                         <img src="{{player.image.url}}" width="100" height="100" style="margin-top: 20px; margin-bottom: 15px; margin-right: 20px; display: block; border-radius: 10px;">
                         <img src="{{player.weapon.image.url}}" width="50" height="50" style="margin-left:25px; margin-right:0px; display: block;">
                     </div>
-
                     <div style="width:100%">
                         <div class="campaign-title" >
                             <div>
@@ -46,46 +42,26 @@
                                 <h2 id="font1" style="right:0">LVL:{{ player.level }}</h2>
                             </div>
                         </div>
-
                         
                         <ul>
                             <li><h3 id="font1">{{ player.character_race }}, {{ player.character_class }}</h3></li>
                             <li><h3 id="font1">HP:&nbsp; {{ player.health }}/{{ player.max_health }}</h3></li>
-                            <!-- unnecesary
-                            <li><h3 id="font1">STR: {{ player.strength }}</h3></li>
-                            <li><h3 id="font1">INT: {{ player.intelligence }}</h3></li>
-                            <li><h3 id="font1">DEX: {{ player.dexterity }}</h3></li>
-                            -->
                             <li><h3 id="font1">EXP: {{ player.exp }}/{{ player.exp_top }}</h3></li>
                             <li><h3 id="font1">WPN: {{ player.weapon.name }}{% if player.weapon.level != 0 %}+{{ player.weapon.level }}{% endif %}</h3></li>
                         </ul>
                     </div>
-
                 </div>
-                
-
-                <!--
-                <ul>
-                    <li><h3 id="font1">{{ campaign.objectives_remaining }} objectives remaining</h3></li>
-                    <li><h3 id="font1">{{ campaign.turns }} turns</h3></li>
-                    <li><h3 id="font1">{{ campaign.size_x }}x{{ campaign.size_y }} map</h3></li>
-                    
-                </ul>
-                -->
             </button>
         </form>
-    
+        {% if not forloop.last %}<br>{% endif %}
     {% endfor %}
     
     <hr>
-    
     <form action="{% url 'playerCreation' %}" method="post">
-        {% csrf_token %}
-        
+    {% csrf_token %}
         <input type="hidden" name="campaign_id" value="{{ player.campaign.id }}">
         <button type="submit" class="btnActionWide" onclick="loading('Loading player creation','playercreation')">
             <h2 id="font1">Create a new player!</h2>
-            <!--<i style="font-size: 60px;" class="fa-solid fa-play"></i>-->
         </button>
     </form>
-</body>
+{% endblock content %}

@@ -1,1 +1,15 @@
-playerCreation
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block css %}
+    <link href="{% static 'css/playercreation.css' %}" rel="stylesheet" type="text/css" />
+{% endblock css %}
+
+{% block content %}
+<!-- no tienes que crear body, ya está definido en la template -->
+<h5>
+    player creation
+</h5>
+
+{% endblock content %}
