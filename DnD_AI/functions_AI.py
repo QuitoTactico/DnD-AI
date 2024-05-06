@@ -10,24 +10,73 @@ try:
     except: 
         from models import *
 except:
-    pass # Testing purposes
+    from .models import *
 
+try:  # AI modules changes frequently, so it's nice to import them in a try-except
+    from openai import OpenAI as OpenAI
 
-# we decided to manage them this way and not with a .env file because we had problems with the .env file
-try:
-    from .API import API_KEY, gemini_api_key, hf_api_key    
+    from langchain.chains.llm import LLMChain
+    from langchain.prompts import PromptTemplate
+    from langchain_openai import OpenAI as llmOpenAI
+
+    import google.generativeai as genai
+    from google.generativeai.types import HarmCategory, HarmBlockThreshold
 except:
-    from .API import API_KEY, gemini_api_key, hf_api_key  #Testing purposes
-    
-from openai import OpenAI as OpenAI
+    pass
 
-from langchain.chains.llm import LLMChain
-from langchain.prompts import PromptTemplate
-from langchain_openai import OpenAI as llmOpenAI
 
-import google.generativeai as genai
-from google.generativeai.types import HarmCategory, HarmBlockThreshold
 
+# ================ OBTAINING THE KEYS ================
+
+
+# its required to have either the openai or the huggingface api key
+# its required to have the google gemini api key
+
+# YES I KNOW...
+# aaaaaall the possible ways to import the api keys (the users are... unpredictable) are:
+#   1. having API.py in the same file than this file
+#   2. having api_keys.env in root
+#   3. having api_keys.env in the same folder than this file
+#   4. having API.py in the root, two ways to import it
+#   5. having any .env file in any folder in the root or above (damn... jesus christ)
+try:    # 1
+    from .API import openai_api_key, hf_api_key, gemini_api_key   
+except:
+    try:    # 2
+        from dotenv import load_dotenv
+        load_dotenv('api_keys.env')
+
+        openai_api_key = os.getenv('openai_api_key') # its required to have either the openai 
+        hf_api_key = os.getenv('hf_api_key')         # or the huggingface api key
+        gemini_api_key = os.getenv('gemini_api_key') # its required to have the google gemini api key
+    except:
+        try:   # 3
+            load_dotenv('DnD_AI/api_keys.env')
+
+            openai_api_key = os.getenv('openai_api_key')
+            hf_api_key = os.getenv('hf_api_key')        
+            gemini_api_key = os.getenv('gemini_api_key')
+        except:
+            import sys
+            sys.path.append("..")  # Añade la carpeta superior al PATH de Python
+
+            try:   # 4
+                from .API import openai_api_key, hf_api_key, gemini_api_key 
+            except:
+                try: 
+                    from API import openai_api_key, hf_api_key, gemini_api_key   
+                except:
+                    try:   # 5
+                        load_dotenv()
+                        openai_api_key = os.getenv('openai_api_key')
+                        hf_api_key = os.getenv('hf_api_key')        
+                        gemini_api_key = os.getenv('gemini_api_key')
+                    except:
+                        pass # you just don't have api keys... so you can't use the AI functions
+                
+NO_API_KEYS_STR = "Sorry dude, you didn't set the api keys or you ran out of balance. Please set the api keys or try again later. Jaja salu2"
+
+def NO_API_KEYS_IMG(): return f"media/entity/icons/no_api_keys{randint(1,3)}.png"
 
 
 # ================ IMAGE GENERATION ================
@@ -37,42 +86,52 @@ illustrations_dir = "media\\illustrations\\"
 
 # --------------- OPENAI (DALL-E) ---------------
 
-client_openai = OpenAI(api_key=API_KEY)
+try:
+    client_openai = OpenAI(api_key=openai_api_key)
+except:
+    pass
+
 
 def image_generator_DallE(prompt):
     '''Through OpenAI API, uses dall-e-3'''
 
-    response_dall_e = client_openai.images.generate(
-        model="dall-e-3",
-        prompt=prompt,
-        size="1024x1024", # the image generation is being too slow
-        #size="512x512",
-        #style="vivid",    # i've found this is possible
-        #style="natural", 
-        quality="standard",
-        n=1,
-    )
+    try:
+        response_dall_e = client_openai.images.generate(
+            model="dall-e-3",
+            prompt=prompt,
+            size="1024x1024", # the image generation is being too slow
+            #size="512x512",
+            #style="vivid",    # i've found this is possible
+            #style="natural", 
+            quality="standard",
+            n=1,
+        )
 
-    #os.makedirs(image_dir, exist_ok=True)
+        #os.makedirs(image_dir, exist_ok=True)
 
-    for _, image_data in enumerate(response_dall_e.data):
-        i = randint(0, 999999999999999999)
+        for _, image_data in enumerate(response_dall_e.data):
+            i = randint(0, 9999999)
 
-        image_url = image_data.url
+            image_url = image_data.url
 
-        image_response = requests.get(image_url)
+            image_response = requests.get(image_url)
 
-        #with open(os.path.join(image_dir, f"image_{i}.png"), "wb") as f:
-            #f.write(image_response.content)
-            #return image_data.url
+            #with open(os.path.join(image_dir, f"image_{i}.png"), "wb") as f:
+                #f.write(image_response.content)
+                #return image_data.url
 
-        #image_route = f"{illustrations_dir}image_{i}.png"
-        image_dir = f"media\\illustrations\\image_DE_{i}.png"
-        image_bytes = image_response.content
-        image = Image.open(BytesIO(image_bytes))
-        image.save(image_dir)
-        #image.show()
-        return image_dir.replace('\\', '/')
+            #image_route = f"{illustrations_dir}image_{i}.png"
+            image_dir = f"media\\illustrations\\image_DE_{i}.png"
+            image_bytes = image_response.content
+            image = Image.open(BytesIO(image_bytes))
+            image.save(image_dir)
+            #image.show()
+            return image_dir.replace('\\', '/')
+    except:
+        try:
+            return image_generator_StabDiff(prompt)
+        except:
+            return NO_API_KEYS_IMG()
 
 
 # --------------- HUGGINGFACE (STABLE DIFFUSION) ---------------
@@ -88,27 +147,30 @@ def StabDiff_query(payload):
 def image_generator_StabDiff(prompt_input):
     '''Through HuggingFace API, uses stable diffusion x1 1.0'''
 
-    prompt = f"Epic scene of {prompt_input}"
+    try:
+        prompt = f"Epic scene of {prompt_input}"
 
-    image_bytes = StabDiff_query({
-        "inputs": prompt,
-    })
+        image_bytes = StabDiff_query({
+            "inputs": prompt,
+        })
 
-    i = randint(0, 999999999999999999)
+        i = randint(0, 999999999999999999)
 
-    # ruta absoluta del directorio de ilustraciones, no funcionó
-    #abs_illustrations_dir = os.path.abspath(illustrations_dir)
+        # ruta absoluta del directorio de ilustraciones, no funcionó
+        #abs_illustrations_dir = os.path.abspath(illustrations_dir)
 
-    # ruta absoluta al guardar la imagen
-    #image_route = f"{abs_illustrations_dir}\image_{i}.png"
-    #image_route = f"media\\image_{i}.png"
-    image_route = f"media\\illustrations\\image_SD_{i}.png"
-    
-    image = Image.open(BytesIO(image_bytes))
-    image.save(image_route)
-    #image.show()
-    #return image
-    return image_route.replace('\\', '/')
+        # ruta absoluta al guardar la imagen
+        #image_route = f"{abs_illustrations_dir}\image_{i}.png"
+        #image_route = f"media\\image_{i}.png"
+        image_route = f"media\\illustrations\\image_SD_{i}.png"
+        
+        image = Image.open(BytesIO(image_bytes))
+        image.save(image_route)
+        #image.show()
+        #return image
+        return image_route.replace('\\', '/')
+    except:
+        return NO_API_KEYS_IMG()
 
 
 
@@ -124,26 +186,35 @@ Answer: Let's think step by step, supossing that i am in a fantastical role-play
 
 prompt_template = PromptTemplate.from_template(template)
 
-llm = llmOpenAI(openai_api_key=API_KEY)
+try:
+    llm = llmOpenAI(openai_api_key=openai_api_key)
 
-llm_chain = LLMChain(prompt=prompt_template, llm=llm)
+    llm_chain = LLMChain(prompt=prompt_template, llm=llm)
+except:
+    pass
 
 def continue_history_gpt(prompt):
-    response = llm_chain.invoke(prompt)
-    return response['text'].replace('\n', '<br>')
+    try:
+        response = llm_chain.invoke(prompt)
+        return response['text'].replace('\n', '<br>')
+    except:
+        return NO_API_KEYS_STR
 
 
 # ------------------ GOOGLE (GEMINI) ------------------
 
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = gemini_api_key
+try:
+    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = gemini_api_key
 
-gemini_model = genai.GenerativeModel('gemini-pro')
+    gemini_model = genai.GenerativeModel('gemini-pro')
 
-genai.configure(api_key=gemini_api_key)
+    genai.configure(api_key=gemini_api_key)
 
-# later, initialice as None, and ask if it's none on the views. If it is None, initialize it with the campaign context. 
-# if it's not None, let's assume that it has already the history of the campaign. 
-gemini_chat = gemini_model.start_chat(history=[])
+    # later, initialice as None, and ask if it's none on the views. If it is None, initialize it with the campaign context. 
+    # if it's not None, let's assume that it has already the history of the campaign. 
+    gemini_chat = gemini_model.start_chat(history=[])
+except:
+    pass
 
 safety_settings = {
     HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
@@ -158,24 +229,34 @@ def create_initial_stories_gemini(prompt:str="", n:int=3) -> list:
     world_type = ["fantasy", "sci-fi", "medieval", "cyberpunk", "post-apocalyptic", "steampunk", "futuristic", "dystopian", "utopian", "magical", "mystical", "mythical", "legendary", "historical", "modern"]
 
     for _ in range(n):
-        story = gemini_model.generate_content(f"Tell me a story about a {choice(world_type)} world where i have to defeat some strong enemies and bosses to win, this is a initial story of a game. Also tell me at least three names of key bosses and it's race and class to be defeated, and why i have to defeat them. Don't talk about a protagonist or a specific hero, just leave it like a mission to fulfill for 'anyone' or 'you (talking to the player)'. "+prompt+"Use the html tag for underline instead of **",
+        try:
+            story = gemini_model.generate_content(f"Tell me a story about a {choice(world_type)} world where i have to defeat some strong enemies and bosses to win, this is a initial story of a game. Also tell me at least three names of key bosses and it's race and class to be defeated, and why i have to defeat them. Don't talk about a protagonist or a specific hero, just leave it like a mission to fulfill for 'anyone' or 'you (talking to the player)'. "+prompt+"Use the html tag for underline instead of **",
                                               safety_settings=safety_settings)
+            initial_story = story.text.replace("\n", "<br>")
+        except:
+            initial_story = NO_API_KEYS_STR
         
-        initial_story = story.text.replace("\n", "<br>")
+        
         stories.append(initial_story)
     return stories
 
 
 def continue_history_gemini(prompt:str="", campaign_story:str="", campaign_achievements:str="") -> str:
-    response = gemini_chat.send_message(f"i did this: {prompt}. Progress the story taking in count that i'm in this world: {campaign_story}. and now my party already achieved this: {campaign_achievements}"+"Use the html tag for underline instead of **",
-                                        safety_settings=safety_settings)
-    return response.text
+    try:
+        response = gemini_chat.send_message(f"i did this: {prompt}. Progress the story taking in count that i'm in this world: {campaign_story}. and now my party already achieved this: {campaign_achievements}"+"Use the html tag for underline instead of **",
+                                            safety_settings=safety_settings)
+        return response.text
+    except:
+        return NO_API_KEYS_STR
 
 
 def ask_world_info_gemini(prompt:str="about what to do next", campaign_story:str="", campaign_achievements:str="") -> str:
-    response = gemini_chat.send_message(f"Tell me {prompt}. Answer taking in count that i've already achieved this: [{campaign_achievements}].\nIn this world: [{campaign_story}]\n."+"Use the html tag for underline instead of **",
-                                        safety_settings=safety_settings)
-    return response.text
+    try:
+        response = gemini_chat.send_message(f"Tell me {prompt}. Answer taking in count that i've already achieved this: [{campaign_achievements}].\nIn this world: [{campaign_story}]\n."+"Use the html tag for underline instead of **",
+                                            safety_settings=safety_settings)
+        return response.text
+    except:
+        return NO_API_KEYS_STR
 
 
 # ================== TEXT INTERPRETER ==================
@@ -216,18 +297,106 @@ def action_interpreter(prompt_input) -> str:
 
     prompt = f"{instruction} So... now categorize this: {prompt_input}"
 
-    response = gemini_model.generate_content(prompt,
-                                      safety_settings=safety_settings)
     try:
-        return response.text 
-    except ValueError:
-        # If the response doesn't contain text, check if the prompt was blocked.
-        # Also check the finish reason to see if the response was blocked.
-        # If the finish reason was SAFETY, the safety ratings have more details.
-        return  f"""{response.prompt_feedback}
-                    {response.candidates[0].finish_reason}
-                    {response.candidates[0].safety_ratings}"""
+        response = gemini_model.generate_content(prompt,
+                                        safety_settings=safety_settings)
+        try:
+            return response.text 
+        except ValueError:
+            # If the response doesn't contain text, check if the prompt was blocked.
+            # Also check the finish reason to see if the response was blocked.
+            # If the finish reason was SAFETY, the safety ratings have more details.
+            return  f"""{response.prompt_feedback}
+                        {response.candidates[0].finish_reason}
+                        {response.candidates[0].safety_ratings}"""
+    except:
+        '''
+        return f"""{NO_API_KEYS_STR}
+        
+        But if you want to play anyways, there's the list of commands. they all starts with /
+        
+        {('zzzul'+instruction[377:-33]+'zzzulf').replace("\n", "zzzlifzzzli")}
+        
+        all starting with /""".replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>").replace('zzzulf', '</ul>').replace('zzzul', '<ul>').replace('zzzlif', '</li>').replace('zzzli', '<li>')
+        '''
+
+        TUTORIAL = """<ul>
+                <li>/levelup &lt;stat_or_weaponstat&gt;</li>
+                <li>/use &lt;item_name&gt;</li>
+                <li>/equip &lt;weapon_name(optional)&gt;</li>
+                <li>/take &lt;treasure_name(optional)&gt;</li>
+                <li>/attack &lt;target(optional)&gt;</li>
+                <li>/move &lt;direction&gt;</li>
+                <li>/info &lt;question&gt;</li>
+            </ul>
+
+            <p>Valid values for:</p>
+            <ul>
+                <li>stat_or_weaponstat:
+                    <ul>
+                        <li>"health"</li>
+                        <li>"strength"</li>
+                        <li>"intelligence"</li>
+                        <li>"recursiveness"</li>
+                        <li>"dexterity"</li>
+                        <li>"phyres"</li>
+                        <li>"magres"</li>
+                        <li>"constitution"</li>
+                        <li>"damage"</li>
+                        <li>"range"</li>
+                    </ul>
+                </li>
+                <li>direction:
+                    <ul>
+                        <li>"up"</li>
+                        <li>"down"</li>
+                        <li>"left"</li>
+                        <li>"right"</li>
+                        <li>"upright"</li>
+                        <li>"upleft"</li>
+                        <li>"downright"</li>
+                        <li>"downleft"</li>
+                    </ul>
+                </li>
+                <li>treasure_name:
+                    <ul>
+                        <li>"gold"</li>
+                        <li>"bag"</li>
+                        <li>"chest"</li>
+                        <li>"key"</li>
+                        <li>"weapon"</li>
+                        <li>"tombstone"</li>
+                    </ul>
+                </li>
+                <li>target:
+                    <ul>
+                        <li>literally any target on range, a monster name</li>
+                    </ul>
+                </li>
+                <li>weapon_name:
+                    <ul>
+                        <li>literally any near weapon</li>
+                    </ul>
+                </li>
+                <li>question:
+                    <ul>
+                        <li>literally any desired information</li>
+                    </ul>
+                </li>
+                <li>item_name:
+                    <ul>
+                        <li>"health potion", (only that for now)</li>
+                    </ul>
+                </li>
+            </ul>"""
+
+        return f"""{NO_API_KEYS_STR}
+        
+        But if you want to play anyways, there's the list of commands. they start with /
+        """.replace("\n", "<br>")+TUTORIAL
     
+        # Dios obra de formas misteriosas
+
 
 
 # ==================================== TESTING ====================================
@@ -289,7 +458,7 @@ def test():
 
 '''
 # config openai key
-openai.api_key = API_KEY
+openai.api_key = openai_api_key
 
 response = openai.Completion.create(
   engine="text-davinci-002",

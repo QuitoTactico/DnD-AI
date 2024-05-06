@@ -465,10 +465,10 @@ def act_use(player:Character, action:list):
     
     if item_to_use in ['health potion', 'potion', 'hp potion', 'hp']:
         item_to_use = 'health potion'
-        player.health += 50
         successful = player.use_from_inventory(item_to_use, amount = 1)
         player.save()
         if successful:
+            player.health += 50
             History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'{player.name} used a health potion. 50 HP restored!').save()
             return True
         else:
