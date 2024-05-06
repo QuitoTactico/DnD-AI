@@ -23,6 +23,33 @@ python manage.py runserver
 - Python 3.12.X (3.11.X and below are not supported)
 - The needed dependencies and libraries defined in requirements.txt. To get them, run ```pip install -r "requirements.txt"```
 
+## AI usage requirements
+
+- For image generation is needed either a `OpenAI API key` or a `HuggingFace API key`.  
+- For action interpretation, storytelling and campaign's info providing, a `Google Gemini API key` is needed. OpenAI GPT option will be re-added in the future.
+
+You can provide this keys either creating a file called `api_keys.env` on the root dir of the project.
+
+```
+# api_keys.env
+# on root dir of the project
+
+openai_api_key = 
+hf_api_key = 
+gemini_api_key = 
+```
+
+Or a file called `API.py` on `/DnD_AI/` (the application, not the project). At the same level of `functions_AI.py`, the file that uses the api keys.
+```
+# API.py
+# on same folder as /DnD_AI/functions_AI.py
+
+openai_api_key = " "
+hf_api_key = " "
+gemini_api_key = " "
+```
+
+In any case, `the game is still playable with some (or none) of the API keys`. While AI generated images being replaced with placeholder images and action inputs not being interpreted, but supporting the use of commands instead.
 
 ## What's should to be seen:
 
