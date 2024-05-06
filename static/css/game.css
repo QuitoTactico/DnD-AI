@@ -46,6 +46,15 @@
   margin-top: 10px;
 }
 
+@keyframes blink {
+  0% {opacity: 1;}
+  100% {opacity: 0;}
+}
+
+.blink {
+  animation: blink 1s linear infinite;
+}
+
 @keyframes marquee {
   /*además de transform, existe text-indent*/
   0% { transform: translateX(0); }
@@ -147,7 +156,7 @@
   background-color: #ffffff;
   color: #000000;
   border-radius: 10px;
-  padding: 1%;
+  padding: 1.5%;
   overflow-y: auto;
   font-size: 20px;
 }
@@ -157,13 +166,18 @@
 }
 
 .txtAction {
-  padding-left: 5px;
+  color: black;
+  padding-left: 1.5%;
   border-style: none;
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;
   height: 38px;
   width: 80%;
   margin: 0px;
+}
+
+.txtAction::placeholder { 
+  color: gray; 
 }
 
 .btnAction {

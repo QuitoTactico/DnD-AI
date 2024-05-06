@@ -44,7 +44,7 @@
                         </div>
                         
                         <ul>
-                            <li><h3 id="font1">{{ player.character_race }}, {{ player.character_class }}</h3></li>
+                            <li><h3 id="font1">{{ player.character_race }}{% if player.character_class != player.character_race %}, {{ player.character_class }}{% endif %}</h3></li>
                             <li><h3 id="font1">HP:&nbsp; {{ player.health }}/{{ player.max_health }}</h3></li>
                             <li><h3 id="font1">EXP: {{ player.exp }}/{{ player.exp_top }}</h3></li>
                             <li><h3 id="font1">WPN: {{ player.weapon.name }}{% if player.weapon.level != 0 %}+{{ player.weapon.level }}{% endif %}</h3></li>

@@ -37,6 +37,7 @@
                     </div>
                 {% else %}
                     <div style="color: {% if player.name == entry.author %}green{% else %}{{ entry.color }}{% endif %}">
+                        <!--<p><span style="text-decoration:underline">{{ entry.author }}</span>: {{ entry.text|safe }}</p>-->
                         <p>{{ entry.author }}: {{ entry.text|safe }}</p>
                     </div>
                 {% endif %}
@@ -51,11 +52,11 @@
                 <h3 class="text_animation">{{ player.name }}</h3>
             </div>
 
-            <img src="{{ player.image.url }}" width="150" height="150" />
+            <img src="{{ player.image.url }}" width="150" height="150" style="border-radius: 10px"/>
 
-            <div>{{ player.character_race }} {{ player.character_class }}</div>
+            <div>{{ player.character_race }}{% if player.character_class != player.character_race %} {{ player.character_class }}{% endif %}</div>
             
-            <div>HP: &nbsp;{% if player.health < 10 %}<span style="color: #FF4444">{{ player.health }}</span>{% else %}{{ player.health }}{% endif %}/{{ player.max_health }}</div>
+            <div>HP: &nbsp;{% if player.health < 10 %}<span class="blink" style="color: #FF4444">{{ player.health }}</span>{% else %}{{ player.health }}{% endif %}/{{ player.max_health }}</div>
 
             <div>
                 RES:
@@ -71,7 +72,7 @@
                 <h3 class="text_animation">{{ player.weapon.name }}{{ weapon_lvl_label }}</h3>
             </div>
 
-            <img src="{{ player.weapon.image.url }}" width="150" height="150" />
+            <img src="{{ player.weapon.image.url }}" width="150" height="150" style="border-radius: 10px"/>
 
             <div>STR: {{ player.strength }}</div>
             <div>INT: {{ player.intelligence }}</div>
@@ -84,6 +85,7 @@
                     <span style="color: cyan">{{ player.weapon.damage }}</span>
                 {% endif %}
             </div>
+
             <div>
                 RNG: {{ player.weapon.range }}{% if player.weapon.range_level_points != 0 %}<span style="color:gray">+{{ player.weapon.range_level_points}}P</span> {% endif %}
             </div>
@@ -91,17 +93,23 @@
 
         <!-- Target -->
         {% if target %}
+            <!-- Target info -->
             <div class="target">
                 <div style="margin:0px">
                     <h3 class="text_animation">{{ target.name }}</h3>
                 </div>
-                <div>{{ target.monster_race }} {{ target.monster_class }}</div>
-                <div>HP: &nbsp;{% if target.health < 10 %}<span style="color: #FF4444">{{ target.health }}</span>{% else %}{{ target.health }}{% endif %}/{{ target.max_health }}</div>
+
+                <div>{{ target.monster_race }}{% if target.monster_class != target.monster_race %} {{ target.monster_class }}{% endif %}</div>
+
+                <div>HP: &nbsp;{% if target.health < 10 %}<span class="blink" style="color: #FF4444">{{ target.health }}</span>{% else %}{{ target.health }}{% endif %}/{{ target.max_health }}</div>
+                
                 <div>
                     RES:
                     <span style="color: orange">{{ target.physical_resistance }}</span>/<span style="color: cyan">{{ target.magical_resistance }}</span>
                 </div>
+
                 <div>DEX: {{ target.dexterity }}</div>
+
                 <div>
                     DMG:
                     {% if target.weapon.damage_type == "Physical" %}
@@ -110,11 +118,13 @@
                         <span style="color: cyan">{{ target.weapon.damage }}</span>
                     {% endif %}
                 </div>
+
                 <div>RNG: {{ target.weapon.range }}</div>
             </div>
 
+            <!-- Target icon -->
             <div class="targeticon">
-                <img src="{{ target.icon.url }}" width="150" height="150" />
+                <img src="{{ target.icon.url }}" width="150" height="150" style="border-radius: 10px"/>
             </div>
         {% endif %}
 
