@@ -2,9 +2,11 @@
 Domain.png
 DnD_AI_models.dot
 DB_BACKUP
-media/weapon/images/default_beta
+media/weapon/images/default_beta/*
 /DnD_AI/API.py
 /DnD_AI/API_KEYS.py
 media/map/tiles_tries
 DnD_AI/pruebas
 *.env
+*.sqlite3
+media/ilustrations/*
