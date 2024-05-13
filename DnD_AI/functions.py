@@ -173,7 +173,8 @@ def player_won_combat(player:Character, monster:Monster):
                                                       campaign_story=player.campaign.initial_story, 
                                                       campaign_achievements=player.campaign.achievements)
         
-        History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'{history_progression.replace("\n","<br>")}.<br><br>Remaining bosses: {player.campaign.objectives_remaining}').save()
+        history_progression_filtered = history_progression.replace("\n","<br>")
+        History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'{history_progression_filtered}.<br><br>Remaining bosses: {player.campaign.objectives_remaining}').save()
 
     player.save()
     monster.kill()

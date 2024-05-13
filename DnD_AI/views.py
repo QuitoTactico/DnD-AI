@@ -83,12 +83,15 @@ def playerSelection(request):
     - image         (optional) (default = icon)
     '''
 
+    
     if request.method == "POST":
 
         #campaign_id = request.POST['campaign_id'] if 'campaign_id' in request.POST else Campaign.objects.filter(is_completed=False).first().id  # REDUNDANT!
         # Today I've learnt something better than ternary conditional.
         campaign_id = request.POST.get('campaign_id') or Campaign.objects.filter(is_completed=False).first().id
 
+
+        '''  POR AHORA SIN CREACIÓN, AHORITA LO PROBAMOS
         # This goes here. After the player selects his character info, the button will redirect the player to this view.
         # So, the button will send the info to this view and not the other one, to create the character.
         if 'create_player' in request.POST:
@@ -108,15 +111,15 @@ def playerSelection(request):
             constitution = request.POST.get('con')
 
             gift = request.POST.get('gift')
-            inventory = "{}" if gift is None else f"{{{gift}: 5}}"
+            inventory = '{"gold": 5}' if gift is None else '{"' + gift + '": 5, "gold": 5}'
 
             story = request.POST.get('story')
             
             character_race = request.POST.get('race')
-            character_class = request.POST.get('class')
+            character_class = request.POST.get('class') or character_race  # if there's no class selected, the race is used twice instead
             
             icon = request.POST.get('icon')
-            image = request.POST.get('image') or icon
+            image = request.POST.get('image') or icon  # If there's no image selected, the icon is used instead
             
             Character.objects.create(
                 is_playable=True,
@@ -139,8 +142,11 @@ def playerSelection(request):
                 image=image,
                 campaign_id=campaign_id,
             ).save()
+            '''
+            
     else:
         campaign_id = Campaign.objects.filter(is_completed=False).first().id
+    
     
 
     players = Character.objects.filter(campaign_id=campaign_id, is_playable=True).order_by('-level')
@@ -160,10 +166,11 @@ def playerCreation(request):
     '''
 
     campaign_id = request.POST.get('campaign_id') or Campaign.objects.filter(is_completed=False).first().id
+    weapons = Weapon.objects.filter(is_template=True)
 
     races = DEFAULT_RACES
-    classes = DEFAULT_CLASSES
-    weapons = DEFAULT_WEAPONS
+    classes = [player_class for player_class in DEFAULT_CLASSES if player_class not in DEFAULT_RACES]
+    weapons_name = DEFAULT_WEAPONS
     weapons_with_stats = DEFAULT_WEAPON_STATS
     
     return render(request, 'playercreation.html',
@@ -172,6 +179,7 @@ def playerCreation(request):
                         'races':races,
                         'classes':classes,
                         'weapons':weapons,
+                        'weapons_name':weapons_name,
                         'weapons_with_stats':weapons_with_stats,
                         })
     
