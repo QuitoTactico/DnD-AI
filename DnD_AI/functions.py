@@ -359,7 +359,7 @@ def command_executer(prompt:str|list, player:Character, target:Monster) -> tuple
     
     '''
 
-    print(prompt)
+    # print(prompt)
 
     # if the prompt is a string, it will be split into a list
     action = prompt.split(' ') if type(prompt) == str else prompt
