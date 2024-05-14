@@ -42,7 +42,7 @@ input {
 	font-size: 25px;
 }
 
-.infoList {
+.itemList {
 	width: 100%;
 }
 
@@ -52,7 +52,50 @@ input {
 	border-radius: 10px;
 	background-color: #D62828;
 	color: white;
-	padding: 1%;
-	margin: 1%;
-	width: 20%;
+	padding: 0.5%;
+	margin: 0.5%;
+	width: 9%;
+}
+
+.listItem input{
+	display: none;
+}
+
+.statList {
+	width: 100%;
+	justify-content: space-between;
+}
+
+.statItem {
+	display: inline-block;
+	border-style: none;
+  border-radius: 10px;
+	background-color: #D62828;
+	color: white;
+	padding: 0.5%;
+	margin: 0.5%;
+	width: 9%;
+}
+
+.statItem h2 {
+	text-align: center;
+}
+
+.weaponList {
+	width: 100%;
+}
+
+.listWeapon {
+	display: inline-block;
+	border-style: none;
+	border-radius: 10px;
+	background-color: #D62828;
+	color: white;
+	padding: 0.5%;
+	margin: 0.5%;
+	width: 22%;
+}
+
+.listWeapon input{
+	display: none;
 }
