@@ -81,7 +81,8 @@ def NO_API_KEYS_IMG(): return f"media/entity/icons/no_api_keys{randint(1,3)}.png
 
 # ================ IMAGE GENERATION ================
 
-illustrations_dir = "media\\illustrations\\"
+#illustrations_dir = "media\\illustrations\\"
+illustrations_dir = "media/illustrations/"
 
 
 # --------------- OPENAI (DALL-E) ---------------
@@ -121,10 +122,13 @@ def image_generator_DallE(prompt):
                 #return image_data.url
 
             #image_route = f"{illustrations_dir}image_{i}.png"
-            image_dir = f"media\\illustrations\\image_DE_{i}.png"
+            image_dir = f"{illustrations_dir}image_DE_{i}.png"
             image_bytes = image_response.content
             image = Image.open(BytesIO(image_bytes))
-            image.save(image_dir)
+            try:
+                image.save(image_dir)
+            except:
+                image.save(image_dir.replace('/', '\\'))
             #image.show()
             return image_dir.replace('\\', '/')
     except:
@@ -162,13 +166,16 @@ def image_generator_StabDiff(prompt_input):
         # ruta absoluta al guardar la imagen
         #image_route = f"{abs_illustrations_dir}\image_{i}.png"
         #image_route = f"media\\image_{i}.png"
-        image_route = f"media\\illustrations\\image_SD_{i}.png"
+        image_dir = f"{illustrations_dir}image_SD_{i}.png"
         
         image = Image.open(BytesIO(image_bytes))
-        image.save(image_route)
+        try:
+            image.save(image_dir)
+        except:
+            image.save(image_dir.replace('/', '\\'))
         #image.show()
         #return image
-        return image_route.replace('\\', '/')
+        return image_dir.replace('\\', '/')
     except:
         return NO_API_KEYS_IMG()
 
