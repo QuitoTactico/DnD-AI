@@ -11,12 +11,17 @@ def get_random_name():
 DEFAULT_TILE_TYPES = {
     'grass':    'ground_grass_gen_07.png',
     'dirt':     'Dirt_02.png',
-    'path':     '04univ3.png',
-    'dungeon':  'rock_weathered_10.png',
-    'boss':     'desert_cracksv_s.jpg',
     'god':      '461223113.jpg',
     'psycho':   '461223182.jpg',
     'hell':     '461223163.jpg',
+
+    'path':     '04univ3.png',
+    'dungeon':  'rock_weathered_10.png',
+    
+    'spawn':     'random/461223123.jpg',
+    'treasure':  'random/461223113.jpg',
+    'portal':    'random/461223123.jpg',
+    'boss':      'desert_cracksv_s.jpg',
 }
 
 DEFAULT_TREASURE_TYPES = {
@@ -28,6 +33,8 @@ DEFAULT_TREASURE_TYPES = {
     'Key':              'key',
     'Weapon' :          'weapon',
     'Tombstone':        'tombstone',
+    'Portal':           'portal',
+    'Discovered Portal':'portal-discovered',
 }
 
 DEFAULT_WEAPON_PER_RACE = {
@@ -58,6 +65,7 @@ DEFAULT_WEAPON_PER_RACE = {
     'Mermaid': 'Trident',
     'Mimic': 'Fangs',
     'Minotaur': 'Battleaxe',
+    'Moai': 'Great Warhammer',
     'Mummy': 'Scythe',
     'Orc': 'Axe',
     'Rat': 'Fangs',

@@ -10,3 +10,4 @@ DnD_AI/pruebas
 *.env
 *.sqlite3
 media/ilustrations/*
+DnD_AI/map/*
