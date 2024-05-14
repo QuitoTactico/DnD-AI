@@ -1,3 +1,9 @@
+input {
+	height: 30px;	
+	width: 100px;
+	font-size: 25px;
+}
+
 .btnSubmit {
 	text-align: center;
 	border-style: none;
@@ -46,7 +52,7 @@
 	border-radius: 10px;
 	background-color: #D62828;
 	color: white;
-	padding: 20px;
-	margin: 10px;
-	width: 19.7%;
+	padding: 1%;
+	margin: 1%;
+	width: 20%;
 }
