@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block css %}
-    <link href="{% static 'css/playercreation.css' %}" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="{% static 'css/playercreation.css' %}" type="text/css" />
 {% endblock css %}
 
 {% block content %}
@@ -13,17 +13,17 @@
             <p>Creating new player...</p>
         </div>
     </div>
-
-	<div style="text-align: center;">
+    <div style="text-align: center;">
         <h1>Player Creation</h1>
         <h4>How's the hero who will save the world?</h4>
     </div>
+
     <br>
 
     <form action="{% url 'playerSelection' %}" method="post" id="playerinfo">
         {% csrf_token %}
     
-        <h2>1. Choose an epic name</h2>
+        <h2>1. Choose your name</h2>
         <input class="textInput" id="font2" type="text" name="name" placeholder="Write the name of your player." required>
 
         <!-- 
@@ -32,48 +32,47 @@
         ojalá no se vea el circulo de selección, pero si se ve, no importa
         pensaba en si se podía poner un borde rojo alrededor del cuadro seleccionado, pero no sé si se puede
         -->
-        <h2>2. Choose it's race</h2>
+        <h2>2. Choose your race</h2>
+        <div class="infoList">
         {% for race in races %}
-        <label>
-            <br>
+        <div class="listItem">
             <img height=50 src="media/entity/icons/default/{{race}}.png" alt="{{ race }} img">
             <h2 id="font2">{{ race }}</h2>
             <input type="radio" name="race" value="{{ race }}" 
             {% if forloop.first %}required{% endif %}/>
-            <br>
-        </label>
+        </div>
         {% endfor %}
+        </div>
 
         <!-- haz lo mismo que con el de arriba -->
         <!-- este no es requerido. Si no pones nada, se coloca la raza, 
             por ejemplo si quieres ser una rata simple -->
-        <h2>3. Choose it's class</h2>
+        <h2>3. Choose your class</h2>
+        <div class="infoList">
         {% for class in classes %}
-        <label>
-            <br>
-            <img height=50 src="media/entity/icons/default/{{class}}.png" alt="{{ race }} img">
+        <div class="listItem">
+            <img height=50 src="media/entity/icons/default/{{class}}.png" alt="{{ class }} img">
             <h2 id="font2">{{ class }}</h2>
             <input type="radio" name="class" value="{{ class }}"/>
-            <br>
-        </label>
+        </div>
         {% endfor %}
+        </div>
 
         <!-- haz lo mismo que con el de arriba -->
-        <h2>4. Choose it's weapon</h2>
+        <h2>4. Choose your weapon</h2>
+        <div class="infoList">
         {% for weapon in weapons %}
-        <br>
-        <h2 id="font2">name: {{weapon.name}}</h2>
-        <h2 id="font2">image.url: <img height=50 src="{{weapon.image.url}}" alt="{{weapon.name}} image"></h2>
-        <h2 id="font2">weapon_type: {{weapon.weapon_type}}</h2>
-        <h2 id="font2">is_ranged: {{weapon.is_ranged}}</h2>
-        <h2 id="font2">damage_type: {{weapon.damage_type}}</h2>
-        <h2 id="font2">damage: {{weapon.damage}}</h2>
-        <h2 id="font2">range: {{weapon.range}}</h2>
-        <br>
+        <div class="listItem">
+            <h2 id="font2">name: {{weapon.name}}</h2>
+            <h2 id="font2">image: <img height=50 src="{{weapon.image.url}}" alt="{{weapon.name}} image"></h2>
+            <h2 id="font2">is_ranged: {{weapon.is_ranged}}</h2>
+            <h2 id="font2">damage_type: {{weapon.damage_type}}</h2>
+            <h2 id="font2">damage: {{weapon.damage}}</h2>
+            <h2 id="font2">range: {{weapon.range}}</h2>
+            <input type="radio" name="weapon" value="{{ weapon }}"/>
+        </div>
         {% endfor %}
-
-        <!-- al final te debe de dejar seleccionar entre si quieres la imagen de la raza, o de la clase -->
-        <!-- o si quiere que se seleccione una autogenerada (ahorita meto eso desde views), o montar una propia -->
+        </div>
 
         <!--
             cosas que necesito:
@@ -95,9 +94,29 @@
             'class'
             'icon'
         -->
+        
+        <h2>5. Choose your stats and icon</h2>
 
-        <h2>5. That's all!</h2>
+        <div>
+            <h2 id="font2">STR</h2>
+            <input type="number" name="str" value="0" min="0" id="font2">
+            <h2 id="font2">INT</h2>
+            <input type="number" name="int" value="0" min="0" id="font2">
+            <h2 id="font2">REC</h2>
+            <input type="number" name="rec" value="0" min="0" id="font2">
+            <h2 id="font2">DEX</h2>
+            <input type="number" name="dex" value="0" min="0" id="font2">
+            <h2 id="font2">P_RES</h2>
+            <input type="number" name="phyres" value="0" min="0" id="font2">
+            <h2 id="font2">M_RES</h2>
+            <input type="number" name="magres" value="0" min="0" id="font2">
+            <h2 id="font2">CONST</h2>
+            <input type="number" name="con" value="0" min="0" id="font2">
+        </div>
+
+        <h2>6. That's all!</h2>
         <input type="hidden" name="create_player" value="True">
         <input class="btnSubmit" id="font1" type="submit" value="Create player!" onclick="loading('Creating player','playerselection','playerinfo')">
+    </form>
 
 {% endblock content %}
