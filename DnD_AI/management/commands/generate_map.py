@@ -1,5 +1,5 @@
 from DnD_AI.models import *
-from DnD_AI.map_generator import *
+from DnD_AI.campaign_generator import *
 from django.core.management.base import BaseCommand
 
 class Command(BaseCommand):

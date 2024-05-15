@@ -150,7 +150,7 @@ class Weapon(models.Model):
 class Entity(models.Model):
     campaign                = models.ForeignKey(Campaign, on_delete=models.CASCADE, null=True, blank=True)
     name                    = models.CharField(max_length=30, null=True, blank=True)
-    physical_description    = models.CharField(max_length=200, default="Masculine, tall, black clothes")
+    physical_description    = models.CharField(max_length=400, null=True, blank=True)
 
                                                          # DON'T CHANGE THIS T-T
     weapon = models.ForeignKey(Weapon, on_delete=models.SET(get_bare_hands), null=True, blank=True)
@@ -503,6 +503,9 @@ class Character(Entity, models.Model):
                 self.name = self.character_class+' '+get_random_name()
             else:
                 self.name = self.character_race+' '+get_random_name()
+
+        if not self.physical_description:
+            self.physical_description = self.character_class + self.character_race if self.character_race != self.character_class else self.character_class
         
         if self.health == None:
             self.health = self.max_health
@@ -578,6 +581,10 @@ class Monster(Entity, models.Model):
                 self.got_initial_weapon = True
             else:
                 self.weapon = self.disarm()
+
+        if not self.physical_description:
+            self.physical_description = self.monster_class + self.monster_race if self.monster_race != self.monster_class else self.monster_class
+
         super().save(*args, **kwargs)
 
     def __str__(self):

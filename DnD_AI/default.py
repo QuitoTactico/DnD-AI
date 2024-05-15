@@ -358,7 +358,264 @@ DEFAULT_WEAPON_STATS = {
     },
 }
 
-DEFAULT_WEAPONS = DEFAULT_WEAPON_STATS.keys()
+DEFAULT_WEAPONS_NAMES = DEFAULT_WEAPON_STATS.keys()
+
+UNIQUE_WEAPONS_STATS = {
+    'Bat Blade': {
+        'weapon_type': 'Sword',
+        'damage': 25,
+        'range': 1,
+        'is_ranged': False,
+        'physical_description': 'A menacing blade shaped like a bat',
+        'image': 'weapon/images/boss_weapons/bat-blade.png',
+        'damage_type': 'Physical'
+    },
+    'Bloody Sword': {
+        'weapon_type': 'Sword',
+        'damage': 27,
+        'range': 2,
+        'is_ranged': False,
+        'physical_description': 'A sword perpetually covered in blood',
+        'image': 'weapon/images/boss_weapons/bloody-sword.png',
+        'damage_type': 'Physical'
+    },
+    'Bouncing Sword': {
+        'weapon_type': 'Sword',
+        'damage': 22,
+        'range': 1,
+        'is_ranged': False,
+        'physical_description': 'A sword that vibrates and bounces when swung',
+        'image': 'weapon/images/boss_weapons/bouncing-sword.png',
+        'damage_type': 'Physical'
+    },
+    'Chainsaw': {
+        'weapon_type': 'Chainsaw',
+        'damage': 30,
+        'range': 1,
+        'is_ranged': False,
+        'physical_description': 'A brutal chainsaw for tearing through enemies',
+        'image': 'weapon/images/boss_weapons/chainsaw.png',
+        'damage_type': 'Physical'
+    },
+    'Coiled Nail': {
+        'weapon_type': 'Spear',
+        'damage': 26,
+        'range': 2,
+        'is_ranged': False,
+        'physical_description': 'A coiled nail repurposed as a deadly weapon',
+        'image': 'weapon/images/boss_weapons/coiled-nail.png',
+        'damage_type': 'Physical'
+    },
+    'Crossed Pistols': {
+        'weapon_type': 'Pistol',
+        'damage': 28,
+        'range': 5,
+        'is_ranged': True,
+        'physical_description': 'A pair of crossed pistols ready for a quick draw',
+        'image': 'weapon/images/boss_weapons/crossed-pistols.png',
+        'damage_type': 'Physical'
+    },
+    'Curled Tentacle': {
+        'weapon_type': 'Whip',
+        'damage': 24,
+        'range': 1,
+        'is_ranged': False,
+        'physical_description': 'A large curled tentacle, flexible and dangerous',
+        'image': 'weapon/images/boss_weapons/curled-tentacle.png',
+        'damage_type': 'Physical'
+    },
+    'Diving Dagger': {
+        'weapon_type': 'Dagger',
+        'damage': 20,
+        'range': 1,
+        'is_ranged': False,
+        'physical_description': 'A sleek dagger designed for swift attacks',
+        'image': 'weapon/images/boss_weapons/diving-dagger.png',
+        'damage_type': 'Physical'
+    },
+    'Dripping Blade': {
+        'weapon_type': 'Sword',
+        'damage': 29,
+        'range': 1,
+        'is_ranged': False,
+        'physical_description': 'A blade that drips with a mysterious liquid',
+        'image': 'weapon/images/boss_weapons/dripping-blade.png',
+        'damage_type': 'Physical'
+    },
+    'Dripping Sword': {
+        'weapon_type': 'Sword',
+        'damage': 23,
+        'range': 1,
+        'is_ranged': False,
+        'physical_description': 'A sword that drips an eerie, toxic substance',
+        'image': 'weapon/images/boss_weapons/dripping-sword.png',
+        'damage_type': 'Physical'
+    },
+    'Flamethrower': {
+        'weapon_type': 'Flamethrower',
+        'damage': 28,
+        'range': 5,
+        'is_ranged': True,
+        'physical_description': 'A deadly flamethrower that spews fire at a distance',
+        'image': 'weapon/images/boss_weapons/flamethrower.png',
+        'damage_type': 'Fire'
+    },
+    'Flaming Trident': {
+        'weapon_type': 'Trident',
+        'damage': 26,
+        'range': 4,
+        'is_ranged': False,
+        'physical_description': 'A trident wreathed in flames, capable of burning as well as piercing',
+        'image': 'weapon/images/boss_weapons/flaming-trident.png',
+        'damage_type': 'Fire'
+    },
+    'Knife Fork': {
+        'weapon_type': 'Knife',
+        'damage': 24,
+        'range': 1,
+        'is_ranged': False,
+        'physical_description': 'A quirky weapon that resembles kitchen utensils',
+        'image': 'weapon/images/boss_weapons/knife-fork.png',
+        'damage_type': 'Physical'
+    },
+    'Lightning Saber': {
+        'weapon_type': 'Saber',
+        'damage': 29,
+        'range': 3,
+        'is_ranged': True,
+        'physical_description': 'A saber that crackles with electric energy',
+        'image': 'weapon/images/boss_weapons/lightning-saber.png',
+        'damage_type': 'Electric'
+    },
+    'Panzerfaust': {
+        'weapon_type': 'Launcher',
+        'damage': 30,
+        'range': 6,
+        'is_ranged': True,
+        'physical_description': 'A powerful rocket launcher with devastating impact',
+        'image': 'weapon/images/boss_weapons/panzerfaust.png',
+        'damage_type': 'Explosive'
+    },
+    'Reaper Scythe': {
+        'weapon_type': 'Scythe',
+        'damage': 27,
+        'range': 1,
+        'is_ranged': False,
+        'physical_description': 'A dark, menacing scythe that reaps souls',
+        'image': 'weapon/images/boss_weapons/reaper-scythe.png',
+        'damage_type': 'Physical'
+    },
+    'Relic Blade': {
+        'weapon_type': 'Sword',
+        'damage': 25,
+        'range': 2,
+        'is_ranged': False,
+        'physical_description': 'An ancient blade imbued with mystical powers',
+        'image': 'weapon/images/boss_weapons/relic-blade.png',
+        'damage_type': 'Magical'
+    },
+    'Rune Sword': {
+        'weapon_type': 'Sword',
+        'damage': 22,
+        'range': 2,
+        'is_ranged': False,
+        'physical_description': 'A sword carved with enigmatic runes that glow ominously',
+        'image': 'weapon/images/boss_weapons/rune-sword.png',
+        'damage_type': 'Magical'
+    },
+    'Sai': {
+        'weapon_type': 'Dagger',
+        'damage': 20,
+        'range': 1,
+        'is_ranged': False,
+        'physical_description': 'A pair of sai, perfect for quick, close combat',
+        'image': 'weapon/images/boss_weapons/sai.png',
+        'damage_type': 'Physical'
+    },
+    'Sawed-Off Shotgun': {
+        'weapon_type': 'Shotgun',
+        'damage': 26,
+        'range': 4,
+        'is_ranged': True,
+        'physical_description': 'A brutally effective sawed-off shotgun for close-range mayhem',
+        'image': 'weapon/images/boss_weapons/sawed-off-shotgun.png',
+        'damage_type': 'Physical'
+    },
+    'Scales': {
+        'weapon_type': 'Body Part',
+        'damage': 21,
+        'range': 1,
+        'is_ranged': False,
+        'physical_description': 'Hard, protective scales that can also be used offensively',
+        'image': 'weapon/images/boss_weapons/scales.png',
+        'damage_type': 'Physical'
+    },
+    'Spinning Sword': {
+        'weapon_type': 'Sword',
+        'damage': 28,
+        'range': 2,
+        'is_ranged': False,
+        'physical_description': 'A sword designed to spin on its axis, increasing its lethality',
+        'image': 'weapon/images/boss_weapons/spinning-sword.png',
+        'damage_type': 'Physical'
+    },
+    'Thompson M1': {
+        'weapon_type': 'Rifle',
+        'damage': 27,
+        'range': 6,
+        'is_ranged': True,
+        'physical_description': 'A classic Thompson M1 submachine gun with a high rate of fire',
+        'image': 'weapon/images/boss_weapons/thompson-m1.png',
+        'damage_type': 'Physical'
+    },
+    'Thrown Daggers': {
+        'weapon_type': 'Dagger',
+        'damage': 23,
+        'range': 5,
+        'is_ranged': True,
+        'physical_description': 'A set of daggers designed for precise throwing',
+        'image': 'weapon/images/boss_weapons/thrown-daggers.png',
+        'damage_type': 'Physical'
+    },
+    'Umbrella Bayonet': {
+        'weapon_type': 'Bayonet',
+        'damage': 24,
+        'range': 3,
+        'is_ranged': True,
+        'physical_description': 'An unconventional weapon combining an umbrella with a sharp bayonet',
+        'image': 'weapon/images/boss_weapons/umbrella-bayonet.png',
+        'damage_type': 'Physical'
+    },
+    'Wave Strike': {
+        'weapon_type': 'Wave Emitter',
+        'damage': 29,
+        'range': 5,
+        'is_ranged': True,
+        'physical_description': 'A device that emits powerful shockwaves to strike opponents',
+        'image': 'weapon/images/boss_weapons/wave-strike.png',
+        'damage_type': 'Shockwave'
+    },
+    'Winged Sword': {
+        'weapon_type': 'Sword',
+        'damage': 26,
+        'range': 1,
+        'is_ranged': False,
+        'physical_description': 'A sword with wings that enhance maneuverability and speed',
+        'image': 'weapon/images/boss_weapons/winged-sword.png',
+        'damage_type': 'Physical'
+    },
+    'Wolverine Claws': {
+        'weapon_type': 'Claws',
+        'damage': 30,
+        'range': 1,
+        'is_ranged': False,
+        'physical_description': 'A set of retractable claws that can tear through almost anything',
+        'image': 'weapon/images/boss_weapons/wolverine-claws.png',
+        'damage_type': 'Physical'
+    }
+}
+
+UNIQUE_WEAPONS_NAMES = UNIQUE_WEAPONS_STATS.keys() 
 
 
 DEFAULT_MONSTER_STATS = {
@@ -489,7 +746,8 @@ POSSIBLE_BOSSES = [
     'Kronk',
     'THE ZULU',
     'Lucio',
-    'Roberta'
+    'Roberta',
+    'Skibidi Sigma Pomni Digital Fortnite Chamba Free Gigachad Rizz Ohmygodfloo XXXTentacion Hotmail Lionel Ronaldo Junior Mewing Tercero Chiki Ibai Xocas Ete Sech Golden Toy Puppet Ohio Rubén Tuesta YouTubeproinsano Globodetexto51 Decadencia777',
 ]
 
 COOL_SORCERY_NAMES = [

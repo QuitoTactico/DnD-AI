@@ -759,29 +759,7 @@ def create_map(player:Character, characters, monsters, treasures, tiles, target:
     filtered_monsters = [monster for monster in monsters if np.sqrt((monster.x - player.x)**2 + (monster.y - player.y)**2) <= player_vision_range or (monster.is_key and monster.is_boss)]
     
     entities = list(characters) + list(filtered_monsters)
-    '''
-    entity_data = {
-        'x': [entity.x + 0.5 for entity in entities],
-        'y': [entity.y + 0.5 for entity in entities],
-        'raceclass' : [f'{character.character_race} {character.character_class}' if character.character_race != character.character_class else character.character_class for character in characters] + [f'{monster.monster_race} {monster.monster_class}' if monster.monster_race != monster.monster_class else monster.monster_class for monster in monsters],
-        'LVL': [f'LVL: {character.level}' for character in characters]+['' for _ in monsters],
-        'HP': [entity.health for entity in entities],
-        'HP_max': [entity.max_health for entity in entities],
-        'RNG' : [entity.weapon.range for entity in entities],
-        'icon_x': [entity.x +0.1 for entity in entities],
-        'icon_y': [entity.y + 0.9 for entity in entities],
-        'real_x': [entity.x for entity in entities],
-        'real_y': [entity.y for entity in entities],
-        'name': [entity.name for entity in entities],
-        'icon': [entity.icon.url for entity in entities],
-        'weapon_icon': [entity.weapon.image.url for entity in entities],
-        'weapon_name': [f'{entity.weapon.name}+{entity.weapon.level}' if entity.weapon.level != 0 else entity.weapon.name for entity in entities],
-        'weapon_color': ['orange' if entity.weapon.damage_type == 'Physical' else 'cyan' if entity.weapon.damage_type == 'Magical' else 'black' for entity in entities],
-        'color': [('green' if character.id == player.id else 'blue') if character.is_playable else 'gold' for character in characters] + ['deeppink' if monster.is_boss else 'red' for monster in monsters],
-        'dash': ['solid' for _ in characters]+['dashed' if monster.is_key else 'solid' for monster in monsters],
-        'type': ['character' if character.id != player.id else 'player' for character in characters] + ['boss' if monster.is_boss else 'monster' for monster in monsters]
-    }
-    '''
+    
     entity_data = {
         'x': [], 'y': [], 'raceclass': [], 'LVL': [], 'HP': [], 'HP_max': [], 'RNG': [],
         'icon_x': [], 'icon_y': [], 'real_x': [], 'real_y': [], 'name': [], 'icon': [],
@@ -807,7 +785,7 @@ def create_map(player:Character, characters, monsters, treasures, tiles, target:
         if isinstance(entity, Character):
             entity_data['raceclass'].append(f'{entity.character_race} {entity.character_class}' if entity.character_race != entity.character_class else entity.character_class)
             entity_data['LVL'].append(f'LVL: {entity.level}')
-            entity_data['color'].append('green' if entity.id == player.id else 'blue')
+            entity_data['color'].append('green' if entity.id == player.id else 'blue' if entity.is_playable else 'gold')
             entity_data['dash'].append('solid')
             entity_data['type'].append('character' if entity.id != player.id else 'player')
         elif isinstance(entity, Monster):
@@ -955,6 +933,29 @@ MAP PAST TRIES  (DON'T DELETE, PLEASE)
 
 '''
 
+'''
+    entity_data = {
+        'x': [entity.x + 0.5 for entity in entities],
+        'y': [entity.y + 0.5 for entity in entities],
+        'raceclass' : [f'{character.character_race} {character.character_class}' if character.character_race != character.character_class else character.character_class for character in characters] + [f'{monster.monster_race} {monster.monster_class}' if monster.monster_race != monster.monster_class else monster.monster_class for monster in monsters],
+        'LVL': [f'LVL: {character.level}' for character in characters]+['' for _ in monsters],
+        'HP': [entity.health for entity in entities],
+        'HP_max': [entity.max_health for entity in entities],
+        'RNG' : [entity.weapon.range for entity in entities],
+        'icon_x': [entity.x +0.1 for entity in entities],
+        'icon_y': [entity.y + 0.9 for entity in entities],
+        'real_x': [entity.x for entity in entities],
+        'real_y': [entity.y for entity in entities],
+        'name': [entity.name for entity in entities],
+        'icon': [entity.icon.url for entity in entities],
+        'weapon_icon': [entity.weapon.image.url for entity in entities],
+        'weapon_name': [f'{entity.weapon.name}+{entity.weapon.level}' if entity.weapon.level != 0 else entity.weapon.name for entity in entities],
+        'weapon_color': ['orange' if entity.weapon.damage_type == 'Physical' else 'cyan' if entity.weapon.damage_type == 'Magical' else 'black' for entity in entities],
+        'color': [('green' if character.id == player.id else 'blue') if character.is_playable else 'gold' for character in characters] + ['deeppink' if monster.is_boss else 'red' for monster in monsters],
+        'dash': ['solid' for _ in characters]+['dashed' if monster.is_key else 'solid' for monster in monsters],
+        'type': ['character' if character.id != player.id else 'player' for character in characters] + ['boss' if monster.is_boss else 'monster' for monster in monsters]
+    }
+'''
 
 '''# Define las coordenadas x e y para el cuadrado exterior
     x_outer = [[0, player.campaign.size_x, player.campaign.size_x, 0]]

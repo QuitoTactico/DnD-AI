@@ -241,6 +241,69 @@ def generate_mapa_dungeon(campaign: Campaign) -> bool:
 # no más de 500.000 tiles
 # generate_mapa_dungeon(3)
 
+# -----------------------------------------------------------------------------------------------------------
+
+def generate_unique_weapon():
+    from DnD_AI.default import DEFAULT_UNIQUE_WEAPONS
+
+    
+
+    unique_weapon = Weapon(
+        is_template=False,  # Específico para un jefe, no es una plantilla
+        name="Nombre del Arma del Jefe",
+        is_ranged=False,    # True si es un arma a distancia
+        weapon_type="Tipo de Arma",  # Por ejemplo, 'Espada', 'Hacha', etc.
+        damage_type="Tipo de Daño",  # 'Físico', 'Mágico', etc.
+        physical_description="Descripción física del Arma",
+        image="ruta/al/archivo/de/imagen",  # Ruta al archivo de imagen
+        damage=20,          # Cantidad de daño que el arma inflige
+        range=1,            # Rango de ataque del arma
+        range_level_points=0,  # Puntos de nivel de rango para armas a distancia
+        durability=100,     # Durabilidad del arma
+        level=0             # Nivel del arma, podría ser mayor para un jefe
+    )
+    unique_weapon.save()
+
+
+
+
+
+def generate_key_bosses(campaign_id):
+    from DnD_AI.functions_AI import campaign_interpreter
+
+    attributes_dict = campaign_interpreter(campaign_id)
+
+    unique_weapons = [generate_unique_weapon() for _ in range(3)]
+
+    for i in range(3):
+
+
+        key_boss = Monster(
+            name="Nombre del Boss",
+            is_key=True,
+            is_boss=True,
+            monster_race="Raza del Boss",
+            monster_class="Clase del Boss",
+            physical_description="Descripción física del Boss",
+            weapon=get_default_weapon("Nombre del Arma"),
+            campaign_id=campaign_id,
+            max_health=100,  # Salud máxima
+            health=100,      # Salud actual, usualmente igual a max_health al inicio
+            strength=10,     # Fuerza física
+            intelligence=10, # Inteligencia, útil para ataques mágicos
+            recursiveness=10, # Habilidad para usar ítems
+            dexterity=10,    # Destreza, determina quién actúa primero
+            physical_resistance=10,  # Resistencia a daños físicos
+            magical_resistance=10,   # Resistencia a daños mágicos
+            constitution=10, # Constitución, resistencia a efectos como veneno
+            exp_drop=50,     # Puntos de experiencia que otorga al ser derrotado
+            x=0,             # Posición en el eje X
+            y=0,             # Posición en el eje Y
+            icon=None,       # Icono del monstruo
+        )
+        key_boss.save()
+
+
 
 # -----------------------------------------------------------------------------------------------------------
 
