@@ -782,7 +782,7 @@ def create_map(player:Character, characters, monsters, treasures, tiles, target:
         'real_x' : [treasure.x for treasure in treasures],
         'real_y' : [treasure.y for treasure in treasures],
         'color' : [('gold' if treasure.treasure_type == 'Gold' else 'dimgray' if treasure.discovered else '#212121') if treasure.treasure_type != 'Weapon' or not treasure.discovered else 'orange' if treasure.weapon.damage_type == 'Physical' else 'cyan' if treasure.weapon.damage_type == 'Magical' else 'black' for treasure in treasures],
-        'inv': [(treasure.inventory[1:-1] if treasure.discovered  else '???') if treasure.treasure_type!='Weapon' else  (f'DMG: {treasure.weapon.damage}, RNG: {treasure.weapon.range}' if treasure.discovered else '') for treasure in treasures],
+        'inv': ['' if treasure.treasure_type == "Portal" else (treasure.inventory[1:-1] if treasure.discovered  else '???') if treasure.treasure_type!='Weapon' else  (f'DMG: {treasure.weapon.damage}, RNG: {treasure.weapon.range}' if treasure.discovered else '') for treasure in treasures],
         'icon' : [treasure.icon.url for treasure in treasures],
         'name': [('Discovered '+treasure.treasure_type if treasure.discovered else treasure.treasure_type if treasure.treasure_type != 'Weapon' else 'Undiscovered Weapon') if treasure.treasure_type!='Weapon' or not treasure.discovered else treasure.weapon.name for treasure in treasures],
     }
