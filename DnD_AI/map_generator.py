@@ -42,7 +42,7 @@ def designar_habitaciones_especiales(rooms):
     
     # Seleccionar rooms para tesoros
     for h in rooms:
-        if random.random() < 0.15:  # 15% de probabilidad de tener treasure
+        if random.random() < 0.20:  # 20% de probabilidad de tener tesoro (cofre)
             h.treasure = True
 
     # Seleccionar rooms para portales
@@ -117,10 +117,23 @@ def generate_object(campaign_id, room, object_type, entity=None):
                 tries -= 1
 
         if object_type == 'player':
-            existent_player = Character.objects.filter(campaign_id=campaign_id, is_playable=True, x=x, y=y)
+            existent_player = Character.objects.filter(campaign_id=campaign_id, x=x, y=y)
             existent_treasure = Treasure.objects.filter(campaign_id=campaign_id, x=x, y=y)
             
             if not existent_player and not existent_treasure:
+                entity.x = x
+                entity.y = y
+                entity.save()
+                break
+            else:
+                tries -= 1
+
+        if object_type == 'monster':
+            existent_player = Character.objects.filter(campaign_id=campaign_id, x=x, y=y)
+            existent_treasure = Treasure.objects.filter(campaign_id=campaign_id, x=x, y=y)
+            existent_monster = Monster.objects.filter(campaign_id=campaign_id, x=x, y=y)
+            
+            if not existent_player and not existent_treasure and not existent_monster:
                 entity.x = x
                 entity.y = y
                 entity.save()
@@ -154,8 +167,9 @@ def generate_mapa_dungeon(campaign: Campaign) -> bool:
     total_tiles = dimx * dimy   # 200
     num_habitaciones = total_tiles // 200  # 1 habitación por cada 200 tiles
 
-    room_types = ['psycho', 'hell', 'grass', 'dirt', 'god']
-    path_types = ['path', 'dungeon']
+    room_types = ['path', 'dungeon', 'grass', 'dirt']
+    boss_types = ['boss', 'psycho', 'hell', 'god']
+    path_types = ['dirt', 'path', 'dungeon']
 
     rooms = []
     while len(rooms) < num_habitaciones:
@@ -165,13 +179,73 @@ def generate_mapa_dungeon(campaign: Campaign) -> bool:
             if rooms:
                 # Conectar con la habitación más cercana
                 habitacion_cercana = min(rooms, key=lambda h: distancia(h, new_room))
+
+                # Quizás sería mejor ponerlo a lo último
                 conectar_habitaciones(mapa, habitacion_cercana, new_room, random.choice(path_types), campaign_id)
             rooms.append(new_room)
+            mapa[new_room.y:new_room.y + new_room.h, new_room.x:new_room.x + new_room.w] = new_room.room_type
 
     # Designar rooms para spawn de jugadores, jefes y tesoros
     designar_habitaciones_especiales(rooms)
 
-    '''
+    boss_counter = 0
+    bosses = Monster.objects.filter(campaign_id=campaign_id, is_boss=True, is_key=True)
+    for room in rooms:
+
+        tile_type = room.room_type
+
+        if room.spawn:
+            tile_type = 'spawn'
+            generate_object(campaign_id, room, 'portal')
+            for player in Character.objects.filter(campaign_id=campaign_id):
+                generate_object(campaign_id, room, 'player', player)
+
+        elif room.boss:
+            tile_type = random.choice(boss_types)
+            try:
+                generate_object(campaign_id, room, 'boss', bosses[boss_counter])
+                boss_counter += 1
+            except:
+                pass
+
+        elif room.portal:
+            tile_type = 'portal'
+            generate_object(campaign_id, room, 'portal')
+
+        elif room.treasure:
+            generate_object(campaign_id, room, 'treasure')
+            # 15% de probabilidad de tener dos tesoros
+            # 2% de probabilidad de tener tres tesoros
+            how_much = random.random()
+            if how_much < 0.02:
+                generate_object(campaign_id, room, 'treasure')
+                generate_object(campaign_id, room, 'treasure')
+            if how_much < 0.15:
+                generate_object(campaign_id, room, 'treasure')
+
+        for x in range(room.x, room.x + room.w):
+            for y in range(room.y, room.y + room.h):
+                Tile.objects.update_or_create(campaign_id=campaign_id, x=x, y=y, defaults={'tile_type': tile_type})
+    
+    non_boss_rooms = [room for room in rooms if not room.boss]
+
+    for NPC in Character.objects.filter(campaign_id=campaign_id, is_playable=False):
+        generate_object(campaign_id, random.choice(non_boss_rooms), 'player', NPC)
+    
+    for monster in Monster.objects.filter(campaign_id=campaign_id, is_key=False, is_boss=False):
+        generate_object(campaign_id, random.choice(rooms), 'monster', monster)
+
+    return True
+
+# Ejemplo de uso
+# no más de 500.000 tiles
+# generate_mapa_dungeon(3)
+
+
+# -----------------------------------------------------------------------------------------------------------
+
+'''
+# Visualización del mapa en matplotlib
     # Rellenar las rooms y los pasillos en el mapa
     for room in rooms:
         if room.spawn:
@@ -214,46 +288,4 @@ def generate_mapa_dungeon(campaign: Campaign) -> bool:
     plt.xticks([])
     plt.yticks([])
     plt.show()
-    '''
-    boss_counter = 0
-    bosses = Monster.objects.filter(campaign_id=campaign_id, is_boss=True, is_key=True)
-    for room in rooms:
-
-        tile_type = room.room_type
-
-        if room.spawn:
-            tile_type = 'spawn'
-            generate_object(campaign_id, room, 'portal')
-            for player in Character.objects.filter(campaign_id=campaign_id):
-                generate_object(campaign_id, room, 'player', player)
-
-        elif room.boss:
-            tile_type = 'boss'
-            generate_object(campaign_id, room, 'boss', bosses[boss_counter])
-            boss_counter += 1
-
-        elif room.portal:
-            tile_type = 'portal'
-            generate_object(campaign_id, room, 'portal')
-
-        elif room.treasure:
-            generate_object(campaign_id, room, 'treasure')
-            # 10% de probabilidad de tener dos tesoros
-            # 1% de probabilidad de tener tres tesoros
-            how_much = random.random()
-            if how_much < 0.01:
-                generate_object(campaign_id, room, 'treasure')
-                generate_object(campaign_id, room, 'treasure')
-            if how_much < 0.1:
-                generate_object(campaign_id, room, 'treasure')
-        
-
-        for x in range(room.x, room.x + room.w):
-            for y in range(room.y, room.y + room.h):
-                Tile.objects.update_or_create(campaign_id=campaign_id, x=x, y=y, defaults={'tile_type': tile_type})
-            
-    return True
-
-# Ejemplo de uso
-# no más de 500.000 tiles
-# generate_mapa_dungeon(3)
+'''

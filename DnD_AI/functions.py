@@ -9,7 +9,7 @@ import numpy as np
 
 from bokeh.plotting import figure, show                             # for plotting (map)
                                                                     # for plot personalization (map components)
-from bokeh.models import Range1d, Span, CrosshairTool, HoverTool, AdaptiveTicker
+from bokeh.models import Range1d, Span, CrosshairTool, HoverTool, AdaptiveTicker, ColumnDataSource, MultiPolygons 
 from bokeh.embed import components                                  # for plot html rendering (for the front-end)
 
 from .functions_AI import image_generator_DallE, image_generator_StabDiff, ask_world_info_gemini, continue_history_gemini
@@ -596,6 +596,9 @@ def act_move(player:Character, target:Monster, action:list):
 
 def create_map(player:Character, characters, monsters, treasures, tiles, target:Monster=None, host:str=None, show_map:bool=False) -> tuple:
 
+    zoom_border = max(player.campaign.size_x, player.campaign.size_y)
+    player_vision_range = 40
+
     map = figure(active_scroll='wheel_zoom', 
                  title="", 
                  aspect_scale=1, 
@@ -608,13 +611,43 @@ def create_map(player:Character, characters, monsters, treasures, tiles, target:
                  outline_line_color='white',
                  
                  # setting the initial map center and range. The player will be the center with a visual range of 2.5
-                 x_range=Range1d(start=(player.x)-2.5, end=(player.x)+3.5, bounds=(-5, player.campaign.size_x+5)), 
-                 y_range=Range1d(start=(player.y)-2.5, end=(player.y)+3.5, bounds=(-5, player.campaign.size_y+5)),
+                 x_range=Range1d(start=(player.x)-2.5, end=(player.x)+3.5, bounds=(-zoom_border, player.campaign.size_x+zoom_border)), 
+                 #x_range=Range1d(start=(player.x)-2.5, end=(player.x)+3.5, bounds=(-5, player.campaign.size_x+5)), 
+                 y_range=Range1d(start=(player.y)-2.5, end=(player.y)+3.5, bounds=(-zoom_border, player.campaign.size_y+zoom_border)),
+                 #y_range=Range1d(start=(player.y)-2.5, end=(player.y)+3.5, bounds=(-5, player.campaign.size_y+5)),
                  )
-    
-    player_vision_range = 40
 
-    map.rect(x=player.campaign.size_x/2, y=player.campaign.size_y/2, width=player.campaign.size_x, height=player.campaign.size_y, fill_alpha=0, line_width=2, line_color='white')
+    #map.rect(x=player.campaign.size_x/2, y=player.campaign.size_y/2, width=player.campaign.size_x, height=player.campaign.size_y, fill_alpha=0, line_width=2, line_color='gray')
+        
+    # Define las coordenadas x e y para el cuadrado exterior
+    x_inner = [0, player.campaign.size_x, player.campaign.size_x, 0]
+    y_inner = [0, 0, player.campaign.size_y, player.campaign.size_y]
+
+    # Define las coordenadas x e y para el cuadrado interior
+    x_outer = [-zoom_border, player.campaign.size_x+zoom_border, player.campaign.size_x+zoom_border, -zoom_border]
+    y_outer = [-zoom_border, -zoom_border, player.campaign.size_y+zoom_border, player.campaign.size_y+zoom_border]
+    
+    
+    xs_dict = [[{'exterior': x_outer, 'holes': [x_inner]}]]
+    ys_dict = [[{'exterior': y_outer, 'holes': [y_inner]}]]
+
+    xs = [[[p['exterior'], *p['holes']] for p in mp] for mp in xs_dict]
+    ys = [[[p['exterior'], *p['holes']] for p in mp] for mp in ys_dict]
+
+    border_source = ColumnDataSource(dict(xs=xs, ys=ys))
+
+    glyph = MultiPolygons(xs="xs", ys="ys", 
+                          hatch_pattern='spiral',
+                          hatch_scale=8, 
+                          hatch_weight=0.5,
+                          hatch_color='black',
+                          hatch_alpha=0.5,
+                          fill_alpha=0.5,
+                          line_alpha=0, 
+                          line_color='white')
+    map.add_glyph(border_source, glyph)
+
+
 
     # modifying the borders and background of the map
     map.outline_line_alpha = 0.1
@@ -920,6 +953,27 @@ MAP PAST TRIES  (DON'T DELETE, PLEASE)
     borde_player = map.rect(name=player.name, x=player_x+0.5, y=player_y+0.5, width=0.8, height=0.8, line_color="green", fill_color='green', fill_alpha=0, line_width=2)
     borde_player.tags = ['player']
 
+'''
+
+
+'''# Define las coordenadas x e y para el cuadrado exterior
+    x_outer = [[0, player.campaign.size_x, player.campaign.size_x, 0]]
+    y_outer = [[0, 0, player.campaign.size_y, player.campaign.size_y]]
+
+    # Define las coordenadas x e y para el cuadrado interior
+    x_inner = [[player.campaign.size_x/4, 3*player.campaign.size_x/4, 3*player.campaign.size_x/4, player.campaign.size_x/4]]
+    y_inner = [[player.campaign.size_y/4, player.campaign.size_y/4, 3*player.campaign.size_y/4, 3*player.campaign.size_y/4]]
+
+    # Dibuja el cuadrado exterior con un hueco en el medio
+    map.multi_polygons(xs=[x_outer, x_inner], ys=[y_outer, y_inner],
+                    fill_color=['blue', 'white'],
+                    hatch_pattern=['diagonal_cross', None],
+                    hatch_scale=8, 
+                    hatch_weight=0.5,
+                    hatch_color='gray',
+                    hatch_alpha=0.5,
+                    line_alpha=0, 
+                    line_color='white')
 '''
 
 '''
