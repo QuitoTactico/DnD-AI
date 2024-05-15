@@ -22,19 +22,18 @@ class Command(BaseCommand):
 
         for i in range(min(x_init, x_final), max(x_init, x_final)):
             for j in range(min(y_init, y_final), max(y_init, y_final)):
-                try:
-                    tile = Tile.objects.get(campaign_id=campaign_id, x=i, y=j) if tile_type == 'any' else Tile.objects.get(campaign_id=campaign_id, x=i, y=j, tile_type=tile_type) 
-                    if tile:
-                        tile.delete()
-                    
-                    treasure = Treasure.objects.get(campaign_id=campaign_id, x=i, y=j)      
-                    if treasure:
-                        treasure.delete()    
 
-                    monster = Monster.objects.get(campaign_id=campaign_id, x=i, y=j, is_boss=False, is_key=False)      
-                    if monster:
+                tiles = Tile.objects.filter(campaign_id=campaign_id, x=i, y=j) if tile_type == 'any' else Tile.objects.filter(campaign_id=campaign_id, x=i, y=j, tile_type=tile_type) 
+                for tile in tiles:
+                    tile.delete()
+                
+                treasures = Treasure.objects.filter(campaign_id=campaign_id, x=i, y=j)
+                for treasure in treasures:
+                    treasure.delete()
+                    
+                monsters = Monster.objects.filter(campaign_id=campaign_id, x=i, y=j, is_boss=False, is_key=False)      
+                for monster in monsters:
                         monster.delete()           
-                except:
-                    pass
+                
     
         self.stdout.write(self.style.SUCCESS(f'Successfully deleted ({tile_type}) tiles from ({x_init},{y_init}) to ({x_final},{y_final }) in the campaign [{campaign_id}]: {campaign.name}'))

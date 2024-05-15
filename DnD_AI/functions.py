@@ -605,7 +605,16 @@ def create_map(player:Character, characters, monsters, treasures, tiles, target:
                  min_width=410,
                  background_fill_alpha=0.05,
                  border_fill_alpha=0,
-                 outline_line_color='white')
+                 outline_line_color='white',
+                 
+                 # setting the initial map center and range. The player will be the center with a visual range of 2.5
+                 x_range=Range1d(start=(player.x)-2.5, end=(player.x)+3.5, bounds=(-5, player.campaign.size_x+5)), 
+                 y_range=Range1d(start=(player.y)-2.5, end=(player.y)+3.5, bounds=(-5, player.campaign.size_y+5)),
+                 )
+    
+    player_vision_range = 40
+
+    map.rect(x=player.campaign.size_x/2, y=player.campaign.size_y/2, width=player.campaign.size_x, height=player.campaign.size_y, fill_alpha=0, line_width=2, line_color='white')
 
     # modifying the borders and background of the map
     map.outline_line_alpha = 0.1
@@ -671,11 +680,11 @@ def create_map(player:Character, characters, monsters, treasures, tiles, target:
     #hover = 
 
     # setting the initial map center and range. The player will be the center with a visual range of 2.5
-    map.x_range = Range1d(start=(player.x)-2.5, end=(player.x)+3.5) # -2, +3
-    map.y_range = Range1d(start=(player.y)-2.5, end=(player.y)+3.5) # -2, +3
+    #map.x_range = Range1d() # -2, +3
+    #map.y_range = Range1d() # -2, +3
 
 
-    filtered_tiles = [tile for tile in tiles if np.sqrt((tile.x - player.x)**2 + (tile.y - player.y)**2) <= 50]
+    filtered_tiles = [tile for tile in tiles if np.sqrt((tile.x - player.x)**2 + (tile.y - player.y)**2) <= player_vision_range]
     # rendering the map tiles
     '''for tile in Tile.objects.all():
         map.image_url(url=[f'media/map/tiles/{DEFAULT_TILE_TYPES[tile.tile_type]}'], x=tile.x, y=tile.y +1, w=1, h=1)'''
@@ -683,6 +692,9 @@ def create_map(player:Character, characters, monsters, treasures, tiles, target:
     xs = [tile.x for tile in filtered_tiles]
     ys = [tile.y + 1 for tile in filtered_tiles ]
     map.image_url(url=urls, x=xs, y=ys, w=1, h=1)
+
+    # player's vision range (50 tiles)
+    map.circle(x=player.x + 0.5, y=player.y + 0.5, radius=player_vision_range, fill_alpha=0, line_width=1, line_color='gray')
 
     # the wepon range of the player will glow red if there are monsters in range, else it will be gray
     range_color,range_alpha = ('red',0.65) if len(player.get_monsters_in_range()) != 0 else ('gray',0.5)
@@ -711,7 +723,7 @@ def create_map(player:Character, characters, monsters, treasures, tiles, target:
     #map.circle(x=player.x+0.5, y=player.y+0.5, radius=1, fill_alpha=0, line_color='green', line_width=2)
     
     # adding the entities to the map
-    filtered_monsters = [monster for monster in monsters if np.sqrt((monster.x - player.x)**2 + (monster.y - player.y)**2) <= 50 or (monster.is_key and monster.is_boss)]
+    filtered_monsters = [monster for monster in monsters if np.sqrt((monster.x - player.x)**2 + (monster.y - player.y)**2) <= player_vision_range or (monster.is_key and monster.is_boss)]
     
     entities = list(characters) + list(filtered_monsters)
     '''
