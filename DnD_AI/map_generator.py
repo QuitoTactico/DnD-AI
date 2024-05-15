@@ -61,7 +61,7 @@ def distancia(h1, h2):
     centro_h2 = (h2.x + h2.w // 2, h2.y + h2.h // 2)
     return np.sqrt((centro_h1[0] - centro_h2[0]) ** 2 + (centro_h1[1] - centro_h2[1]) ** 2)
 
-def conectar_habitaciones(mapa, habitacion1, habitacion2, tipo_pasillo):
+def conectar_habitaciones(mapa, habitacion1, habitacion2, tipo_pasillo, campaign_id):
     puntos1 = (random.randint(habitacion1.x, habitacion1.x + habitacion1.w - 1),
                random.randint(habitacion1.y, habitacion1.y + habitacion1.h - 1))
     puntos2 = (random.randint(habitacion2.x, habitacion2.x + habitacion2.w - 1),
@@ -73,41 +73,45 @@ def conectar_habitaciones(mapa, habitacion1, habitacion2, tipo_pasillo):
         for x in range(min(puntos1[0], puntos2[0]), max(puntos1[0], puntos2[0]) + 1):
             for offset in range(ancho_pasillo):
                 if 0 <= puntos1[1] + offset < mapa.shape[0]:
-                    mapa[puntos1[1] + offset, x] = tipo_pasillo
+                    #mapa[puntos1[1] + offset, x] = tipo_pasillo
+                    Tile.objects.update_or_create(campaign_id=campaign_id, x=x, y=puntos1[1] + offset, defaults={'tile_type': tipo_pasillo})
         for y in range(min(puntos1[1], puntos2[1]), max(puntos1[1], puntos2[1]) + 1):
             for offset in range(ancho_pasillo):
                 if 0 <= puntos2[0] + offset < mapa.shape[1]:
-                    mapa[y, puntos2[0] + offset] = tipo_pasillo
+                    #mapa[y, puntos2[0] + offset] = tipo_pasillo
+                    Tile.objects.update_or_create(campaign_id=campaign_id, x=puntos2[0] + offset, y=y, defaults={'tile_type': tipo_pasillo})
     else:  # vertical primero, luego horizontal
         for y in range(min(puntos1[1], puntos2[1]), max(puntos1[1], puntos2[1]) + 1):
             for offset in range(ancho_pasillo):
                 if 0 <= puntos1[0] + offset < mapa.shape[1]:
-                    mapa[y, puntos1[0] + offset] = tipo_pasillo
+                    #mapa[y, puntos1[0] + offset] = tipo_pasillo
+                    Tile.objects.update_or_create(campaign_id=campaign_id, x=puntos1[0] + offset, y=y, defaults={'tile_type': tipo_pasillo})
         for x in range(min(puntos1[0], puntos2[0]), max(puntos1[0], puntos2[0]) + 1):
             for offset in range(ancho_pasillo):
                 if 0 <= puntos2[1] + offset < mapa.shape[0]:
-                    mapa[puntos2[1] + offset, x] = tipo_pasillo
+                    #mapa[puntos2[1] + offset, x] = tipo_pasillo
+                    Tile.objects.update_or_create(campaign_id=campaign_id, x=x, y=puntos2[1] + offset, defaults={'tile_type': tipo_pasillo})
 
 
 def generate_object(campaign_id, room, object_type, boss=None):
     tries = 30
     while tries > 0:
-        x = random.randint(room.x, room.x + room.w)
-        y = random.randint(room.y, room.y + room.h)
+        x = random.randint(room.x, room.x + room.w - 1)
+        y = random.randint(room.y, room.y + room.h - 1)
 
         if object_type == 'treasure':
-            existent_treasure = Treasure.objects.filter(campaign=campaign_id, x=x, y=y)
+            existent_treasure = Treasure.objects.filter(campaign_id=campaign_id, x=x, y=y)
             
             if not existent_treasure:
-                Treasure.objects.create(campaign=campaign_id, treasure_type='Treasure', x=x, y=y)
+                Treasure.objects.create(campaign_id=campaign_id, treasure_type='Chest', x=x, y=y)
                 break
             else:
                 tries -= 1
 
         elif object_type == 'portal':
-            existent_portal = Treasure.objects.filter(campaign=campaign_id, x=x, y=y)
+            existent_portal = Treasure.objects.filter(campaign_id=campaign_id, x=x, y=y)
             if not existent_portal:
-                Treasure.objects.create(campaign=campaign_id, treasure_type='Portal', x=x, y=y)
+                Treasure.objects.create(campaign_id=campaign_id, treasure_type='Portal', x=x, y=y)
                 break
             else:
                 tries -= 1
@@ -116,14 +120,18 @@ def generate_object(campaign_id, room, object_type, boss=None):
             boss.x = x
             boss.y = y
             boss.save()
+            break
     
 
-def generate_mapa_dungeon(campaign_id:int) -> bool:
-    campaign = Campaign.objects.get(id=campaign_id)
+def generate_mapa_dungeon(campaign: Campaign) -> bool:
+    #campaign = Campaign.objects.get(id=campaign_id)
+    #print(campaign)
+    campaign_id = campaign.id
     dimx = campaign.size_x
     dimy = campaign.size_y
 
-    if dimx * dimy > 500.000:
+    if dimx * dimy > 500000:
+        print('Mapa demasiado grande')
         return False
     
     mapa = np.full((dimy, dimx), '', dtype=object)
@@ -142,7 +150,7 @@ def generate_mapa_dungeon(campaign_id:int) -> bool:
             if rooms:
                 # Conectar con la habitación más cercana
                 habitacion_cercana = min(rooms, key=lambda h: distancia(h, new_room))
-                conectar_habitaciones(mapa, habitacion_cercana, new_room, random.choice(path_types))
+                conectar_habitaciones(mapa, habitacion_cercana, new_room, random.choice(path_types), campaign_id)
             rooms.append(new_room)
 
     # Designar rooms para spawn de jugadores, jefes y tesoros
@@ -193,7 +201,7 @@ def generate_mapa_dungeon(campaign_id:int) -> bool:
     plt.show()
     '''
     boss_counter = 0
-    bosses = Monster.objects.filter(campaign=campaign_id, is_boss=True, is_key=True)
+    bosses = Monster.objects.filter(campaign_id=campaign_id, is_boss=True, is_key=True)
     for room in rooms:
 
         tile_type = room.room_type
@@ -225,7 +233,7 @@ def generate_mapa_dungeon(campaign_id:int) -> bool:
 
         for x in range(room.x, room.x + room.w):
             for y in range(room.y, room.y + room.h):
-                Tile.objects.update_or_create(campaign=campaign_id, x=x, y=y, defaults={'tile_type': tile_type})
+                Tile.objects.update_or_create(campaign_id=campaign_id, x=x, y=y, defaults={'tile_type': tile_type})
             
     return True
 
