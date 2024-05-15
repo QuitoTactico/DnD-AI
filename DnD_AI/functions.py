@@ -2,12 +2,14 @@ from .models import *
 from .default import *
 
 from random import randint  # to roll the dice
+import numpy as np
 
 #from django.conf import settings   # to image access
 #import os          
 
 from bokeh.plotting import figure, show                             # for plotting (map)
-from bokeh.models import Range1d, Span, CrosshairTool, HoverTool    # for plot personalization (map components)
+                                                                    # for plot personalization (map components)
+from bokeh.models import Range1d, Span, CrosshairTool, HoverTool, AdaptiveTicker
 from bokeh.embed import components                                  # for plot html rendering (for the front-end)
 
 from .functions_AI import image_generator_DallE, image_generator_StabDiff, ask_world_info_gemini, continue_history_gemini
@@ -673,12 +675,13 @@ def create_map(player:Character, characters, monsters, treasures, tiles, target:
     map.y_range = Range1d(start=(player.y)-2.5, end=(player.y)+3.5) # -2, +3
 
 
+    filtered_tiles = [tile for tile in tiles if np.sqrt((tile.x - player.x)**2 + (tile.y - player.y)**2) <= 50]
     # rendering the map tiles
     '''for tile in Tile.objects.all():
         map.image_url(url=[f'media/map/tiles/{DEFAULT_TILE_TYPES[tile.tile_type]}'], x=tile.x, y=tile.y +1, w=1, h=1)'''
-    urls = [f'media/map/tiles/{DEFAULT_TILE_TYPES[tile.tile_type]}' for tile in tiles]
-    xs = [tile.x for tile in tiles]
-    ys = [tile.y + 1 for tile in tiles]
+    urls = [f'media/map/tiles/{DEFAULT_TILE_TYPES[tile.tile_type]}' for tile in filtered_tiles]
+    xs = [tile.x for tile in filtered_tiles]
+    ys = [tile.y + 1 for tile in filtered_tiles ]
     map.image_url(url=urls, x=xs, y=ys, w=1, h=1)
 
     # the wepon range of the player will glow red if there are monsters in range, else it will be gray
@@ -708,7 +711,9 @@ def create_map(player:Character, characters, monsters, treasures, tiles, target:
     #map.circle(x=player.x+0.5, y=player.y+0.5, radius=1, fill_alpha=0, line_color='green', line_width=2)
     
     # adding the entities to the map
-    entities = list(characters) + list(monsters)
+    filtered_monsters = [monster for monster in monsters if np.sqrt((monster.x - player.x)**2 + (monster.y - player.y)**2) <= 50 or (monster.is_key and monster.is_boss)]
+    
+    entities = list(characters) + list(filtered_monsters)
     '''
     entity_data = {
         'x': [entity.x + 0.5 for entity in entities],
@@ -767,7 +772,16 @@ def create_map(player:Character, characters, monsters, treasures, tiles, target:
             entity_data['dash'].append('dashed' if entity.is_key else 'solid')
             entity_data['type'].append('boss' if entity.is_boss else 'monster')
 
-    map.rect(x='x', y='y', width=0.8, height=0.8, fill_color='color', fill_alpha=0.3, line_alpha=0, source=entity_data)  
+    # key bosses decorations
+    bosses_data = [(monster.x + 0.5, monster.y + 0.5) for monster in monsters if monster.is_key and monster.is_boss]
+    bosses_x, bosses_y = zip(*bosses_data)
+    #map.circle(x=bosses_x, y=bosses_y, radius=0.6, fill_color='deeppink', fill_alpha=0.3, line_width=2, line_color='deeppink')
+    map.circle(x=bosses_x, y=bosses_y, radius=0.8, fill_alpha=0, line_width=2, line_color='deeppink')
+    map.rect(x=bosses_x, y=bosses_y, width=1.13, height=1.13, angle=7.07, fill_alpha=0, line_width=2, line_color='deeppink')
+    map.rect(x=bosses_x, y=bosses_y, width=1.13, height=1.13, fill_alpha=0, line_width=2, line_color='deeppink')
+
+    # everyone else's decorations
+    map.rect(x='x', y='y', width=0.8, height=0.8, fill_color='color', fill_alpha=0.3, line_alpha=0, source=entity_data) 
     map.image_url(url='icon', x='icon_x', y='icon_y', h=0.8, w=0.8, name='name', source=entity_data)
     map.image_url(url='weapon_icon', x='x', y='y', h=0.4, w=0.4, name='weapon_name', source=entity_data)
     entities = map.rect(x='x', y='y', width=0.8, height=0.8, line_color='color', line_dash='dash', fill_alpha=0, line_width=2, name='name', source=entity_data)
@@ -800,6 +814,11 @@ def create_map(player:Character, characters, monsters, treasures, tiles, target:
         show(map)
         map.sizing_mode = 'scale_width'
 
+    map.grid.grid_line_color = "grey"
+    
+    map.xaxis.ticker = AdaptiveTicker(min_interval=1,  mantissas=[1, 2, 5], base=10)
+    map.yaxis.ticker = AdaptiveTicker(min_interval=1,  mantissas=[1, 2, 5], base=10)
+    
     map_script, map_div = components(map)
     return map_script, map_div
 
@@ -889,7 +908,54 @@ MAP PAST TRIES  (DON'T DELETE, PLEASE)
     borde_player = map.rect(name=player.name, x=player_x+0.5, y=player_y+0.5, width=0.8, height=0.8, line_color="green", fill_color='green', fill_alpha=0, line_width=2)
     borde_player.tags = ['player']
 
+'''
 
+'''
+
+    # Define una función para mover las marcas de graduación a la mitad de las celdas de la cuadrícula
+    formatter = FuncTickFormatter(code="""
+        return (tick + 0.5).toFixed(1);
+    """)
+    #return Math.round(tick + 0.5)
+    
+    minor_ticks = [i + 0.5 for i in range(0, 10)]  # Ajusta el rango según el tamaño de tu cuadrícula
+
+    # Ajusta los major ticks en los ejes x e y
+    map.xaxis.ticker = SingleIntervalTicker(interval=1, num_minor_ticks=0)
+    map.yaxis.ticker = SingleIntervalTicker(interval=1, num_minor_ticks=0)
+
+        # Ajusta los minor ticks en los ejes x e y
+    map.xaxis.minor_ticks = FixedTicker(ticks=minor_ticks)
+    map.yaxis.minor_ticks = FixedTicker(ticks=minor_ticks)
+
+    # Oculta los major ticks
+    map.xaxis.major_label_overrides = {i: '' for i in range(0, 10)}  # Ajusta el rango según el tamaño de tu cuadrícula
+    map.yaxis.major_label_overrides = {i: '' for i in range(0, 10)}  # Ajusta el rango según el tamaño de tu cuadrícula
+
+    map.xaxis.formatter = formatter
+    map.yaxis.formatter = formatter
+    
+    # Define una función para mover las marcas de graduación a la mitad de las celdas de la cuadrícula
+    formatter = FuncTickFormatter(code="""
+        return (tick + 0.5).toFixed(0);
+    """)
+
+    # Ajusta los major ticks en los ejes x e y
+    map.xaxis.ticker = SingleIntervalTicker(interval=1, num_minor_ticks=1)
+    map.yaxis.ticker = SingleIntervalTicker(interval=1, num_minor_ticks=1)
+
+    # Ajusta los minor ticks en los ejes x e y
+    map.xaxis.formatter = formatter
+    map.yaxis.formatter = formatter
+
+    # Oculta los major ticks
+    map.xaxis.major_label_overrides = {i: '' for i in range(0, 10)}  # Ajusta el rango según el tamaño de tu cuadrícula
+    map.yaxis.major_label_overrides = {i: '' for i in range(0, 10)}  # Ajusta el rango según el tamaño de tu cuadrícula
+    
+'''
+
+
+'''
 MAP LABELS
 
 unexpected attribute 'theme' to figure, possible attributes are above, active_drag, active_inspect, active_multi, active_scroll, active_tap, align, aspect_ratio, aspect_scale, attribution, background_fill_alpha, background_fill_color, below, border_fill_alpha, border_fill_color, center, context_menu, css_classes, css_variables, disabled, elements, extra_x_ranges, extra_x_scales, extra_y_ranges, extra_y_scales, flow_mode, frame_align, frame_height, frame_width, height, height_policy, hidpi, hold_render, inner_height, inner_width, js_event_callbacks, js_property_callbacks, left, lod_factor, lod_interval, lod_threshold, lod_timeout, margin, match_aspect, max_height, max_width, min_border, min_border_bottom, min_border_left, min_border_right, min_border_top, min_height, min_width, name, outer_height, outer_width, outline_line_alpha, outline_line_cap, outline_line_color, outline_line_dash, outline_line_dash_offset, outline_line_join, outline_line_width, output_backend, renderers, reset_policy, resizable, right, sizing_mode, styles, stylesheets, subscribed_events, syncable, tags, title, title_location, toolbar, toolbar_inner, toolbar_location, toolbar_sticky, tools, tooltips, visible, width, width_policy, x_axis_label, x_axis_location, x_axis_type, x_minor_ticks, x_range, x_scale, y_axis_label, y_axis_location, y_axis_type, y_minor_ticks, y_range or y_scale

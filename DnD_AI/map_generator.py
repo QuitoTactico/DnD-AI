@@ -93,7 +93,7 @@ def conectar_habitaciones(mapa, habitacion1, habitacion2, tipo_pasillo, campaign
                     Tile.objects.update_or_create(campaign_id=campaign_id, x=x, y=puntos2[1] + offset, defaults={'tile_type': tipo_pasillo})
 
 
-def generate_object(campaign_id, room, object_type, boss=None):
+def generate_object(campaign_id, room, object_type, entity=None):
     tries = 30
     while tries > 0:
         x = random.randint(room.x, room.x + room.w - 1)
@@ -109,18 +109,33 @@ def generate_object(campaign_id, room, object_type, boss=None):
                 tries -= 1
 
         elif object_type == 'portal':
-            existent_portal = Treasure.objects.filter(campaign_id=campaign_id, x=x, y=y)
-            if not existent_portal:
+            existent_treasure = Treasure.objects.filter(campaign_id=campaign_id, x=x, y=y)
+            if not existent_treasure:
                 Treasure.objects.create(campaign_id=campaign_id, treasure_type='Portal', x=x, y=y)
                 break
             else:
                 tries -= 1
 
+        if object_type == 'player':
+            existent_player = Character.objects.filter(campaign_id=campaign_id, is_playable=True, x=x, y=y)
+            existent_treasure = Treasure.objects.filter(campaign_id=campaign_id, x=x, y=y)
+            
+            if not existent_player and not existent_treasure:
+                entity.x = x
+                entity.y = y
+                entity.save()
+                break
+            else:
+                tries -= 1
+
         elif object_type == 'boss':
-            boss.x = x
-            boss.y = y
-            boss.save()
+            entity.x = x
+            entity.y = y
+            entity.save()
             break
+    if tries == 0:
+        return False
+    return True
     
 
 def generate_mapa_dungeon(campaign: Campaign) -> bool:
@@ -209,6 +224,8 @@ def generate_mapa_dungeon(campaign: Campaign) -> bool:
         if room.spawn:
             tile_type = 'spawn'
             generate_object(campaign_id, room, 'portal')
+            for player in Character.objects.filter(campaign_id=campaign_id):
+                generate_object(campaign_id, room, 'player', player)
 
         elif room.boss:
             tile_type = 'boss'

@@ -24,7 +24,16 @@ class Command(BaseCommand):
             for j in range(min(y_init, y_final), max(y_init, y_final)):
                 try:
                     tile = Tile.objects.get(campaign_id=campaign_id, x=i, y=j) if tile_type == 'any' else Tile.objects.get(campaign_id=campaign_id, x=i, y=j, tile_type=tile_type) 
-                    tile.delete()
+                    if tile:
+                        tile.delete()
+                    
+                    treasure = Treasure.objects.get(campaign_id=campaign_id, x=i, y=j)      
+                    if treasure:
+                        treasure.delete()    
+
+                    monster = Monster.objects.get(campaign_id=campaign_id, x=i, y=j, is_boss=False, is_key=False)      
+                    if monster:
+                        monster.delete()           
                 except:
                     pass
     
