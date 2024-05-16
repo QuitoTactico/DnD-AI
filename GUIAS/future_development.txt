@@ -19,11 +19,15 @@ Bruma de guerra, no se ve la habitación hasta que estás en ella
 
 generar NPCs en las habitaciones también
 
+conectar campaign reaction con la eneración de mapa
 
+conectar player creation o el mismísimo save character con las tiles de spawn
 
+arreglar el targeteo de ataque cuando se mete un nombre de monstruo que está afuera del rango de ataque
 
+Una x rosada o blanca para los bosses opcionales y tesoros por fuera del rango de visión
 
-
+Quizás pasar de matriz(array) de numpy a matriz(diccionario), la cosa es que no debería de ser tan lento el de array, no es un for de acceso sino de iterator/copia, O quién sabe, probar
 
 
 

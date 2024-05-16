@@ -26,15 +26,23 @@ def campaignSelection(request):
 
     if request.method == "POST":
         if 'create_campaign' in request.POST:
+            from .campaign_generator import generate_dungeon_map
             name = request.POST.get('name')
             initial_story = request.POST.get('initial_story')
             size_x = request.POST.get('size_x')
             size_y = request.POST.get('size_y')
             
-            Campaign.objects.create(name=name, 
+            campaign = Campaign.objects.create(name=name, 
                                     initial_story=initial_story,
                                     size_x=size_x,
-                                    size_y=size_y).save()
+                                    size_y=size_y)
+            campaign.save()
+
+            History.objects.create(campaign_id=campaign.id, author='NARRATOR', color='purple', text=initial_story).save()
+
+            generate_dungeon_map(campaign)
+            
+
 
     campaigns = Campaign.objects.all().order_by('is_completed', '-turns')
 

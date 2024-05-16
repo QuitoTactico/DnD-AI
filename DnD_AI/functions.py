@@ -1,7 +1,7 @@
 from .models import *
 from .default import *
 
-from random import randint  # to roll the dice
+from random import randint, choice  # to roll the dice
 import numpy as np
 
 #from django.conf import settings   # to image access
@@ -155,12 +155,14 @@ def combat_turn(player:Character, monster:Monster, player_dice:int = roll_dice()
     return {'player_died': player_died, 'monster_died': monster_died, 'player_result': player_result, 'monster_result': monster_result}
 
 def player_died_in_combat(player:Character, monster:Monster):
+    action_image_generation('', 'attack', monster, player)
     Treasure.objects.create(campaign=player.campaign, treasure_type='Tombstone', inventory=player.inventory, x=player.x, y=player.y, discovered=False).save()
     History.objects.create(campaign=player.campaign ,author='SYSTEM', text=f'{player.name} died in combat.').save()
     History.objects.create(campaign=player.campaign ,author=monster.name, text='JA'*randint(2,15), color='red').save()
     player.kill()
 
 def player_won_combat(player:Character, monster:Monster):
+    action_image_generation('', 'attack', player, monster)
     loot = monster.get_inventory()
     player.add_all_to_inventory(loot)
     player.exp += monster.exp_drop
@@ -176,10 +178,11 @@ def player_won_combat(player:Character, monster:Monster):
                                                       campaign_achievements=player.campaign.achievements)
         
         history_progression_filtered = history_progression.replace("\n","<br>")
-        History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'{history_progression_filtered}.<br><br>Remaining bosses: {player.campaign.objectives_remaining}').save()
+        History.objects.create(campaign=player.campaign, author='NARRATOR', color='purple', text=f'{history_progression_filtered}.<br><br>Remaining bosses: {player.campaign.objectives_remaining}').save()
 
     player.save()
-    monster.kill()
+    #monster.kill()
+    monster.delete()
 
 
 # The full_combat function will calculate the result of a full combat between a player and a monster
@@ -262,29 +265,55 @@ def player_selection_by_id(player_id):
             player.save()
     return player
 
-def target_selection_by_name(monster_name):
+'''
+def target_selection_by_name(monster_name, player:Character = None):
     if monster_name:
-        try:
-            monster = Monster.objects.get(name__iexact=monster_name)
-        except:
             try:
-                # If the name of the monster is not found, it tries to find a monster whose name contains the string entered
-                monster = Monster.objects.filter(name__icontains=monster_name).first()
-                if monster == None:
-                    # If there is no monster containing the name entered, it selects the first monster in the database
-                    monster = Monster.objects.first()
+                monster = Monster.objects.get(name__iexact=monster_name) if not player else player.get_monsters_in_range(monster_name)[0]
             except:
-                monster = Monster.objects.first()
+                try:
+                    # If the name of the monster is not found, it tries to find a monster whose name contains the string entered
+                    monster = Monster.objects.filter(name__icontains=monster_name).first() if not player else player.get_monsters_in_range(monster_name)[0]
+                    if monster == None:
+                        # If there is no monster containing the name entered, it selects the first monster in the database
+                        #monster = Monster.objects.first()
+                        return None
+                except:
+                    #monster = Monster.objects.first()
+                    return None
     else:
-        # If the monster label is not sent, it selects the first monster in the database
-        # We can change this to let the player select the monster by himself, but we'll see.
-        try:
-            monster = Monster.objects.first()
-        except:
-            monster = Monster.objects.create()
-            monster.save()
+            # If the monster label is not sent, it selects the first monster in the database
+            # We can change this to let the player select the monster by himself, but we'll see.
+            try:
+                monster = Monster.objects.first()
+            except:
+                monster = Monster.objects.create()
+                monster.save()
     return monster
+'''
 
+def target_selection_by_name(monster_name, player:Character = None, campaign_id:int = None):
+    if player:
+        possible_targets = player.get_monsters_in_range(monster_name)
+        if len(possible_targets) == 0:
+            return None
+        else:
+            return possible_targets[0]
+    elif campaign_id:
+        possible_targets = Monster.objects.filter(campaign_id=campaign_id, name__icontains=monster_name)
+        if possible_targets.count() == 0:
+            return None
+        else:
+            return possible_targets.first()
+    else:
+        possible_targets = Monster.objects.filter(name__icontains=monster_name)
+        if possible_targets.count() == 0:
+            return None
+        return possible_targets.first()
+
+    
+
+'''
 def target_selection_by_id(monster_id):
     if monster_id:
         try:
@@ -305,24 +334,37 @@ def target_selection_by_id(monster_id):
             monster = Monster.objects.create()
             monster.save()
     return monster
+'''
+
+def target_selection_by_id(monster_id):
+    monster = Monster.objects.filter(id=monster_id)
+    if monster.count() == 0:
+        return None
+    return monster.first()
 
 
 # ------------------------------------------------ ACT --------------------------------------------------
 
 
-def action_image_generation(prompt:str, action:str, player:Character, target:Monster):
+def action_image_generation(prompt:str, action:str, player:Character, target:Monster = None):
 
     if action == 'move':
-        image_description = f"{player.character_race} {player.character_class} {player.physical_description} running to the {prompt[4:]}"
+        image_description = f"{player.name}, {player.character_race} {player.character_class} {player.physical_description} running to the {prompt[4:]}"
 
     elif action == 'attack':
-        image_description = f"{player.character_race} {player.character_class} {player.physical_description} using a{player.weapon.weapon_type}, fighting a {target.monster_race} {target.monster_class} {target.physical_description} who's using a {target.weapon.weapon_type}"
+        image_description = f"{player.name}, {player.character_race} {player.character_class} {player.physical_description} using a {player.weapon.weapon_type}, fighting with a {target.monster_race} {target.monster_class} {target.physical_description} who's using a {target.weapon.weapon_type}"
         #image_description = f"{player.character_race} {player.character_class} {player.physical_description} fighting a {target.monster_race} {target.monster_class} {target.physical_description} with a {player.weapon.weapon_type}"
 
     elif action == 'equip':
         weapon_name = 'weapon' if prompt[6:] == "" else prompt[6:]
         image_description = f"{player.character_race} {player.character_class} {player.physical_description} taking a {weapon_name} from the ground"
         # holding up a {weapon_name}
+
+    elif action == 'chest':
+        image_description = f"{player.name}, {player.character_race} {player.character_class} {player.physical_description} is opening a chest with amazement, surprised face"
+
+    elif action == 'portal':
+        image_description = f"{player.name}, {player.character_race} {player.character_class} {player.physical_description} with a surprised face, is discovering a PORTAL with amazement"
     
     # take, use, levelup, info
     else:
@@ -330,8 +372,11 @@ def action_image_generation(prompt:str, action:str, player:Character, target:Mon
             #prompt = 'asking himself about'+prompt[5:]
             prompt = 'thinking, reflecting, pondering...'
 
+        if action == 'levelup':
+            prompt = 'shining, glowing, leveling up...'
+
         #image_description = f"{player.character_race} {player.character_class} {player.physical_description} is {prompt}"
-        image_description = f"{player.character_race} {player.character_class} holding a {player.weapon.weapon_type}, {player.physical_description} is {prompt}"
+        image_description = f"{player.name}, {player.character_race} {player.character_class} holding a {player.weapon.weapon_type}, {player.physical_description} is {prompt}"
 
     # try to generate an image with DallE, if it fails, it will use StabDiff
     # REASONS TO FAIL:
@@ -366,7 +411,7 @@ def command_executer(prompt:str|list, player:Character, target:Monster) -> tuple
     # if the prompt is a string, it will be split into a list
     action = prompt.split(' ') if type(prompt) == str else prompt
 
-    if action[0] not in ['move','attack']:
+    if action[0] not in ['move', 'attack', 'take']:
         action_image_generation(prompt, action[0], player, target)
 
     # for each action, the turns on the campaign will be increased
@@ -419,7 +464,7 @@ def act_info(player:Character, action:list):
         response = ask_world_info_gemini(prompt=action[1],
                               campaign_story=player.campaign.initial_story, 
                               campaign_achievements=player.campaign.achievements)
-    History.objects.create(campaign=player.campaign, author='NARRATOR', text=response.replace("\n", "<br>")).save()
+    History.objects.create(campaign=player.campaign, author='NARRATOR', color='purple', text=response.replace("\n", "<br>")).save()
 
     try:
         image_dir_DallE = image_generator_DallE(response)
@@ -432,21 +477,25 @@ def act_info(player:Character, action:list):
 
 
 def act_levelup(player:Character, action:list):
-    if action[1] in ['dmg','damage','rng', 'range', 'wpn', 'weapon']:
-        wpn_stat = 'dmg' if action[1] in ['wpn', 'weapon'] else action[1]
+    if player.exp >= player.exp_top:
+        if action[1] in ['dmg','damage','rng', 'range', 'wpn', 'weapon']:
+            wpn_stat = 'dmg' if action[1] in ['wpn', 'weapon'] else action[1]
 
-        # it means that the player wants to rename his weapon
-        if len(action) > 2:
-            wpn_name = ' '.join(action[2:])
-            successful = player.level_up_weapon(wpn_stat, wpn_name)
-        else: # if not, the weapon name remains the same
-            successful = player.level_up_weapon(wpn_stat)
-        
+            # it means that the player wants to rename his weapon
+            if len(action) > 2:
+                wpn_name = ' '.join(action[2:])
+                successful = player.level_up_weapon(wpn_stat, wpn_name)
+            else: # if not, the weapon name remains the same
+                successful = player.level_up_weapon(wpn_stat)
+            
+        else:
+            stat = action[1]
+            successful = player.level_up_stat(stat)  
+
+        return successful
     else:
-        stat = action[1]
-        successful = player.level_up_stat(stat)  
-
-    return successful
+        History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"You don't have enough EXP to level up.").save()
+        return False
 
 
 def act_use(player:Character, action:list):
@@ -458,34 +507,52 @@ def act_use(player:Character, action:list):
             # I don't have a list of possible usable items xd, so
             #History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"There's a list of your items: ").save()
         #if 'health potion' not in player_inventory.keys():
-        if player_inventory.keys() == ["gold"] or player_inventory.keys() == []:
+        if player_inventory.keys() == ["gold"] or len(player_inventory.keys()) == 0:
             History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"By the way... You don't have usable items.").save()
 
         return False
     
 
     item_to_use = (' '.join(action[1:])).lower().replace('_',' ')
-    
+    successful = False
     if item_to_use in ['health potion', 'potion', 'hp potion', 'hp']:
         item_to_use = 'health potion'
         successful = player.use_from_inventory(item_to_use, amount = 1)
         player.save()
         if successful:
-            player.health += 50
+            player.health = min(player.health + 50, player.max_health)
+            player.save()
             History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'{player.name} used a health potion. 50 HP restored!').save()
             return True
-        else:
-            History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"You don't have {item_to_use}s.").save()
-            return False
         
+    elif item_to_use in ['go back bone', 'go back', 'bone', 'back bone']:
+        item_to_use = 'go back bone'
+        successful = player.use_from_inventory(item_to_use, amount = 1)
+        player.save()
+        if successful:
+            random_portal = choice(Treasure.objects.filter(campaign=player.campaign, treasure_type='Portal', discovered=True))
+            player.x, player.y = random_portal.x, random_portal.y
+            player.save()
+            History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'{player.name} used a go back bone.').save()
+            return True
 
     #elif item_to_use == 'mana potion':, or something like that for each item
         # probably is not the best way, it would be better to be implemented on Character.use_from_inventory()
         # please remember me to create a list of possible usable items an their effects on default.py
-    
+
     else:
         History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"You can't use that.").save()
+        return False    
+    
+
+    if not successful:
+        History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"You have no {item_to_use}s.").save()
         return False
+        
+
+    
+    
+    
 
 def act_equip(player:Character, action:list):
     treasure_to_take = action[1].lower() if len(action) > 1 else 'all'
@@ -517,6 +584,8 @@ def act_take(player:Character, action:list):
         for treasure in possible_treasures:
             if treasure.treasure_type != 'Weapon':
                 loot = treasure.get_inventory()
+                if treasure.treasure_type == 'Chest':
+                    action_image_generation('', 'chest', player)
                 History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'{player.name} got {loot} from {treasure.treasure_type}.').save()
                 player.add_all_to_inventory(loot)
                 treasure.delete()
@@ -541,9 +610,15 @@ def act_attack(player:Character, target:Monster, action:list):
                 target_id = int(target_id)
                 target = target_selection_by_id(target_id)
             else:
-                target = target_selection_by_name(target_id)
+                target = target_selection_by_name(target_id, player=player)
+                if target is None:
+                    possible_targets = player.get_monsters_in_range()
+                    if len(possible_targets) == 0:
+                        History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"There's no monster called {target_id} in your range.").save()
+                    else:
+                        target = possible_targets[0]
+                        History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"There's no monster called {target_id} in your range, attacking {target.name} instead.").save()
 
-        action_image_generation('', action[0], player, target)
 
         result = combat_turn(player=player, monster=target, player_dice=roll_dice(), monster_dice=roll_dice())
 
@@ -551,7 +626,7 @@ def act_attack(player:Character, target:Monster, action:list):
             new_player = player_selection(None)  ###
             player_died = True
         if result['monster_died']:
-            target.delete()     # por si algo, me tiene mamao' que no se borre el monstruo
+            #target.delete()     # por si algo, me tiene mamao' que no se borre el monstruo
             target_died = True
             try:
                 new_target = player.get_monsters_in_range()[0]
@@ -576,6 +651,8 @@ def act_move(player:Character, target:Monster, action:list):
     for treasure in player.get_treasures_in_range():
         if not treasure.discovered:
             treasure.discover()
+            if treasure.treasure_type == 'Portal':
+                action_image_generation('', 'portal', player)
 
     if not successful:
         History.objects.create(campaign=player.campaign, author='SYSTEM', text="You can't be there").save()
@@ -796,12 +873,15 @@ def create_map(player:Character, characters, monsters, treasures, tiles, target:
             entity_data['type'].append('boss' if entity.is_boss else 'monster')
 
     # key bosses decorations
-    bosses_data = [(monster.x + 0.5, monster.y + 0.5) for monster in monsters if monster.is_key and monster.is_boss]
-    bosses_x, bosses_y = zip(*bosses_data)
-    #map.circle(x=bosses_x, y=bosses_y, radius=0.6, fill_color='deeppink', fill_alpha=0.3, line_width=2, line_color='deeppink')
-    map.circle(x=bosses_x, y=bosses_y, radius=0.8, fill_alpha=0, line_width=2, line_color='deeppink')
-    map.rect(x=bosses_x, y=bosses_y, width=1.13, height=1.13, angle=7.07, fill_alpha=0, line_width=2, line_color='deeppink')
-    map.rect(x=bosses_x, y=bosses_y, width=1.13, height=1.13, fill_alpha=0, line_width=2, line_color='deeppink')
+    try:
+        bosses_data = [(monster.x + 0.5, monster.y + 0.5) for monster in monsters if monster.is_key and monster.is_boss]
+        bosses_x, bosses_y = zip(*bosses_data)
+        #map.circle(x=bosses_x, y=bosses_y, radius=0.6, fill_color='deeppink', fill_alpha=0.3, line_width=2, line_color='deeppink')
+        map.circle(x=bosses_x, y=bosses_y, radius=0.8, fill_alpha=0, line_width=2, line_color='deeppink')
+        map.rect(x=bosses_x, y=bosses_y, width=1.13, height=1.13, angle=7.07, fill_alpha=0, line_width=2, line_color='deeppink')
+        map.rect(x=bosses_x, y=bosses_y, width=1.13, height=1.13, fill_alpha=0, line_width=2, line_color='deeppink')
+    except:
+        pass
 
     # everyone else's decorations
     map.rect(x='x', y='y', width=0.8, height=0.8, fill_color='color', fill_alpha=0.3, line_alpha=0, source=entity_data) 
