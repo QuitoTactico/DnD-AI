@@ -68,7 +68,7 @@ input {
 
 .statList {
 	width: 100%;
-	justify-content: space-between;
+  justify-content: space-between;
 }
 
 .statItem {
@@ -79,16 +79,22 @@ input {
 	color: white;
 	padding: 0.5%;
 	margin: 0.5%;
-	width: 9%;
-}
-
-.statItem:hover {
-	background-color: #ff6f6f;
-	color: white;
+	width: 13%;
 }
 
 .statItem h2 {
 	text-align: center;
+}
+
+.statItem div {
+	justify-content: center;
+  align-items: center;
+}
+
+.statItem input {
+	text-align: center;
+	border-style: none;
+  border-radius: 10px;
 }
 
 .weaponList {

@@ -75,67 +75,77 @@
         </div>
 
         <!--
-            cosas que necesito:
-
-            'name'
-            'physical_description'
-            'weapon_id'
-            'max_health'
-            'str'
-            'int'
-            'rec'
-            'dex'
-            'phyres'
-            'magres'
-            'con'
-            'gift'
-            'story'
-            'race'
-            'class'
-            'icon'
+            'stat limit'
         -->
         
         <h2>5. Choose your stats:</h2>
 
         <div class="statsList">
             <div class="statItem">
-                <h2 id="font2">MAX_HEALTH</h2>
-                <input type="number" name="max_health" value="0" min="0" id="font2">
+                <h2 id="font2">VITALITY</h2>
+                <div>
+                    <input type="number" name="vitality" value="1" min="1" id="font2">
+                </div>
             </div>
             <div class="statItem">
                 <h2 id="font2">STR</h2>
-                <input type="number" name="str" value="0" min="0" id="font2">
+                <div>
+                    <input type="number" name="str" value="1" min="1" id="font2">
+                </div>
             </div>
             <div class="statItem">
                 <h2 id="font2">INT</h2>
-                <input type="number" name="int" value="0" min="0" id="font2">
-            </div>
-            <div class="statItem">
-                <h2 id="font2">REC</h2>
-                <input type="number" name="rec" value="0" min="0" id="font2">
+                <div>
+                    <input type="number" name="int" value="1" min="1" id="font2">
+                </div>
             </div>
             <div class="statItem">
                 <h2 id="font2">DEX</h2>
-                <input type="number" name="dex" value="0" min="0" id="font2">
+                <div>
+                    <input type="number" name="dex" value="1" min="1" id="font2">
+                </div>
             </div>
             <div class="statItem">
                 <h2 id="font2">P_RES</h2>
-                <input type="number" name="phyres" value="0" min="0" id="font2">
+                <div>
+                    <input type="number" name="phyres" value="1" min="1" id="font2">
+                </div>
             </div>
             <div class="statItem">
                 <h2 id="font2">M_RES</h2>
-                <input type="number" name="magres" value="0" min="0" id="font2">
-            </div>
-            <div class="statItem">
-                <h2 id="font2">CONST</h2>
-                <input type="number" name="con" value="0" min="0" id="font2">
+                <div>
+                    <input type="number" name="magres" value="1" min="1" id="font2">
+                </div>
             </div>
         </div>
 
         <h2>6. Describe your character:</h2>
         <input class="textInput" id="font2" type="text" name="physical_description" placeholder="Describe everything." required>
 
-        <h2>7. That's all!</h2>
+        <h2>7. Select a gift from the gods:</h2>
+        <div class="weaponList">
+            <div class="listWeapon" onclick="selectGift(event)">
+                <h2 id="font2">GOLD x50</h2>
+                <input type="radio" name="gift" value="gold"/>
+            </div>
+            <div class="listWeapon" onclick="selectGift(event)">
+                <h2 id="font2">GO BACK BONE x5</h2>
+                <input type="radio" name="gift" value="go back bone"/>
+            </div>
+            <div class="listWeapon" onclick="selectGift(event)">
+                <h2 id="font2">HEALTH POTION x5</h2>
+                <input type="radio" name="gift" value="health potion"/>
+            </div>
+            <div class="listWeapon" onclick="selectGift(event)">
+                <h2 id="font2">KEYS x5</h2>
+                <input type="radio" name="gift" value="key"/>
+            </div>
+        <div>
+
+        <h2>8. What's yout story:</h2>
+        <input class="textInput" id="font2" type="text" name="story" placeholder="Once upon a time." required>
+        
+        <h2>9. That's all!</h2>
         <input type="hidden" name="create_player" value="True">
         <input class="btnSubmit" id="font1" type="submit" value="Create player!" onclick="loading('Creating player','playerselection','playerinfo')">
     </form>
