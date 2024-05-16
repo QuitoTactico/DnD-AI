@@ -756,7 +756,7 @@ def create_map(player:Character, characters, monsters, treasures, tiles, target:
     #map.circle(x=player.x+0.5, y=player.y+0.5, radius=1, fill_alpha=0, line_color='green', line_width=2)
     
     # adding the entities to the map
-    filtered_monsters = [monster for monster in monsters if np.sqrt((monster.x - player.x)**2 + (monster.y - player.y)**2) <= player_vision_range or (monster.is_key and monster.is_boss)]
+    filtered_monsters = [monster for monster in monsters if np.sqrt((monster.x - player.x)**2 + (monster.y - player.y)**2) <= player_vision_range or monster.is_boss]
     
     entities = list(characters) + list(filtered_monsters)
     
@@ -810,18 +810,19 @@ def create_map(player:Character, characters, monsters, treasures, tiles, target:
     entities = map.rect(x='x', y='y', width=0.8, height=0.8, line_color='color', line_dash='dash', fill_alpha=0, line_width=2, name='name', source=entity_data)
     entities.tags = ['entity']
 
+    filtered_treasures = [treasure for treasure in treasures if treasure.treasure_type == 'Chest' or treasure.treasure_type =='Weapon' or treasure.treasure_type == 'Portal' or np.sqrt((treasure.x - player.x)**2 + (treasure.y - player.y)**2) <= player_vision_range]
 
     treasure_data = {
-        'x' : [treasure.x + 0.5 for treasure in treasures],
-        'y' : [treasure.y + 0.5 for treasure in treasures],
-        'icon_x' : [treasure.x +0.1 for treasure in treasures],
-        'icon_y' : [treasure.y +0.9 for treasure in treasures],
-        'real_x' : [treasure.x for treasure in treasures],
-        'real_y' : [treasure.y for treasure in treasures],
-        'color' : [('gold' if treasure.treasure_type == 'Gold' else 'dimgray' if treasure.discovered else '#212121') if treasure.treasure_type != 'Weapon' or not treasure.discovered else 'orange' if treasure.weapon.damage_type == 'Physical' else 'cyan' if treasure.weapon.damage_type == 'Magical' else 'black' for treasure in treasures],
-        'inv': ['' if treasure.treasure_type == "Portal" else (treasure.inventory[1:-1] if treasure.discovered  else '???') if treasure.treasure_type!='Weapon' else  (f'DMG: {treasure.weapon.damage}, RNG: {treasure.weapon.range}' if treasure.discovered else '') for treasure in treasures],
-        'icon' : [treasure.icon.url for treasure in treasures],
-        'name': [('Discovered '+treasure.treasure_type if treasure.discovered else treasure.treasure_type if treasure.treasure_type != 'Weapon' else 'Undiscovered Weapon') if treasure.treasure_type!='Weapon' or not treasure.discovered else treasure.weapon.name for treasure in treasures],
+        'x' : [treasure.x + 0.5 for treasure in filtered_treasures],
+        'y' : [treasure.y + 0.5 for treasure in filtered_treasures],
+        'icon_x' : [treasure.x +0.1 for treasure in filtered_treasures],
+        'icon_y' : [treasure.y +0.9 for treasure in filtered_treasures],
+        'real_x' : [treasure.x for treasure in filtered_treasures],
+        'real_y' : [treasure.y for treasure in filtered_treasures],
+        'color' : [('gold' if treasure.treasure_type == 'Gold' else 'dimgray' if treasure.discovered else '#212121') if treasure.treasure_type != 'Weapon' or not treasure.discovered else 'orange' if treasure.weapon.damage_type == 'Physical' else 'cyan' if treasure.weapon.damage_type == 'Magical' else 'black' for treasure in filtered_treasures],
+        'inv': ['' if treasure.treasure_type == "Portal" else (treasure.inventory[1:-1] if treasure.discovered  else '???') if treasure.treasure_type!='Weapon' else  (f'DMG: {treasure.weapon.damage}, RNG: {treasure.weapon.range}' if treasure.discovered else '') for treasure in filtered_treasures],
+        'icon' : [treasure.icon.url for treasure in filtered_treasures],
+        'name': [('Discovered '+treasure.treasure_type if treasure.discovered else treasure.treasure_type if treasure.treasure_type != 'Weapon' else 'Undiscovered Weapon') if treasure.treasure_type!='Weapon' or not treasure.discovered else treasure.weapon.name for treasure in filtered_treasures],
     }
 
     map.image_url(url='icon', x='icon_x', y='icon_y', h=0.8, w=0.8, name='name', source=treasure_data)

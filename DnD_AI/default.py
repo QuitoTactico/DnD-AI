@@ -121,6 +121,38 @@ DEFAULT_CLASSES = DEFAULT_WEAPON_PER_CLASS.keys()
 DEFAULT_WEAPON_PER_CLASS.update(DEFAULT_WEAPON_PER_RACE)
 
 
+DEFAULT_RACE_PER_TILE_TYPE = {
+    'grass': [
+        'Centaur', 'Elf', 'Druid', 'Fairy', 'Human', 'Indigenous', 'Werewolf', 'Unicorn'
+    ],
+    'dirt': [
+        'Dwarf', 'Goblin', 'Orc', 'Troll', 'Rat', 'Wolf'
+    ],
+    'god': [
+        'Angel', 'Fairy', 'Unicorn', 'Elf'
+    ],
+    'psycho': [
+        'Vampire', 'Werewolf', 'Demon', 'Ghost', 'Chimera', 'Hydra', 'Medusa'
+    ],
+    'hell': [
+        'Demon', 'Dragon', 'Skeleton', 'Zombie', 'Vampire', 'Golem'
+    ],
+    'path': [
+        'Human', 'Elf', 'Centaur', 'Harpy', 'Goblin'
+    ],
+    'dungeon': [
+        'Mummy', 'Skeleton', 'Minotaur', 'Golem', 'Cyclop', 'Moai'
+    ],
+    'treasure': [
+        'Mimic', 'Goblin', 'Elf', 'Rat', 'Troll'
+    ],
+    'portal': [
+        'Alien', 'Chimera', 'Dragon', 'Fairy', 'Ghost'
+    ]
+}
+
+
+
 DEFAULT_WEAPON_STATS = {
     'Sword': {
         'weapon_type': 'Sword',
@@ -358,9 +390,9 @@ DEFAULT_WEAPON_STATS = {
     },
 }
 
-DEFAULT_WEAPONS_NAMES = DEFAULT_WEAPON_STATS.keys()
+DEFAULT_WEAPON_NAMES = DEFAULT_WEAPON_STATS.keys()
 
-UNIQUE_WEAPONS_STATS = {
+UNIQUE_WEAPON_STATS = {
     'Bat Blade': {
         'weapon_type': 'Sword',
         'damage': 25,
@@ -615,7 +647,7 @@ UNIQUE_WEAPONS_STATS = {
     }
 }
 
-UNIQUE_WEAPONS_NAMES = UNIQUE_WEAPONS_STATS.keys() 
+UNIQUE_WEAPON_NAMES = UNIQUE_WEAPON_STATS.keys() 
 
 
 DEFAULT_MONSTER_STATS = {

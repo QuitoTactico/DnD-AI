@@ -14,7 +14,7 @@ class Command(BaseCommand):
         campaign_id = int(input('Campaign id: '))
         campaign = Campaign.objects.get(id=campaign_id)
 
-        result = generate_mapa_dungeon(campaign)
+        result = generate_dungeon_map(campaign)
     
         if result:
             self.stdout.write(self.style.SUCCESS(f'Successfully created a {campaign.size_x}x{campaign.size_y} map for the campaign [{campaign_id}]: {campaign.name}'))

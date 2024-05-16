@@ -170,7 +170,7 @@ def playerCreation(request):
 
     races = DEFAULT_RACES
     classes = [player_class for player_class in DEFAULT_CLASSES if player_class not in DEFAULT_RACES]
-    weapons_name = DEFAULT_WEAPONS_NAMES
+    weapons_name = DEFAULT_WEAPON_NAMES
     weapons_with_stats = DEFAULT_WEAPON_STATS
     
     return render(request, 'playercreation.html',

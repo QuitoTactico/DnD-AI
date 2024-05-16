@@ -61,7 +61,7 @@ def distancia(h1, h2):
     centro_h2 = (h2.x + h2.w // 2, h2.y + h2.h // 2)
     return np.sqrt((centro_h1[0] - centro_h2[0]) ** 2 + (centro_h1[1] - centro_h2[1]) ** 2)
 
-def conectar_habitaciones(mapa, habitacion1, habitacion2, tipo_pasillo, campaign_id):
+def conectar_habitaciones(mapa, habitacion1, habitacion2, hallway_type, campaign_id):
     puntos1 = (random.randint(habitacion1.x, habitacion1.x + habitacion1.w - 1),
                random.randint(habitacion1.y, habitacion1.y + habitacion1.h - 1))
     puntos2 = (random.randint(habitacion2.x, habitacion2.x + habitacion2.w - 1),
@@ -72,41 +72,157 @@ def conectar_habitaciones(mapa, habitacion1, habitacion2, tipo_pasillo, campaign
     if random.random() < 0.5:  # horizontal primero, luego vertical
         for x in range(min(puntos1[0], puntos2[0]), max(puntos1[0], puntos2[0]) + 1):
             for offset in range(ancho_pasillo):
-                if 0 <= puntos1[1] + offset < mapa.shape[0]:
+                y = puntos1[1] + offset
+                if 0 <= y < mapa.shape[0]:
                     #mapa[puntos1[1] + offset, x] = tipo_pasillo
-                    Tile.objects.update_or_create(campaign_id=campaign_id, x=x, y=puntos1[1] + offset, defaults={'tile_type': tipo_pasillo})
+                    Tile.objects.update_or_create(campaign_id=campaign_id, x=x, y=y, defaults={'tile_type': hallway_type})
+                    if random.random() < 0.1:
+                        generate_object_in_coords(campaign_id, x, y, hallway_type)
         for y in range(min(puntos1[1], puntos2[1]), max(puntos1[1], puntos2[1]) + 1):
             for offset in range(ancho_pasillo):
-                if 0 <= puntos2[0] + offset < mapa.shape[1]:
+                x = puntos2[0] + offset
+                if 0 <= x < mapa.shape[1]:
                     #mapa[y, puntos2[0] + offset] = tipo_pasillo
-                    Tile.objects.update_or_create(campaign_id=campaign_id, x=puntos2[0] + offset, y=y, defaults={'tile_type': tipo_pasillo})
+                    Tile.objects.update_or_create(campaign_id=campaign_id, x=x, y=y, defaults={'tile_type': hallway_type})
+                    if random.random() < 0.1:
+                        generate_object_in_coords(campaign_id, x, y, hallway_type)
     else:  # vertical primero, luego horizontal
         for y in range(min(puntos1[1], puntos2[1]), max(puntos1[1], puntos2[1]) + 1):
             for offset in range(ancho_pasillo):
-                if 0 <= puntos1[0] + offset < mapa.shape[1]:
+                x = puntos1[0] + offset
+                if 0 <= x < mapa.shape[1]:
                     #mapa[y, puntos1[0] + offset] = tipo_pasillo
-                    Tile.objects.update_or_create(campaign_id=campaign_id, x=puntos1[0] + offset, y=y, defaults={'tile_type': tipo_pasillo})
+                    Tile.objects.update_or_create(campaign_id=campaign_id, x=x, y=y, defaults={'tile_type': hallway_type})
+                    if random.random() < 0.1:
+                        generate_object_in_coords(campaign_id, x, y, hallway_type)
         for x in range(min(puntos1[0], puntos2[0]), max(puntos1[0], puntos2[0]) + 1):
             for offset in range(ancho_pasillo):
-                if 0 <= puntos2[1] + offset < mapa.shape[0]:
+                y = puntos2[1] + offset
+                if 0 <= y < mapa.shape[0]:
                     #mapa[puntos2[1] + offset, x] = tipo_pasillo
-                    Tile.objects.update_or_create(campaign_id=campaign_id, x=x, y=puntos2[1] + offset, defaults={'tile_type': tipo_pasillo})
+                    Tile.objects.update_or_create(campaign_id=campaign_id, x=x, y=y, defaults={'tile_type': hallway_type})
+                    if random.random() < 0.1:
+                        generate_object_in_coords(campaign_id, x, y, hallway_type)
 
 
-def generate_object(campaign_id, room, object_type, entity=None):
+def generate_monster(campaign_id, tile_type):
+    from DnD_AI.default import COOL_NAMES, DEFAULT_RACES, DEFAULT_CLASSES, COOL_BOSSES_WITH_ICON, DEFAULT_RACE_PER_TILE_TYPE
+    FILTERED_CLASSES = [entity_class for entity_class in DEFAULT_CLASSES if entity_class not in DEFAULT_RACES]
+
+    #monster_race = random.choice(DEFAULT_RACES)
+    monster_race = random.choice(DEFAULT_RACE_PER_TILE_TYPE[tile_type])
+    monster_class = random.choice(FILTERED_CLASSES)
+
+    magical_result = random.randint(7,13)
+    physical_result = random.randint(7,13)
+    survival_result = random.randint(7,13)
+
+
+    optional_boss = random.random() < 0.05
+
+    if optional_boss:
+        weapon = generate_unique_weapon()
+        multiplier = random.randint(3, 5)
+    else:
+        weapon = get_default_weapon(entity_class=monster_class) if random.random() < 0.5 else get_default_weapon(entity_class=monster_race)
+        multiplier = 1
+
+
+    monster = Monster.objects.create(
+            is_boss=optional_boss,
+            monster_race=monster_race,
+            monster_class=monster_class,
+            weapon=weapon,
+            campaign_id=campaign_id,
+            max_health=random.randint(20,30)*multiplier,
+            strength=physical_result,
+            intelligence=magical_result,
+            recursiveness=survival_result,
+            dexterity=random.randint(10,16),
+            physical_resistance=physical_result, 
+            magical_resistance=magical_result,
+            constitution=survival_result,
+            exp_drop=random.randint(20,40)*multiplier,
+            x=0,
+            y=0,
+        )
+    
+    if optional_boss:
+        monster_name = random.choice(COOL_BOSSES_WITH_ICON)
+        monster_physical_description = monster_name
+
+        icon_path = monster_name.replace(' ', '-').lower()+'.png'
+        icon = f"entity/icons/boss_icons/{icon_path}.png"
+
+        monster.name = monster_name
+        monster.physical_description = monster_physical_description
+        monster.icon = icon
+
+
+    if random.random() < 0.02:
+        monster.name = random.choice(COOL_NAMES)
+
+    monster.save()
+    return monster
+    
+
+
+
+def generate_object_in_coords(campaign_id, x, y, tile_type):
+    if random.random() < 0.05:
+        generate_object(campaign_id, None, 'small_treasure', entity=None, x=x, y=y)
+    else:
+        monster = generate_monster(campaign_id, tile_type)
+        generate_object(campaign_id, None, 'monster', monster, x=x, y=y)
+
+
+def generate_object(campaign_id, room, object_type, entity=None, x=None, y=None):
     tries = 30
     while tries > 0:
-        x = random.randint(room.x, room.x + room.w - 1)
-        y = random.randint(room.y, room.y + room.h - 1)
+        if x is None and y is None:
+            x = random.randint(room.x, room.x + room.w - 1)
+            y = random.randint(room.y, room.y + room.h - 1)
 
         if object_type == 'treasure':
             existent_treasure = Treasure.objects.filter(campaign_id=campaign_id, x=x, y=y)
             
             if not existent_treasure:
-                Treasure.objects.create(campaign_id=campaign_id, treasure_type='Chest', x=x, y=y)
+                if random.random() < 0.5:
+                    Treasure.objects.create(campaign_id=campaign_id, treasure_type='Chest', x=x, y=y,
+                                            inventory=str(
+                                                {'gold': random.randint(30, 100), 'health potion': random.randint(3, 5)}
+                                                ))
+                else:
+                    Treasure.objects.create(campaign_id=campaign_id, treasure_type='Weapon', x=x, y=y,
+                                            weapon=generate_unique_weapon(common_too=True),
+                                            inventory=str(
+                                                {'gold': random.randint(1, 50), 'health potion': random.randint(1, 3)}
+                                                ))
                 break
             else:
                 tries -= 1
+
+
+        
+        elif object_type == 'small_treasure':
+            existent_player = Character.objects.filter(campaign_id=campaign_id, x=x, y=y)
+            existent_treasure = Treasure.objects.filter(campaign_id=campaign_id, x=x, y=y)
+            existent_monster = Monster.objects.filter(campaign_id=campaign_id, x=x, y=y)
+            
+            if not existent_player and not existent_treasure and not existent_monster:
+                bar_or_key = random.random() < 0.5
+                if bar_or_key:
+                    inventory = str({'health potion': random.randint(1, 2)}) if bar_or_key < 0.25 else str({'gold': random.randint(1,10)})
+                    Treasure.objects.create(campaign_id=campaign_id, treasure_type='Bag', x=x, y=y,
+                                            inventory=inventory)
+                else:
+                    inventory = str({'key': random.randint(1, 2)})
+                    Treasure.objects.create(campaign_id=campaign_id, treasure_type='Key', x=x, y=y,
+                                            inventory=inventory)
+                break
+            else:
+                tries -= 1
+
 
         elif object_type == 'portal':
             existent_treasure = Treasure.objects.filter(campaign_id=campaign_id, x=x, y=y)
@@ -115,6 +231,7 @@ def generate_object(campaign_id, room, object_type, entity=None):
                 break
             else:
                 tries -= 1
+
 
         if object_type == 'player':
             existent_player = Character.objects.filter(campaign_id=campaign_id, x=x, y=y)
@@ -127,6 +244,7 @@ def generate_object(campaign_id, room, object_type, entity=None):
                 break
             else:
                 tries -= 1
+
 
         if object_type == 'monster':
             existent_player = Character.objects.filter(campaign_id=campaign_id, x=x, y=y)
@@ -141,6 +259,7 @@ def generate_object(campaign_id, room, object_type, entity=None):
             else:
                 tries -= 1
 
+
         elif object_type == 'boss':
             entity.x = x
             entity.y = y
@@ -151,7 +270,7 @@ def generate_object(campaign_id, room, object_type, entity=None):
     return True
     
 
-def generate_mapa_dungeon(campaign: Campaign) -> bool:
+def generate_dungeon_map(campaign: Campaign) -> bool:
     #campaign = Campaign.objects.get(id=campaign_id)
     #print(campaign)
     campaign_id = campaign.id
@@ -170,6 +289,7 @@ def generate_mapa_dungeon(campaign: Campaign) -> bool:
     room_types = ['path', 'dungeon', 'grass', 'dirt']
     boss_types = ['boss', 'psycho', 'hell', 'god']
     path_types = ['dirt', 'path', 'dungeon']
+    portal_types = ['portal', 'psycho', 'hell', 'god']
 
     rooms = []
     while len(rooms) < num_habitaciones:
@@ -190,8 +310,10 @@ def generate_mapa_dungeon(campaign: Campaign) -> bool:
 
     boss_counter = 0
     key_bosses = Monster.objects.filter(campaign_id=campaign_id, is_boss=True, is_key=True)
-    if key_bosses.count() < 3:
-        key_bosses = generate_key_bosses(campaign_id, 3)
+    if key_bosses.count() < 3:          # 3 jefes clave
+        key_bosses = generate_key_bosses(campaign_id, 3-key_bosses.count())
+
+    #are_there_common_monsters = Monster.objects.filter(campaign_id=campaign_id, is_key=False).exists()
 
     for room in rooms:
 
@@ -212,37 +334,34 @@ def generate_mapa_dungeon(campaign: Campaign) -> bool:
                 pass
 
         elif room.portal:
-            tile_type = 'portal'
+            tile_type = random.choice(portal_types)
             generate_object(campaign_id, room, 'portal')
 
-        elif room.treasure:
+        elif room.treasure or room.boss:
             generate_object(campaign_id, room, 'treasure')
-            # 15% de probabilidad de tener dos tesoros
+            # 20% de probabilidad de tener dos tesoros
             # 2% de probabilidad de tener tres tesoros
             how_much = random.random()
             if how_much < 0.02:
                 generate_object(campaign_id, room, 'treasure')
                 generate_object(campaign_id, room, 'treasure')
-            if how_much < 0.15:
+            elif how_much < 0.2:
                 generate_object(campaign_id, room, 'treasure')
 
         for x in range(room.x, room.x + room.w):
             for y in range(room.y, room.y + room.h):
                 Tile.objects.update_or_create(campaign_id=campaign_id, x=x, y=y, defaults={'tile_type': tile_type})
 
-                '''
-                spawn = random.random()
-
-                if spawn < 0.05 and not room.spawn:
-                    pass
-                '''
+                if tile_type not in ['spawn', 'boss']:
+                    if random.random() < 0.05:
+                        generate_object_in_coords(campaign_id, x, y, tile_type)
 
                 
 
 
     
     non_boss_rooms = [room for room in rooms if not room.boss]
-    non_spawn_rooms = [room for room in rooms if not room.spawn]
+    #usable_rooms = [room for room in rooms if not room.spawn]
 
     for NPC in Character.objects.filter(campaign_id=campaign_id, is_playable=False):
         generate_object(campaign_id, random.choice(non_boss_rooms), 'player', NPC)
@@ -267,11 +386,14 @@ def generate_mapa_dungeon(campaign: Campaign) -> bool:
 
 # -----------------------------------------------------------------------------------------------------------
 
-def generate_unique_weapon():
-    from DnD_AI.default import UNIQUE_WEAPONS_NAMES, UNIQUE_WEAPONS_STATS
+def generate_unique_weapon(common_too=False):
+    from DnD_AI.default import UNIQUE_WEAPON_NAMES, UNIQUE_WEAPON_STATS, DEFAULT_WEAPON_NAMES, DEFAULT_WEAPON_STATS
 
-    weapon_name = random.choice(list(UNIQUE_WEAPONS_NAMES))
-    weapon_stats = UNIQUE_WEAPONS_STATS[weapon_name]
+    weapon_name = random.choice(list(UNIQUE_WEAPON_NAMES)) if not common_too else random.choice(list(UNIQUE_WEAPON_NAMES)+list(DEFAULT_WEAPON_NAMES))
+    try:
+        weapon_stats = UNIQUE_WEAPON_STATS[weapon_name]
+    except:
+        weapon_stats = DEFAULT_WEAPON_STATS[weapon_name]
 
     unique_weapon = Weapon.objects.create(
         is_template=False,
