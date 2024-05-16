@@ -1,7 +1,7 @@
 from .models import *
 from .default import *
 
-from random import randint  # to roll the dice
+from random import randint, choice  # to roll the dice
 import numpy as np
 
 #from django.conf import settings   # to image access
@@ -468,21 +468,25 @@ def act_info(player:Character, action:list):
 
 
 def act_levelup(player:Character, action:list):
-    if action[1] in ['dmg','damage','rng', 'range', 'wpn', 'weapon']:
-        wpn_stat = 'dmg' if action[1] in ['wpn', 'weapon'] else action[1]
+    if player.exp >= player.exp_top:
+        if action[1] in ['dmg','damage','rng', 'range', 'wpn', 'weapon']:
+            wpn_stat = 'dmg' if action[1] in ['wpn', 'weapon'] else action[1]
 
-        # it means that the player wants to rename his weapon
-        if len(action) > 2:
-            wpn_name = ' '.join(action[2:])
-            successful = player.level_up_weapon(wpn_stat, wpn_name)
-        else: # if not, the weapon name remains the same
-            successful = player.level_up_weapon(wpn_stat)
-        
+            # it means that the player wants to rename his weapon
+            if len(action) > 2:
+                wpn_name = ' '.join(action[2:])
+                successful = player.level_up_weapon(wpn_stat, wpn_name)
+            else: # if not, the weapon name remains the same
+                successful = player.level_up_weapon(wpn_stat)
+            
+        else:
+            stat = action[1]
+            successful = player.level_up_stat(stat)  
+
+        return successful
     else:
-        stat = action[1]
-        successful = player.level_up_stat(stat)  
-
-    return successful
+        History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"You don't have enough EXP to level up.").save()
+        return False
 
 
 def act_use(player:Character, action:list):
@@ -494,34 +498,52 @@ def act_use(player:Character, action:list):
             # I don't have a list of possible usable items xd, so
             #History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"There's a list of your items: ").save()
         #if 'health potion' not in player_inventory.keys():
-        if player_inventory.keys() == ["gold"] or player_inventory.keys() == []:
+        if player_inventory.keys() == ["gold"] or len(player_inventory.keys()) == 0:
             History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"By the way... You don't have usable items.").save()
 
         return False
     
 
     item_to_use = (' '.join(action[1:])).lower().replace('_',' ')
-    
+    successful = False
     if item_to_use in ['health potion', 'potion', 'hp potion', 'hp']:
         item_to_use = 'health potion'
         successful = player.use_from_inventory(item_to_use, amount = 1)
         player.save()
         if successful:
-            player.health += 50
+            player.health = min(player.health + 50, player.max_health)
+            player.save()
             History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'{player.name} used a health potion. 50 HP restored!').save()
             return True
-        else:
-            History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"You don't have {item_to_use}s.").save()
-            return False
         
+    elif item_to_use in ['go back bone', 'go back', 'bone', 'back bone']:
+        item_to_use = 'go back bone'
+        successful = player.use_from_inventory(item_to_use, amount = 1)
+        player.save()
+        if successful:
+            random_portal = choice(Treasure.objects.filter(campaign=player.campaign, treasure_type='Portal', discovered=True))
+            player.x, player.y = random_portal.x, random_portal.y
+            player.save()
+            History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'{player.name} used a go back bone.').save()
+            return True
 
     #elif item_to_use == 'mana potion':, or something like that for each item
         # probably is not the best way, it would be better to be implemented on Character.use_from_inventory()
         # please remember me to create a list of possible usable items an their effects on default.py
-    
+
     else:
         History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"You can't use that.").save()
+        return False    
+    
+
+    if not successful:
+        History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"You have no {item_to_use}s.").save()
         return False
+        
+
+    
+    
+    
 
 def act_equip(player:Character, action:list):
     treasure_to_take = action[1].lower() if len(action) > 1 else 'all'

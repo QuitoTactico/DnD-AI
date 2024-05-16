@@ -224,7 +224,7 @@ class Entity(models.Model):
     def use_from_inventory(self, item:str, amount:int = 1) -> bool:
         ''' removes an item from the inventory, returns if was succesful '''
         inventory_dict = self.get_inventory()
-        if item in inventory_dict:
+        if item in inventory_dict and inventory_dict[item] >= amount:
             inventory_dict[item] -= amount
             if inventory_dict[item] <= 0:
                 del inventory_dict[item]
