@@ -55,13 +55,13 @@ def designar_habitaciones_especiales(rooms):
 
 
 
-def distancia(h1, h2):
+def distance(h1, h2):
     # Calcular la distancia entre el centro de dos rooms
     centro_h1 = (h1.x + h1.w // 2, h1.y + h1.h // 2)
     centro_h2 = (h2.x + h2.w // 2, h2.y + h2.h // 2)
     return np.sqrt((centro_h1[0] - centro_h2[0]) ** 2 + (centro_h1[1] - centro_h2[1]) ** 2)
 
-def conectar_habitaciones(mapa, habitacion1, habitacion2, hallway_type, campaign_id):
+def connect_rooms(mapa, habitacion1, habitacion2, hallway_type, campaign_id):
     puntos1 = (random.randint(habitacion1.x, habitacion1.x + habitacion1.w - 1),
                random.randint(habitacion1.y, habitacion1.y + habitacion1.h - 1))
     puntos2 = (random.randint(habitacion2.x, habitacion2.x + habitacion2.w - 1),
@@ -76,16 +76,19 @@ def conectar_habitaciones(mapa, habitacion1, habitacion2, hallway_type, campaign
                 if 0 <= y < mapa.shape[0]:
                     #mapa[puntos1[1] + offset, x] = tipo_pasillo
                     Tile.objects.update_or_create(campaign_id=campaign_id, x=x, y=y, defaults={'tile_type': hallway_type})
-                    if random.random() < 0.1:
+                    if random.random() < 0.05:
                         generate_object_in_coords(campaign_id, x, y, hallway_type)
+
         for y in range(min(puntos1[1], puntos2[1]), max(puntos1[1], puntos2[1]) + 1):
             for offset in range(ancho_pasillo):
                 x = puntos2[0] + offset
                 if 0 <= x < mapa.shape[1]:
                     #mapa[y, puntos2[0] + offset] = tipo_pasillo
                     Tile.objects.update_or_create(campaign_id=campaign_id, x=x, y=y, defaults={'tile_type': hallway_type})
-                    if random.random() < 0.1:
+                    if random.random() < 0.05:
                         generate_object_in_coords(campaign_id, x, y, hallway_type)
+
+
     else:  # vertical primero, luego horizontal
         for y in range(min(puntos1[1], puntos2[1]), max(puntos1[1], puntos2[1]) + 1):
             for offset in range(ancho_pasillo):
@@ -93,15 +96,16 @@ def conectar_habitaciones(mapa, habitacion1, habitacion2, hallway_type, campaign
                 if 0 <= x < mapa.shape[1]:
                     #mapa[y, puntos1[0] + offset] = tipo_pasillo
                     Tile.objects.update_or_create(campaign_id=campaign_id, x=x, y=y, defaults={'tile_type': hallway_type})
-                    if random.random() < 0.1:
+                    if random.random() < 0.05:
                         generate_object_in_coords(campaign_id, x, y, hallway_type)
+
         for x in range(min(puntos1[0], puntos2[0]), max(puntos1[0], puntos2[0]) + 1):
             for offset in range(ancho_pasillo):
                 y = puntos2[1] + offset
                 if 0 <= y < mapa.shape[0]:
                     #mapa[puntos2[1] + offset, x] = tipo_pasillo
                     Tile.objects.update_or_create(campaign_id=campaign_id, x=x, y=y, defaults={'tile_type': hallway_type})
-                    if random.random() < 0.1:
+                    if random.random() < 0.05:
                         generate_object_in_coords(campaign_id, x, y, hallway_type)
 
 
@@ -151,7 +155,7 @@ def generate_monster(campaign_id, tile_type):
         monster_name = random.choice(COOL_BOSSES_WITH_ICON)
         monster_physical_description = monster_name
 
-        icon_path = monster_name.replace(' ', '-').lower()+'.png'
+        icon_path = monster_name.replace(' ', '-').lower()
         icon = f"entity/icons/boss_icons/{icon_path}.png"
 
         monster.name = monster_name
@@ -166,10 +170,8 @@ def generate_monster(campaign_id, tile_type):
     return monster
     
 
-
-
 def generate_object_in_coords(campaign_id, x, y, tile_type):
-    if random.random() < 0.05:
+    if random.random() < 0.3:
         generate_object(campaign_id, None, 'small_treasure', entity=None, x=x, y=y)
     else:
         monster = generate_monster(campaign_id, tile_type)
@@ -298,10 +300,10 @@ def generate_dungeon_map(campaign: Campaign) -> bool:
         if new_room:
             if rooms:
                 # Conectar con la habitación más cercana
-                habitacion_cercana = min(rooms, key=lambda h: distancia(h, new_room))
+                habitacion_cercana = min(rooms, key=lambda h: distance(h, new_room))
 
                 # Quizás sería mejor ponerlo a lo último
-                conectar_habitaciones(mapa, habitacion_cercana, new_room, random.choice(path_types), campaign_id)
+                connect_rooms(mapa, habitacion_cercana, new_room, random.choice(path_types), campaign_id)
             rooms.append(new_room)
             mapa[new_room.y:new_room.y + new_room.h, new_room.x:new_room.x + new_room.w] = new_room.room_type
 
@@ -353,8 +355,16 @@ def generate_dungeon_map(campaign: Campaign) -> bool:
                 Tile.objects.update_or_create(campaign_id=campaign_id, x=x, y=y, defaults={'tile_type': tile_type})
 
                 if tile_type not in ['spawn', 'boss']:
-                    if random.random() < 0.05:
+                    spawn = random.random()
+                    if spawn < 0.05:
                         generate_object_in_coords(campaign_id, x, y, tile_type)
+                    #elif spawn > 1-0.003:
+                    #    generate_object_in_coords(campaign_id, x, y, tile_type) NPCCCC
+                    #    la idea es generar un NPC
+
+        # así se asegura que haya al menos una cosa interesante en cada habitación
+        if tile_type not in ['spawn', 'boss']:
+            generate_object_in_coords(campaign_id, x, y, tile_type)
 
                 
 
@@ -395,8 +405,8 @@ def generate_unique_weapon(common_too=False):
     except:
         weapon_stats = DEFAULT_WEAPON_STATS[weapon_name]
 
-    unique_weapon = Weapon.objects.create(
-        is_template=False,
+    unique_weapon = Weapon.objects.get_or_create(
+        is_template=True,
         name=weapon_name,
         is_ranged=weapon_stats['is_ranged'],
         weapon_type=weapon_stats['weapon_type'],  
@@ -408,9 +418,9 @@ def generate_unique_weapon(common_too=False):
         range_level_points=0,
         durability=100,
     )
-    unique_weapon.save()
+    unique_weapon[0].save()
 
-    return unique_weapon
+    return unique_weapon[0]
 
 
 
@@ -470,7 +480,7 @@ def generate_key_bosses(campaign_id, n:int = 3):
                 key_boss.icon = image_dir_StabDiff
             except:
                 name = random.choice(COOL_BOSSES_WITH_ICON)
-                icon_path = name.replace(' ', '-').lower()+'.png'
+                icon_path = name.replace(' ', '-').lower()
                 icon = f"entity/icons/boss_icons/{icon_path}.png"
 
                 key_boss.name = name
