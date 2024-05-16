@@ -372,6 +372,9 @@ def action_image_generation(prompt:str, action:str, player:Character, target:Mon
             #prompt = 'asking himself about'+prompt[5:]
             prompt = 'thinking, reflecting, pondering...'
 
+        if action == 'levelup':
+            prompt = 'shining, glowing, leveling up...'
+
         #image_description = f"{player.character_race} {player.character_class} {player.physical_description} is {prompt}"
         image_description = f"{player.name}, {player.character_race} {player.character_class} holding a {player.weapon.weapon_type}, {player.physical_description} is {prompt}"
 
