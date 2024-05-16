@@ -19,23 +19,25 @@ class Command(BaseCommand):
             else:
                 print('Invalid campaign id. Try again.')
 
+        campaign_id = campaign.id
+
         # Elimina todos los tiles que coinciden con campaign_id
-        tiles_counter = Tile.objects.filter(campaign_id=campaign_id).delete()
+        tiles_counter = Tile.objects.filter(campaign_id=campaign_id).delete()[0]
 
         # Elimina todos los tesoros que coinciden con campaign_id
-        treasures_counter = Treasure.objects.filter(campaign_id=campaign_id).delete()
+        treasures_counter = Treasure.objects.filter(campaign_id=campaign_id).delete()[0]
         
         # Elimina todos los npc que coinciden con campaign_id
-        npc_counter = Treasure.objects.filter(campaign_id=campaign_id, is_playable=False).delete()
+        npc_counter = Character.objects.filter(campaign_id=campaign_id, is_playable=False).delete()[0]
 
         # Elimina todos los monstruos que no son bosses clave y que coinciden con campaign_id
-        monsters_counter = Monster.objects.filter(campaign_id=campaign_id, is_boss=False, is_key=False).delete()
+        monsters_counter = Monster.objects.filter(campaign_id=campaign_id, is_boss=False, is_key=False).delete()[0]
 
         # Elimina todos los monstruos clave que no son bosses y que coinciden con campaign_id
-        key_monsters_counter = Monster.objects.filter(campaign_id=campaign_id, is_boss=False, is_key=True).delete()
+        key_monsters_counter = Monster.objects.filter(campaign_id=campaign_id, is_boss=False, is_key=True).delete()[0]
 
         # Elimina todos los jefes no clave que coinciden con campaign_id
-        optional_bosses_counter = Monster.objects.filter(campaign_id=campaign_id, is_boss=True, is_key=False).delete()
+        optional_bosses_counter = Monster.objects.filter(campaign_id=campaign_id, is_boss=True, is_key=False).delete()[0]
 
 
         self.stdout.write(self.style.SUCCESS(f'Successfully deleted the map of the campaign [{campaign_id}]: {campaign.name}'))

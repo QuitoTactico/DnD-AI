@@ -570,7 +570,10 @@ class Monster(Entity, models.Model):
             self.icon = self.get_default_entity_icon(self.monster_race, self.monster_class)
 
         if not self.name:
-            self.name = self.monster_race+' '+get_random_name()
+            if self.monster_race == 'Human':
+                self.name = self.monster_class+' '+get_random_name()
+            else:
+                self.name = self.monster_race+' '+get_random_name()
 
         if self.health == None:
             self.health = self.max_health
