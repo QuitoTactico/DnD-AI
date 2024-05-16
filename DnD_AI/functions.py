@@ -155,12 +155,14 @@ def combat_turn(player:Character, monster:Monster, player_dice:int = roll_dice()
     return {'player_died': player_died, 'monster_died': monster_died, 'player_result': player_result, 'monster_result': monster_result}
 
 def player_died_in_combat(player:Character, monster:Monster):
+    action_image_generation('', 'attack', monster, player)
     Treasure.objects.create(campaign=player.campaign, treasure_type='Tombstone', inventory=player.inventory, x=player.x, y=player.y, discovered=False).save()
     History.objects.create(campaign=player.campaign ,author='SYSTEM', text=f'{player.name} died in combat.').save()
     History.objects.create(campaign=player.campaign ,author=monster.name, text='JA'*randint(2,15), color='red').save()
     player.kill()
 
 def player_won_combat(player:Character, monster:Monster):
+    action_image_generation('', 'attack', player, monster)
     loot = monster.get_inventory()
     player.add_all_to_inventory(loot)
     player.exp += monster.exp_drop
@@ -179,7 +181,8 @@ def player_won_combat(player:Character, monster:Monster):
         History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'{history_progression_filtered}.<br><br>Remaining bosses: {player.campaign.objectives_remaining}').save()
 
     player.save()
-    monster.kill()
+    #monster.kill()
+    monster.delete()
 
 
 # The full_combat function will calculate the result of a full combat between a player and a monster
@@ -262,29 +265,55 @@ def player_selection_by_id(player_id):
             player.save()
     return player
 
-def target_selection_by_name(monster_name):
+'''
+def target_selection_by_name(monster_name, player:Character = None):
     if monster_name:
-        try:
-            monster = Monster.objects.get(name__iexact=monster_name)
-        except:
             try:
-                # If the name of the monster is not found, it tries to find a monster whose name contains the string entered
-                monster = Monster.objects.filter(name__icontains=monster_name).first()
-                if monster == None:
-                    # If there is no monster containing the name entered, it selects the first monster in the database
-                    monster = Monster.objects.first()
+                monster = Monster.objects.get(name__iexact=monster_name) if not player else player.get_monsters_in_range(monster_name)[0]
             except:
-                monster = Monster.objects.first()
+                try:
+                    # If the name of the monster is not found, it tries to find a monster whose name contains the string entered
+                    monster = Monster.objects.filter(name__icontains=monster_name).first() if not player else player.get_monsters_in_range(monster_name)[0]
+                    if monster == None:
+                        # If there is no monster containing the name entered, it selects the first monster in the database
+                        #monster = Monster.objects.first()
+                        return None
+                except:
+                    #monster = Monster.objects.first()
+                    return None
     else:
-        # If the monster label is not sent, it selects the first monster in the database
-        # We can change this to let the player select the monster by himself, but we'll see.
-        try:
-            monster = Monster.objects.first()
-        except:
-            monster = Monster.objects.create()
-            monster.save()
+            # If the monster label is not sent, it selects the first monster in the database
+            # We can change this to let the player select the monster by himself, but we'll see.
+            try:
+                monster = Monster.objects.first()
+            except:
+                monster = Monster.objects.create()
+                monster.save()
     return monster
+'''
 
+def target_selection_by_name(monster_name, player:Character = None, campaign_id:int = None):
+    if player:
+        possible_targets = player.get_monsters_in_range(monster_name)
+        if len(possible_targets) == 0:
+            return None
+        else:
+            return possible_targets[0]
+    elif campaign_id:
+        possible_targets = Monster.objects.filter(campaign_id=campaign_id, name__icontains=monster_name)
+        if possible_targets.count() == 0:
+            return None
+        else:
+            return possible_targets.first()
+    else:
+        possible_targets = Monster.objects.filter(name__icontains=monster_name)
+        if possible_targets.count() == 0:
+            return None
+        return possible_targets.first()
+
+    
+
+'''
 def target_selection_by_id(monster_id):
     if monster_id:
         try:
@@ -305,6 +334,13 @@ def target_selection_by_id(monster_id):
             monster = Monster.objects.create()
             monster.save()
     return monster
+'''
+
+def target_selection_by_id(monster_id):
+    monster = Monster.objects.filter(id=monster_id)
+    if monster.count() == 0:
+        return None
+    return monster.first()
 
 
 # ------------------------------------------------ ACT --------------------------------------------------
@@ -541,9 +577,15 @@ def act_attack(player:Character, target:Monster, action:list):
                 target_id = int(target_id)
                 target = target_selection_by_id(target_id)
             else:
-                target = target_selection_by_name(target_id)
+                target = target_selection_by_name(target_id, player=player)
+                if target is None:
+                    possible_targets = player.get_monsters_in_range()
+                    if len(possible_targets) == 0:
+                        History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"There's no monster called {target_id} in your range.").save()
+                    else:
+                        target = possible_targets[0]
+                        History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"There's no monster called {target_id} in your range, attacking {target.name} instead.").save()
 
-        action_image_generation('', action[0], player, target)
 
         result = combat_turn(player=player, monster=target, player_dice=roll_dice(), monster_dice=roll_dice())
 
@@ -551,7 +593,7 @@ def act_attack(player:Character, target:Monster, action:list):
             new_player = player_selection(None)  ###
             player_died = True
         if result['monster_died']:
-            target.delete()     # por si algo, me tiene mamao' que no se borre el monstruo
+            #target.delete()     # por si algo, me tiene mamao' que no se borre el monstruo
             target_died = True
             try:
                 new_target = player.get_monsters_in_range()[0]

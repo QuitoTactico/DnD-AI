@@ -163,7 +163,7 @@ def generate_monster(campaign_id, tile_type):
         monster.icon = icon
 
 
-    if random.random() < 0.02:
+    if random.random() < 0.1:
         monster.name = random.choice(COOL_NAMES)
 
     monster.save()
@@ -230,6 +230,14 @@ def generate_object(campaign_id, room, object_type, entity=None, x=None, y=None)
             existent_treasure = Treasure.objects.filter(campaign_id=campaign_id, x=x, y=y)
             if not existent_treasure:
                 Treasure.objects.create(campaign_id=campaign_id, treasure_type='Portal', x=x, y=y)
+                break
+            else:
+                tries -= 1
+
+        elif object_type == 'discovered_portal':
+            existent_treasure = Treasure.objects.filter(campaign_id=campaign_id, x=x, y=y)
+            if not existent_treasure:
+                Treasure.objects.create(campaign_id=campaign_id, treasure_type='Portal', x=x, y=y, discovered=True)
                 break
             else:
                 tries -= 1
@@ -323,7 +331,7 @@ def generate_dungeon_map(campaign: Campaign) -> bool:
 
         if room.spawn:
             tile_type = 'spawn'
-            generate_object(campaign_id, room, 'portal')
+            generate_object(campaign_id, room, 'discovered_portal')
             for player in Character.objects.filter(campaign_id=campaign_id):
                 generate_object(campaign_id, room, 'player', player)
 

@@ -275,7 +275,7 @@ def ask_world_info_gemini(prompt:str="about what to do next", campaign_story:str
 def action_interpreter(prompt_input) -> str:
     instruction = """I need you to categorize this natural language desired action into a function (act) according to this definitions. And depending on the function, I need its inputs too, all in just a line, no more. Always add the function at the beginning of the line. Never write the inputs name. Just write something like "attack skeleton james". For move, use specifically its valid values. Here are the functions and their inputs:
     
-    "levelup <stat_or_weaponstat>"
+    "levelup <stat_or_weaponstat> <weapon_name(optional)>"
     "use <item_name>"
     "equip <weapon_name(optional)>"
     "take <treasure_name(optional)>"
@@ -284,7 +284,7 @@ def action_interpreter(prompt_input) -> str:
     "info <question>"
 
     valid values for:
-    stat_or_weaponstat: "health", "strength", "intelligence", "recursiveness", "dexterity", "phyres", "magres", "constitution", "damage", "range"
+    stat_or_weaponstat: "health", "strength", "intelligence", "recursiveness", "dexterity", "phyres", "magres", "constitution", "damage", "range", "weapon"
     direction: "up", "down", "left", "right", "upright", "upleft", "downright", "downleft"
     treasure_name: "gold", "bag", "chest", "key", "weapon", "tombstone"
     target: literally anyone, the desired target that was said by the player
@@ -300,6 +300,8 @@ def action_interpreter(prompt_input) -> str:
     "take gold"
     "take"
     "i want to know about where to go next" -> "info where to go next"
+    "level up my Super Excalibur" -> "levelup damage Super Excalibur"
+    "make my Revolver's range bigger" -> "levelup range Revolver"
     without saying the function
     """
     #about_what: "player", "enemies", "bosses", "world", "game", "story", "quests", "items", "weapons", "enemies", "bosses", "npcs",
