@@ -35,7 +35,7 @@
         <h2>2. Choose your race:</h2>
         <div class="itemList">
         {% for race in races %}
-        <div class="listItem">
+        <div class="listItem" onclick="selectRace(event)">
             <img height=50 src="media/entity/icons/default/{{race|lower}}.png" alt="{{ race }} img">
             <h2 id="font2">{{ race }}</h2>
             <input type="radio" name="race" value="{{ race }}" 
@@ -50,7 +50,7 @@
         <h2>3. Choose your class:</h2>
         <div class="itemList">
             {% for class in classes %}
-            <div class="listItem">
+            <div class="listItem" onclick="selectItem(event)">
                 <img height=50 src="media/entity/icons/default/{{class|lower}}.png" alt="{{ class }} img">
                 <h2 id="font2">{{ class }}</h2>
                 <input type="radio" name="class" value="{{ class }}"/>
@@ -62,7 +62,7 @@
         <h2>4. Choose your weapon:</h2>
         <div class="weaponList">
             {% for weapon in weapons %}
-            <div class="listWeapon">
+            <div class="listWeapon" onclick="selectWeapon(event)">
                 <h2 id="font2">name: {{weapon.name}}</h2>
                 <h2 id="font2">image: <img height=50 src="{{weapon.image.url}}" alt="{{weapon.name}} image"></h2>
                 <h2 id="font2">is_ranged: {{weapon.is_ranged}}</h2>

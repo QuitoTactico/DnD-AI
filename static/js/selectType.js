@@ -1,12 +1,38 @@
-document.addEventListener('click', function(event) {
-    document.getElementByClassName("itemList");
-});
+var previusRace;
 
-function checkSelected() {
-      var selectedOption = document.querySelector('input[name="myRadioGroup"]:checked');
-      if (selectedOption) {
-        alert("Selected option: " + selectedOption.value);
-      } else {
-        alert("No option selected");
-      }
-  }
+function selectRace(event) {
+    var raceSelected = event.currentTarget;
+    var radio = raceSelected.getElementsByTagName("input");
+    radio[0].checked = true;
+    if (previusRace != null) {
+        previusRace.style.backgroundColor = "#D62828"; //return color
+    }
+    raceSelected.style.backgroundColor = "#ff6f6f"; //give new color
+    previusRace = raceSelected; //save the new div
+}
+
+var previusItem;
+  
+function selectItem(event) {
+    var raceSelected = event.currentTarget;
+    var radio = raceSelected.getElementsByTagName("input");
+    radio[0].checked = true;
+    if (previusItem != null) {
+        previusItem .style.backgroundColor = "#D62828"; //return color
+    }
+    raceSelected.style.backgroundColor = "#ff6f6f"; //give new color
+    previusItem  = raceSelected; //save the new div
+}
+
+var previusWeapon;
+ 
+function selectWeapon(event) {
+    var raceSelected = event.currentTarget;
+    var radio = raceSelected.getElementsByTagName("input");
+    radio[0].checked = true;
+    if (previusWeapon != null) {
+        previusWeapon.style.backgroundColor = "#D62828"; //return color
+    }
+    raceSelected.style.backgroundColor = "#ff6f6f"; //give new color
+    previusWeapon = raceSelected; //save the new div
+} 

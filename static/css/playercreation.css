@@ -57,8 +57,13 @@ input {
 	width: 9%;
 }
 
+.listItem:hover {
+	background-color: #ff6f6f;
+	color: white;
+}
+
 .listItem input{
-	display: none;
+	display:none;
 }
 
 .statList {
@@ -75,6 +80,11 @@ input {
 	padding: 0.5%;
 	margin: 0.5%;
 	width: 9%;
+}
+
+.statItem:hover {
+	background-color: #ff6f6f;
+	color: white;
 }
 
 .statItem h2 {
@@ -96,6 +106,11 @@ input {
 	width: 22%;
 }
 
+.listWeapon:hover {
+	background-color: #ff6f6f;
+	color: white;
+}
+
 .listWeapon input{
-	display: none;
+	display:none;
 }
