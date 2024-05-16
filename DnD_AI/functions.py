@@ -597,7 +597,7 @@ def act_move(player:Character, target:Monster, action:list):
 def create_map(player:Character, characters, monsters, treasures, tiles, target:Monster=None, host:str=None, show_map:bool=False) -> tuple:
 
     zoom_border = max(player.campaign.size_x, player.campaign.size_y)
-    player_vision_range = 40
+    player_vision_range = 30
 
     map = figure(active_scroll='wheel_zoom', 
                  title="", 

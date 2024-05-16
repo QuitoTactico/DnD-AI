@@ -407,7 +407,7 @@ def action_interpreter(prompt_input) -> str:
         # Dios obra de formas misteriosas
 
 
-def campaign_interpreter(campaign_id):
+def campaign_interpreter(campaign_id, n = int):
     campaign = Campaign.objects.get(id=campaign_id)
 
     attributes_response = {}
@@ -415,7 +415,7 @@ def campaign_interpreter(campaign_id):
     for attribute in ['name', 'race', 'class', 'physical_description']:
         
         
-        intro = f"Give me the {attribute} of the bosses of this story:" if attribute != 'physical_description' else f"Create the {attribute} of the bosses of this story, a detailed physical description, perfect for image generation, talking about its clothes, physical appareance, colors, and others, you can create one if it's not said, 100 characters aprox:"
+        intro = f"Give me the {attribute} of the bosses of this story:" if attribute != 'physical_description' else f"Create the {attribute} of the {n} bosses of this story, a detailed physical description, perfect for image generation, talking about its clothes, physical appareance, colors, and others, you can create one if it's not said, 100 characters aprox:"
 
         prompt = f"""{intro}
         {campaign.initial_story}
@@ -430,9 +430,9 @@ def campaign_interpreter(campaign_id):
             attributes_response[attribute] = response.text.split('|')
             
         except:
-            return "NO_API_KEYS"
+            return {} , False
         
-    return attributes_response
+    return attributes_response, True
 
 
 # ==================================== TESTING ====================================

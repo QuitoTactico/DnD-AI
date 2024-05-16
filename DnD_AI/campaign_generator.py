@@ -189,7 +189,10 @@ def generate_mapa_dungeon(campaign: Campaign) -> bool:
     designar_habitaciones_especiales(rooms)
 
     boss_counter = 0
-    bosses = Monster.objects.filter(campaign_id=campaign_id, is_boss=True, is_key=True)
+    key_bosses = Monster.objects.filter(campaign_id=campaign_id, is_boss=True, is_key=True)
+    if key_bosses.count() < 3:
+        key_bosses = generate_key_bosses(campaign_id, 3)
+
     for room in rooms:
 
         tile_type = room.room_type
@@ -203,7 +206,7 @@ def generate_mapa_dungeon(campaign: Campaign) -> bool:
         elif room.boss:
             tile_type = random.choice(boss_types)
             try:
-                generate_object(campaign_id, room, 'boss', bosses[boss_counter])
+                generate_object(campaign_id, room, 'boss', key_bosses[boss_counter])
                 boss_counter += 1
             except:
                 pass
@@ -226,14 +229,35 @@ def generate_mapa_dungeon(campaign: Campaign) -> bool:
         for x in range(room.x, room.x + room.w):
             for y in range(room.y, room.y + room.h):
                 Tile.objects.update_or_create(campaign_id=campaign_id, x=x, y=y, defaults={'tile_type': tile_type})
+
+                '''
+                spawn = random.random()
+
+                if spawn < 0.05 and not room.spawn:
+                    pass
+                '''
+
+                
+
+
     
     non_boss_rooms = [room for room in rooms if not room.boss]
+    non_spawn_rooms = [room for room in rooms if not room.spawn]
 
     for NPC in Character.objects.filter(campaign_id=campaign_id, is_playable=False):
         generate_object(campaign_id, random.choice(non_boss_rooms), 'player', NPC)
     
+    '''
     for monster in Monster.objects.filter(campaign_id=campaign_id, is_key=False, is_boss=False):
-        generate_object(campaign_id, random.choice(rooms), 'monster', monster)
+        generate_object(campaign_id, random.choice(non_spawn_rooms), 'monster', monster)
+    
+    for monster in Monster.objects.filter(campaign_id=campaign_id, is_key=True, is_boss=False):
+        generate_object(campaign_id, random.choice(non_spawn_rooms), 'monster', monster)
+
+    for monster in Monster.objects.filter(campaign_id=campaign_id, is_key=False, is_boss=True):
+        generate_object(campaign_id, random.choice(non_spawn_rooms), 'monster', monster)
+    '''
+    
 
     return True
 
@@ -244,65 +268,97 @@ def generate_mapa_dungeon(campaign: Campaign) -> bool:
 # -----------------------------------------------------------------------------------------------------------
 
 def generate_unique_weapon():
-    from DnD_AI.default import DEFAULT_UNIQUE_WEAPONS
+    from DnD_AI.default import UNIQUE_WEAPONS_NAMES, UNIQUE_WEAPONS_STATS
 
-    
+    weapon_name = random.choice(list(UNIQUE_WEAPONS_NAMES))
+    weapon_stats = UNIQUE_WEAPONS_STATS[weapon_name]
 
-    unique_weapon = Weapon(
-        is_template=False,  # Específico para un jefe, no es una plantilla
-        name="Nombre del Arma del Jefe",
-        is_ranged=False,    # True si es un arma a distancia
-        weapon_type="Tipo de Arma",  # Por ejemplo, 'Espada', 'Hacha', etc.
-        damage_type="Tipo de Daño",  # 'Físico', 'Mágico', etc.
-        physical_description="Descripción física del Arma",
-        image="ruta/al/archivo/de/imagen",  # Ruta al archivo de imagen
-        damage=20,          # Cantidad de daño que el arma inflige
-        range=1,            # Rango de ataque del arma
-        range_level_points=0,  # Puntos de nivel de rango para armas a distancia
-        durability=100,     # Durabilidad del arma
-        level=0             # Nivel del arma, podría ser mayor para un jefe
+    unique_weapon = Weapon.objects.create(
+        is_template=False,
+        name=weapon_name,
+        is_ranged=weapon_stats['is_ranged'],
+        weapon_type=weapon_stats['weapon_type'],  
+        damage_type=weapon_stats['damage_type'],  
+        physical_description=weapon_stats['physical_description'],
+        image=weapon_stats['image'],
+        damage=weapon_stats['damage'],
+        range=weapon_stats['range'],
+        range_level_points=0,
+        durability=100,
     )
     unique_weapon.save()
 
+    return unique_weapon
 
 
 
 
-def generate_key_bosses(campaign_id):
-    from DnD_AI.functions_AI import campaign_interpreter
+def generate_key_bosses(campaign_id, n:int = 3):
+    from DnD_AI.functions_AI import campaign_interpreter, image_generator_DallE, image_generator_StabDiff
+    from DnD_AI.default import COOL_NAMES, DEFAULT_RACES, DEFAULT_CLASSES, COOL_BOSSES_WITH_ICON
 
-    attributes_dict = campaign_interpreter(campaign_id)
+    FILTERED_CLASSES = [player_class for player_class in DEFAULT_CLASSES if player_class not in DEFAULT_RACES]
+    
+    attributes_dict, API_KEY_GEMINI = campaign_interpreter(campaign_id, n)
 
-    unique_weapons = [generate_unique_weapon() for _ in range(3)]
+    unique_weapons = [generate_unique_weapon() for _ in range(n)]
 
-    for i in range(3):
+    key_bosses = []
 
+    for i in range(n):
 
-        key_boss = Monster(
-            name="Nombre del Boss",
+        no_api_name, no_api_boss_race, no_api_boss_class, no_api_physical_description = None, None, None, None
+        if not API_KEY_GEMINI:
+            no_api_name = random.choice(COOL_NAMES)
+            no_api_boss_race = random.choice(DEFAULT_RACES)
+            no_api_boss_class = random.choice(FILTERED_CLASSES)
+            no_api_physical_description = no_api_boss_race+' '+no_api_boss_class
+
+        key_boss = Monster.objects.create(
+            name=no_api_name if not API_KEY_GEMINI else attributes_dict['name'][i],
             is_key=True,
             is_boss=True,
-            monster_race="Raza del Boss",
-            monster_class="Clase del Boss",
-            physical_description="Descripción física del Boss",
-            weapon=get_default_weapon("Nombre del Arma"),
+            monster_race=no_api_boss_race if not API_KEY_GEMINI else  attributes_dict['race'][i],
+            monster_class=no_api_boss_class if not API_KEY_GEMINI else attributes_dict['class'][i],
+            physical_description=no_api_physical_description if not API_KEY_GEMINI else  attributes_dict['physical_description'][i],
+            weapon=unique_weapons[i],
             campaign_id=campaign_id,
-            max_health=100,  # Salud máxima
-            health=100,      # Salud actual, usualmente igual a max_health al inicio
-            strength=10,     # Fuerza física
-            intelligence=10, # Inteligencia, útil para ataques mágicos
-            recursiveness=10, # Habilidad para usar ítems
-            dexterity=10,    # Destreza, determina quién actúa primero
-            physical_resistance=10,  # Resistencia a daños físicos
-            magical_resistance=10,   # Resistencia a daños mágicos
-            constitution=10, # Constitución, resistencia a efectos como veneno
-            exp_drop=50,     # Puntos de experiencia que otorga al ser derrotado
-            x=0,             # Posición en el eje X
-            y=0,             # Posición en el eje Y
-            icon=None,       # Icono del monstruo
+            max_health=random.randint(4,6)*100,
+            strength=random.randint(10,15),
+            intelligence=random.randint(10,15),
+            recursiveness=random.randint(10,15),
+            dexterity=random.randint(10,15),
+            physical_resistance=random.randint(10,15), 
+            magical_resistance=random.randint(10,15),
+            constitution=random.randint(10,15),
+            exp_drop=1000,
+            x=random.randint(0,10),
+            y=random.randint(0,10),
         )
+
+        boss_personality = random.choice(['making a smug face', 'laughing...', 'looking at you with a serious face', 'smiling', 'intimidating'])
+
+        image_description = f"{key_boss.name}{key_boss.monster_race} {key_boss.monster_class} holding a {key_boss.weapon.weapon_type}, {key_boss.physical_description} is {boss_personality}"
+        try:
+            image_dir_DallE = image_generator_DallE(image_description).replace('media/', '')
+            key_boss.icon = image_dir_DallE
+        except:
+            try:
+                image_dir_StabDiff = image_generator_StabDiff(image_description).replace('media/', '')
+                key_boss.icon = image_dir_StabDiff
+            except:
+                name = random.choice(COOL_BOSSES_WITH_ICON)
+                icon_path = name.replace(' ', '-').lower()+'.png'
+                icon = f"entity/icons/boss_icons/{icon_path}.png"
+
+                key_boss.name = name
+                key_boss.icon = icon
+
         key_boss.save()
 
+        key_bosses.append(key_boss)
+
+    return key_bosses
 
 
 # -----------------------------------------------------------------------------------------------------------

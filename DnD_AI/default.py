@@ -632,15 +632,15 @@ DEFAULT_MONSTER_STATS = {
 
 # strange things, don't take this seriously
 
-POSSIBLE_BOSSES = [
-    'The Sphinx', 
-    'Cthulhu', 
-    'The Leviathan', 
+COOL_NAMES = [
+    'The Sphinx (Friendly)', 
+    'Cthulhu (Friendly)', 
+    'The Leviathan (Friendly)', 
     'Behemoth', 
-    'The Kraken', 
-    'Hades', 
-    'Cerberus', 
-    'GOD', 
+    'The Kraken (Friendly)', 
+    'Hades (Friendly)', 
+    'Cerberus (Friendly)', 
+    'GOD (Friendly)', 
     'Zeus', 
     'Ares', 
     'Thanatos', 
@@ -648,6 +648,8 @@ POSSIBLE_BOSSES = [
     'Mr Beast', 
     'Lord Voldemort', 
     'Your Mom', 
+    'Your Mom (Friendly)', 
+    'Your Mom (My Wife)', 
     'The Devil', 
     'Telematica Demon', 
     'Diomedes Diaz', 
@@ -689,6 +691,10 @@ POSSIBLE_BOSSES = [
     'Sans', 
     'The Game', 
     'Juan Carlos', 
+    'Juan Carlos Mecha', 
+    'Juan Carlos Neko', 
+    'Juan Carlos Gamer',
+    'Juan Carlos (Friendly)', 
     'El Pepe', 
     'Ete Sech', 
     'Tilín', 
@@ -704,7 +710,7 @@ POSSIBLE_BOSSES = [
     'Fetus',
     'Conde Eyácula',
     'Jax: Minor Hunter',
-    'Unas salchipapas',
+    'Unas Salchipapas',
     'Sr. Pelo',
     'Molinete',
     'Powerbazinga',
@@ -747,8 +753,21 @@ POSSIBLE_BOSSES = [
     'THE ZULU',
     'Lucio',
     'Roberta',
+    'El Ayudador de Pibes',
+    'El Vendedor de Weas',
+    'Diomedes Diaz',
+    'El Rector de la Nacho',
+    'El c papu :v',
+    'When haces tus momos en NPCs',
+    'Oscar.',
+    'Papá de Oscar.',
+    'Hijo de Oscar.',
+    'xXx PAPU xXx',
     'Skibidi Sigma Pomni Digital Fortnite Chamba Free Gigachad Rizz Ohmygodfloo XXXTentacion Hotmail Lionel Ronaldo Junior Mewing Tercero Chiki Ibai Xocas Ete Sech Golden Toy Puppet Ohio Rubén Tuesta YouTubeproinsano Globodetexto51 Decadencia777',
 ]
+
+COOL_BOSSES_WITH_ICON = ['Anubis', 'Australia', 'Bird Mask', 'Bolivia', 'Brazil', 'Caesar', 'Croc Jaws', 'Crystal Eye', 'Delighted', 'Diamonds Smile', 'Dracula', 'Evil Minion', 'Fetus', 'Frankenstein Creature', 'Gaze', 'Gluttonous Smile', 'Grim Reaper', 'Honeycomb', 'Horned Reptile', 'Hunter Eyes', 'Insect Jaws', 'Kenku Head', 'Kraken Tentacle', 'Mad Scientist', 'Maze Cornea', 'Mecha Mask', 'Metal Golem Head', 'Mewing', 'Octogonal Eye', 'One Eyed', 'Overlord', 'Paranoia', 'Pick Of Destiny', 'Pou', 'Pummeled', 'Purple Tentacle', 'Skeleton King', 'Sphinx', 'Spiked Armor', 'Swallow', 'Tangerine', 'Tear Tracks', 'Thunder Struck', 'Toad Teeth', 
+'Triton Head']
 
 COOL_SORCERY_NAMES = [
     "Qui's Crotolamo",
@@ -761,18 +780,12 @@ COOL_SORCERY_NAMES = [
     'The Game'
 ]
 
-
-COOL_NPCS = [
-    'El Ayudador de Pibes',
-    'El Vendedor de Vainas',
-    'Diomedes Diaz',
-
-]
-
 COOL_LOCATIONS = [
     'El club de las papeadas',
     'Taberna el Balde de ###',
-    'La Montañañañañañaña'
+    'La Montañañañañañaña',
+    'Tortas Del Gordo',
+    'D1'
 ]
 
 
