@@ -346,19 +346,25 @@ def target_selection_by_id(monster_id):
 # ------------------------------------------------ ACT --------------------------------------------------
 
 
-def action_image_generation(prompt:str, action:str, player:Character, target:Monster):
+def action_image_generation(prompt:str, action:str, player:Character, target:Monster = None):
 
     if action == 'move':
-        image_description = f"{player.character_race} {player.character_class} {player.physical_description} running to the {prompt[4:]}"
+        image_description = f"{player.name}, {player.character_race} {player.character_class} {player.physical_description} running to the {prompt[4:]}"
 
     elif action == 'attack':
-        image_description = f"{player.character_race} {player.character_class} {player.physical_description} using a{player.weapon.weapon_type}, fighting a {target.monster_race} {target.monster_class} {target.physical_description} who's using a {target.weapon.weapon_type}"
+        image_description = f"{player.name}, {player.character_race} {player.character_class} {player.physical_description} using a {player.weapon.weapon_type}, fighting with a {target.monster_race} {target.monster_class} {target.physical_description} who's using a {target.weapon.weapon_type}"
         #image_description = f"{player.character_race} {player.character_class} {player.physical_description} fighting a {target.monster_race} {target.monster_class} {target.physical_description} with a {player.weapon.weapon_type}"
 
     elif action == 'equip':
         weapon_name = 'weapon' if prompt[6:] == "" else prompt[6:]
         image_description = f"{player.character_race} {player.character_class} {player.physical_description} taking a {weapon_name} from the ground"
         # holding up a {weapon_name}
+
+    elif action == 'chest':
+        image_description = f"{player.name}, {player.character_race} {player.character_class} {player.physical_description} is opening a chest with amazement, surprised face"
+
+    elif action == 'portal':
+        image_description = f"{player.name}, {player.character_race} {player.character_class} {player.physical_description} with a surprised face, is discovering a PORTAL with amazement"
     
     # take, use, levelup, info
     else:
@@ -367,7 +373,7 @@ def action_image_generation(prompt:str, action:str, player:Character, target:Mon
             prompt = 'thinking, reflecting, pondering...'
 
         #image_description = f"{player.character_race} {player.character_class} {player.physical_description} is {prompt}"
-        image_description = f"{player.character_race} {player.character_class} holding a {player.weapon.weapon_type}, {player.physical_description} is {prompt}"
+        image_description = f"{player.name}, {player.character_race} {player.character_class} holding a {player.weapon.weapon_type}, {player.physical_description} is {prompt}"
 
     # try to generate an image with DallE, if it fails, it will use StabDiff
     # REASONS TO FAIL:
@@ -402,7 +408,7 @@ def command_executer(prompt:str|list, player:Character, target:Monster) -> tuple
     # if the prompt is a string, it will be split into a list
     action = prompt.split(' ') if type(prompt) == str else prompt
 
-    if action[0] not in ['move','attack']:
+    if action[0] not in ['move', 'attack', 'take']:
         action_image_generation(prompt, action[0], player, target)
 
     # for each action, the turns on the campaign will be increased
@@ -575,6 +581,8 @@ def act_take(player:Character, action:list):
         for treasure in possible_treasures:
             if treasure.treasure_type != 'Weapon':
                 loot = treasure.get_inventory()
+                if treasure.treasure_type == 'Chest':
+                    action_image_generation('', 'chest', player)
                 History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'{player.name} got {loot} from {treasure.treasure_type}.').save()
                 player.add_all_to_inventory(loot)
                 treasure.delete()
@@ -640,6 +648,8 @@ def act_move(player:Character, target:Monster, action:list):
     for treasure in player.get_treasures_in_range():
         if not treasure.discovered:
             treasure.discover()
+            if treasure.treasure_type == 'Portal':
+                action_image_generation('', 'portal', player)
 
     if not successful:
         History.objects.create(campaign=player.campaign, author='SYSTEM', text="You can't be there").save()
