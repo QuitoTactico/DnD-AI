@@ -224,7 +224,7 @@ class Entity(models.Model):
     def use_from_inventory(self, item:str, amount:int = 1) -> bool:
         ''' removes an item from the inventory, returns if was succesful '''
         inventory_dict = self.get_inventory()
-        if item in inventory_dict:
+        if item in inventory_dict and inventory_dict[item] >= amount:
             inventory_dict[item] -= amount
             if inventory_dict[item] <= 0:
                 del inventory_dict[item]
@@ -326,10 +326,12 @@ class Character(Entity, models.Model):
     exp     = models.IntegerField(default=0)
     exp_top = models.IntegerField(default=30)  # exp until level_up
 
-    def get_monsters_in_range(self):
+
+    def get_monsters_in_range(self, name:str = None):
         monsters_in_range = []
         #for monster in Monster.objects.filter(campaign_id=self.campaign.id):
-        for monster in Monster.objects.filter(campaign_id=self.campaign.id):
+        monsters = Monster.objects.filter(campaign_id=self.campaign.id) if name is None else Monster.objects.filter(campaign_id=self.campaign.id, name__icontains=name)
+        for monster in monsters:
             if abs(self.x - monster.x) <= self.weapon.range and abs(self.y - monster.y) <= self.weapon.range:
                 monsters_in_range.append(monster)
         return monsters_in_range
@@ -507,7 +509,7 @@ class Character(Entity, models.Model):
         if not self.physical_description:
             self.physical_description = self.character_class + self.character_race if self.character_race != self.character_class else self.character_class
         
-        if self.health == None:
+        if self.health is None:
             self.health = self.max_health
 
         super().save(*args, **kwargs)
