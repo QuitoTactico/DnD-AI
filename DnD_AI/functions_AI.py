@@ -288,7 +288,7 @@ def action_interpreter(prompt_input) -> str:
     direction: "up", "down", "left", "right", "upright", "upleft", "downright", "downleft"
     treasure_name: "gold", "bag", "chest", "key", "weapon", "tombstone"
     target: literally anyone, the desired target that was said by the player
-    weapon_name: literally anything, the desired weapon that was said by the player
+    weapon_name: literally anything, the desired weapon that was said by the player. If it's not said, don't put it.
     question: literally anything, the desired information interest that was said by the player
     item_name: "health potion", "go back bone"
 

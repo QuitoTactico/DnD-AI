@@ -205,20 +205,24 @@ def generate_object(campaign_id, room, object_type, entity=None, x=None, y=None)
                 tries -= 1
 
 
-        
+        # gold = 33%, bag = 33%, key = 33%
         elif object_type == 'small_treasure':
             existent_player = Character.objects.filter(campaign_id=campaign_id, x=x, y=y)
             existent_treasure = Treasure.objects.filter(campaign_id=campaign_id, x=x, y=y)
             existent_monster = Monster.objects.filter(campaign_id=campaign_id, x=x, y=y)
             
             if not existent_player and not existent_treasure and not existent_monster:
-                bar_or_key = random.random() < 0.5
-                if bar_or_key:
-                    inventory = str({'health potion': random.randint(1, 2)}) if bar_or_key < 0.25 else str({'gold': random.randint(1,10)})
+                spawn = random.random()
+                if spawn < 0.33:
+                    inventory = str({'health potion': random.randint(1, 2)}) if spawn < 0.25 else str({'gold': random.randint(1,10)})
                     Treasure.objects.create(campaign_id=campaign_id, treasure_type='Bag', x=x, y=y,
                                             inventory=inventory)
+                elif spawn < 0.66:
+                    inventory = str({'gold': random.randint(5, 20)})
+                    Treasure.objects.create(campaign_id=campaign_id, treasure_type='Gold', x=x, y=y,
+                                            inventory=inventory)
                 else:
-                    inventory = str({'key': random.randint(1, 2)})
+                    inventory = str({'key': 1})
                     Treasure.objects.create(campaign_id=campaign_id, treasure_type='Key', x=x, y=y,
                                             inventory=inventory)
                 break
