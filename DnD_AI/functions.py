@@ -178,7 +178,7 @@ def player_won_combat(player:Character, monster:Monster):
                                                       campaign_achievements=player.campaign.achievements)
         
         history_progression_filtered = history_progression.replace("\n","<br>")
-        History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'{history_progression_filtered}.<br><br>Remaining bosses: {player.campaign.objectives_remaining}').save()
+        History.objects.create(campaign=player.campaign, author='NARRATOR', color='purple', text=f'{history_progression_filtered}.<br><br>Remaining bosses: {player.campaign.objectives_remaining}').save()
 
     player.save()
     #monster.kill()
@@ -464,7 +464,7 @@ def act_info(player:Character, action:list):
         response = ask_world_info_gemini(prompt=action[1],
                               campaign_story=player.campaign.initial_story, 
                               campaign_achievements=player.campaign.achievements)
-    History.objects.create(campaign=player.campaign, author='NARRATOR', text=response.replace("\n", "<br>")).save()
+    History.objects.create(campaign=player.campaign, author='NARRATOR', color='purple', text=response.replace("\n", "<br>")).save()
 
     try:
         image_dir_DallE = image_generator_DallE(response)
@@ -873,12 +873,15 @@ def create_map(player:Character, characters, monsters, treasures, tiles, target:
             entity_data['type'].append('boss' if entity.is_boss else 'monster')
 
     # key bosses decorations
-    bosses_data = [(monster.x + 0.5, monster.y + 0.5) for monster in monsters if monster.is_key and monster.is_boss]
-    bosses_x, bosses_y = zip(*bosses_data)
-    #map.circle(x=bosses_x, y=bosses_y, radius=0.6, fill_color='deeppink', fill_alpha=0.3, line_width=2, line_color='deeppink')
-    map.circle(x=bosses_x, y=bosses_y, radius=0.8, fill_alpha=0, line_width=2, line_color='deeppink')
-    map.rect(x=bosses_x, y=bosses_y, width=1.13, height=1.13, angle=7.07, fill_alpha=0, line_width=2, line_color='deeppink')
-    map.rect(x=bosses_x, y=bosses_y, width=1.13, height=1.13, fill_alpha=0, line_width=2, line_color='deeppink')
+    try:
+        bosses_data = [(monster.x + 0.5, monster.y + 0.5) for monster in monsters if monster.is_key and monster.is_boss]
+        bosses_x, bosses_y = zip(*bosses_data)
+        #map.circle(x=bosses_x, y=bosses_y, radius=0.6, fill_color='deeppink', fill_alpha=0.3, line_width=2, line_color='deeppink')
+        map.circle(x=bosses_x, y=bosses_y, radius=0.8, fill_alpha=0, line_width=2, line_color='deeppink')
+        map.rect(x=bosses_x, y=bosses_y, width=1.13, height=1.13, angle=7.07, fill_alpha=0, line_width=2, line_color='deeppink')
+        map.rect(x=bosses_x, y=bosses_y, width=1.13, height=1.13, fill_alpha=0, line_width=2, line_color='deeppink')
+    except:
+        pass
 
     # everyone else's decorations
     map.rect(x='x', y='y', width=0.8, height=0.8, fill_color='color', fill_alpha=0.3, line_alpha=0, source=entity_data) 
