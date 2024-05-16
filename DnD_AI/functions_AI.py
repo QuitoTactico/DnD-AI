@@ -4,13 +4,15 @@ from io import BytesIO
 import os
 from random import randint, choice
 
+
 try:
-    try:
-        from DnD_AI.models import *
-    except: 
-        from models import *
+    from DnD_AI.models import *
 except:
-    from .models import *
+    try:
+        from models import *
+    except: 
+        from .models import *
+
 
 try:  # AI modules changes frequently, so it's nice to import them in a try-except
     from openai import OpenAI as OpenAI
@@ -404,6 +406,33 @@ def action_interpreter(prompt_input) -> str:
     
         # Dios obra de formas misteriosas
 
+
+def campaign_interpreter(campaign_id, n = int):
+    campaign = Campaign.objects.get(id=campaign_id)
+
+    attributes_response = {}
+
+    for attribute in ['name', 'race', 'class', 'physical_description']:
+        
+        
+        intro = f"Give me the {attribute} of the bosses of this story:" if attribute != 'physical_description' else f"Create the {attribute} of the {n} bosses of this story, a detailed physical description, perfect for image generation, talking about its clothes, physical appareance, colors, and others, you can create one if it's not said, 100 characters aprox:"
+
+        prompt = f"""{intro}
+        {campaign.initial_story}
+
+        Please give it in a raw format and separed by |, like just this:  {attribute}1|{attribute}2|{attribute}3
+        No other formats are allowed.""" 
+
+        try:
+            response = gemini_model.generate_content(prompt,
+                                            safety_settings=safety_settings)
+            
+            attributes_response[attribute] = response.text.split('|')
+            
+        except:
+            return {} , False
+        
+    return attributes_response, True
 
 
 # ==================================== TESTING ====================================

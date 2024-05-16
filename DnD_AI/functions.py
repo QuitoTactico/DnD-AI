@@ -2,12 +2,14 @@ from .models import *
 from .default import *
 
 from random import randint  # to roll the dice
+import numpy as np
 
 #from django.conf import settings   # to image access
 #import os          
 
 from bokeh.plotting import figure, show                             # for plotting (map)
-from bokeh.models import Range1d, Span, CrosshairTool, HoverTool    # for plot personalization (map components)
+                                                                    # for plot personalization (map components)
+from bokeh.models import Range1d, Span, CrosshairTool, HoverTool, AdaptiveTicker, ColumnDataSource, MultiPolygons 
 from bokeh.embed import components                                  # for plot html rendering (for the front-end)
 
 from .functions_AI import image_generator_DallE, image_generator_StabDiff, ask_world_info_gemini, continue_history_gemini
@@ -594,6 +596,9 @@ def act_move(player:Character, target:Monster, action:list):
 
 def create_map(player:Character, characters, monsters, treasures, tiles, target:Monster=None, host:str=None, show_map:bool=False) -> tuple:
 
+    zoom_border = max(player.campaign.size_x, player.campaign.size_y)
+    player_vision_range = 30
+
     map = figure(active_scroll='wheel_zoom', 
                  title="", 
                  aspect_scale=1, 
@@ -603,7 +608,46 @@ def create_map(player:Character, characters, monsters, treasures, tiles, target:
                  min_width=410,
                  background_fill_alpha=0.05,
                  border_fill_alpha=0,
-                 outline_line_color='white')
+                 outline_line_color='white',
+                 
+                 # setting the initial map center and range. The player will be the center with a visual range of 2.5
+                 x_range=Range1d(start=(player.x)-2.5, end=(player.x)+3.5, bounds=(-zoom_border, player.campaign.size_x+zoom_border)), 
+                 #x_range=Range1d(start=(player.x)-2.5, end=(player.x)+3.5, bounds=(-5, player.campaign.size_x+5)), 
+                 y_range=Range1d(start=(player.y)-2.5, end=(player.y)+3.5, bounds=(-zoom_border, player.campaign.size_y+zoom_border)),
+                 #y_range=Range1d(start=(player.y)-2.5, end=(player.y)+3.5, bounds=(-5, player.campaign.size_y+5)),
+                 )
+
+    #map.rect(x=player.campaign.size_x/2, y=player.campaign.size_y/2, width=player.campaign.size_x, height=player.campaign.size_y, fill_alpha=0, line_width=2, line_color='gray')
+        
+    # Define las coordenadas x e y para el cuadrado exterior
+    x_inner = [0, player.campaign.size_x, player.campaign.size_x, 0]
+    y_inner = [0, 0, player.campaign.size_y, player.campaign.size_y]
+
+    # Define las coordenadas x e y para el cuadrado interior
+    x_outer = [-zoom_border, player.campaign.size_x+zoom_border, player.campaign.size_x+zoom_border, -zoom_border]
+    y_outer = [-zoom_border, -zoom_border, player.campaign.size_y+zoom_border, player.campaign.size_y+zoom_border]
+    
+    
+    xs_dict = [[{'exterior': x_outer, 'holes': [x_inner]}]]
+    ys_dict = [[{'exterior': y_outer, 'holes': [y_inner]}]]
+
+    xs = [[[p['exterior'], *p['holes']] for p in mp] for mp in xs_dict]
+    ys = [[[p['exterior'], *p['holes']] for p in mp] for mp in ys_dict]
+
+    border_source = ColumnDataSource(dict(xs=xs, ys=ys))
+
+    glyph = MultiPolygons(xs="xs", ys="ys", 
+                          hatch_pattern='spiral',
+                          hatch_scale=8, 
+                          hatch_weight=0.5,
+                          hatch_color='black',
+                          hatch_alpha=0.5,
+                          fill_alpha=0.5,
+                          line_alpha=0, 
+                          line_color='white')
+    map.add_glyph(border_source, glyph)
+
+
 
     # modifying the borders and background of the map
     map.outline_line_alpha = 0.1
@@ -669,17 +713,21 @@ def create_map(player:Character, characters, monsters, treasures, tiles, target:
     #hover = 
 
     # setting the initial map center and range. The player will be the center with a visual range of 2.5
-    map.x_range = Range1d(start=(player.x)-2.5, end=(player.x)+3.5) # -2, +3
-    map.y_range = Range1d(start=(player.y)-2.5, end=(player.y)+3.5) # -2, +3
+    #map.x_range = Range1d() # -2, +3
+    #map.y_range = Range1d() # -2, +3
 
 
+    filtered_tiles = [tile for tile in tiles if np.sqrt((tile.x - player.x)**2 + (tile.y - player.y)**2) <= player_vision_range]
     # rendering the map tiles
     '''for tile in Tile.objects.all():
         map.image_url(url=[f'media/map/tiles/{DEFAULT_TILE_TYPES[tile.tile_type]}'], x=tile.x, y=tile.y +1, w=1, h=1)'''
-    urls = [f'media/map/tiles/{DEFAULT_TILE_TYPES[tile.tile_type]}' for tile in tiles]
-    xs = [tile.x for tile in tiles]
-    ys = [tile.y + 1 for tile in tiles]
+    urls = [f'media/map/tiles/{DEFAULT_TILE_TYPES[tile.tile_type]}' for tile in filtered_tiles]
+    xs = [tile.x for tile in filtered_tiles]
+    ys = [tile.y + 1 for tile in filtered_tiles ]
     map.image_url(url=urls, x=xs, y=ys, w=1, h=1)
+
+    # player's vision range (50 tiles)
+    map.circle(x=player.x + 0.5, y=player.y + 0.5, radius=player_vision_range, fill_alpha=0, line_width=1, line_color='gray')
 
     # the wepon range of the player will glow red if there are monsters in range, else it will be gray
     range_color,range_alpha = ('red',0.65) if len(player.get_monsters_in_range()) != 0 else ('gray',0.5)
@@ -708,30 +756,10 @@ def create_map(player:Character, characters, monsters, treasures, tiles, target:
     #map.circle(x=player.x+0.5, y=player.y+0.5, radius=1, fill_alpha=0, line_color='green', line_width=2)
     
     # adding the entities to the map
-    entities = list(characters) + list(monsters)
-    '''
-    entity_data = {
-        'x': [entity.x + 0.5 for entity in entities],
-        'y': [entity.y + 0.5 for entity in entities],
-        'raceclass' : [f'{character.character_race} {character.character_class}' if character.character_race != character.character_class else character.character_class for character in characters] + [f'{monster.monster_race} {monster.monster_class}' if monster.monster_race != monster.monster_class else monster.monster_class for monster in monsters],
-        'LVL': [f'LVL: {character.level}' for character in characters]+['' for _ in monsters],
-        'HP': [entity.health for entity in entities],
-        'HP_max': [entity.max_health for entity in entities],
-        'RNG' : [entity.weapon.range for entity in entities],
-        'icon_x': [entity.x +0.1 for entity in entities],
-        'icon_y': [entity.y + 0.9 for entity in entities],
-        'real_x': [entity.x for entity in entities],
-        'real_y': [entity.y for entity in entities],
-        'name': [entity.name for entity in entities],
-        'icon': [entity.icon.url for entity in entities],
-        'weapon_icon': [entity.weapon.image.url for entity in entities],
-        'weapon_name': [f'{entity.weapon.name}+{entity.weapon.level}' if entity.weapon.level != 0 else entity.weapon.name for entity in entities],
-        'weapon_color': ['orange' if entity.weapon.damage_type == 'Physical' else 'cyan' if entity.weapon.damage_type == 'Magical' else 'black' for entity in entities],
-        'color': [('green' if character.id == player.id else 'blue') if character.is_playable else 'gold' for character in characters] + ['deeppink' if monster.is_boss else 'red' for monster in monsters],
-        'dash': ['solid' for _ in characters]+['dashed' if monster.is_key else 'solid' for monster in monsters],
-        'type': ['character' if character.id != player.id else 'player' for character in characters] + ['boss' if monster.is_boss else 'monster' for monster in monsters]
-    }
-    '''
+    filtered_monsters = [monster for monster in monsters if np.sqrt((monster.x - player.x)**2 + (monster.y - player.y)**2) <= player_vision_range or monster.is_boss]
+    
+    entities = list(characters) + list(filtered_monsters)
+    
     entity_data = {
         'x': [], 'y': [], 'raceclass': [], 'LVL': [], 'HP': [], 'HP_max': [], 'RNG': [],
         'icon_x': [], 'icon_y': [], 'real_x': [], 'real_y': [], 'name': [], 'icon': [],
@@ -757,7 +785,7 @@ def create_map(player:Character, characters, monsters, treasures, tiles, target:
         if isinstance(entity, Character):
             entity_data['raceclass'].append(f'{entity.character_race} {entity.character_class}' if entity.character_race != entity.character_class else entity.character_class)
             entity_data['LVL'].append(f'LVL: {entity.level}')
-            entity_data['color'].append('green' if entity.id == player.id else 'blue')
+            entity_data['color'].append('green' if entity.id == player.id else 'blue' if entity.is_playable else 'gold')
             entity_data['dash'].append('solid')
             entity_data['type'].append('character' if entity.id != player.id else 'player')
         elif isinstance(entity, Monster):
@@ -767,24 +795,34 @@ def create_map(player:Character, characters, monsters, treasures, tiles, target:
             entity_data['dash'].append('dashed' if entity.is_key else 'solid')
             entity_data['type'].append('boss' if entity.is_boss else 'monster')
 
-    map.rect(x='x', y='y', width=0.8, height=0.8, fill_color='color', fill_alpha=0.3, line_alpha=0, source=entity_data)  
+    # key bosses decorations
+    bosses_data = [(monster.x + 0.5, monster.y + 0.5) for monster in monsters if monster.is_key and monster.is_boss]
+    bosses_x, bosses_y = zip(*bosses_data)
+    #map.circle(x=bosses_x, y=bosses_y, radius=0.6, fill_color='deeppink', fill_alpha=0.3, line_width=2, line_color='deeppink')
+    map.circle(x=bosses_x, y=bosses_y, radius=0.8, fill_alpha=0, line_width=2, line_color='deeppink')
+    map.rect(x=bosses_x, y=bosses_y, width=1.13, height=1.13, angle=7.07, fill_alpha=0, line_width=2, line_color='deeppink')
+    map.rect(x=bosses_x, y=bosses_y, width=1.13, height=1.13, fill_alpha=0, line_width=2, line_color='deeppink')
+
+    # everyone else's decorations
+    map.rect(x='x', y='y', width=0.8, height=0.8, fill_color='color', fill_alpha=0.3, line_alpha=0, source=entity_data) 
     map.image_url(url='icon', x='icon_x', y='icon_y', h=0.8, w=0.8, name='name', source=entity_data)
     map.image_url(url='weapon_icon', x='x', y='y', h=0.4, w=0.4, name='weapon_name', source=entity_data)
     entities = map.rect(x='x', y='y', width=0.8, height=0.8, line_color='color', line_dash='dash', fill_alpha=0, line_width=2, name='name', source=entity_data)
     entities.tags = ['entity']
 
+    filtered_treasures = [treasure for treasure in treasures if treasure.treasure_type == 'Chest' or treasure.treasure_type =='Weapon' or treasure.treasure_type == 'Portal' or np.sqrt((treasure.x - player.x)**2 + (treasure.y - player.y)**2) <= player_vision_range]
 
     treasure_data = {
-        'x' : [treasure.x + 0.5 for treasure in treasures],
-        'y' : [treasure.y + 0.5 for treasure in treasures],
-        'icon_x' : [treasure.x +0.1 for treasure in treasures],
-        'icon_y' : [treasure.y +0.9 for treasure in treasures],
-        'real_x' : [treasure.x for treasure in treasures],
-        'real_y' : [treasure.y for treasure in treasures],
-        'color' : [('gold' if treasure.treasure_type == 'Gold' else 'dimgray' if treasure.discovered else '#212121') if treasure.treasure_type != 'Weapon' or not treasure.discovered else 'orange' if treasure.weapon.damage_type == 'Physical' else 'cyan' if treasure.weapon.damage_type == 'Magical' else 'black' for treasure in treasures],
-        'inv': [(treasure.inventory[1:-1] if treasure.discovered  else '???') if treasure.treasure_type!='Weapon' else  (f'DMG: {treasure.weapon.damage}, RNG: {treasure.weapon.range}' if treasure.discovered else '') for treasure in treasures],
-        'icon' : [treasure.icon.url for treasure in treasures],
-        'name': [('Discovered '+treasure.treasure_type if treasure.discovered else treasure.treasure_type if treasure.treasure_type != 'Weapon' else 'Undiscovered Weapon') if treasure.treasure_type!='Weapon' or not treasure.discovered else treasure.weapon.name for treasure in treasures],
+        'x' : [treasure.x + 0.5 for treasure in filtered_treasures],
+        'y' : [treasure.y + 0.5 for treasure in filtered_treasures],
+        'icon_x' : [treasure.x +0.1 for treasure in filtered_treasures],
+        'icon_y' : [treasure.y +0.9 for treasure in filtered_treasures],
+        'real_x' : [treasure.x for treasure in filtered_treasures],
+        'real_y' : [treasure.y for treasure in filtered_treasures],
+        'color' : [('gold' if treasure.treasure_type == 'Gold' else 'dimgray' if treasure.discovered else '#212121') if treasure.treasure_type != 'Weapon' or not treasure.discovered else 'orange' if treasure.weapon.damage_type == 'Physical' else 'cyan' if treasure.weapon.damage_type == 'Magical' else 'black' for treasure in filtered_treasures],
+        'inv': ['' if treasure.treasure_type == "Portal" else (treasure.inventory[1:-1] if treasure.discovered  else '???') if treasure.treasure_type!='Weapon' else  (f'DMG: {treasure.weapon.damage}, RNG: {treasure.weapon.range}' if treasure.discovered else '') for treasure in filtered_treasures],
+        'icon' : [treasure.icon.url for treasure in filtered_treasures],
+        'name': [('Discovered '+treasure.treasure_type if treasure.discovered else treasure.treasure_type if treasure.treasure_type != 'Weapon' else 'Undiscovered Weapon') if treasure.treasure_type!='Weapon' or not treasure.discovered else treasure.weapon.name for treasure in filtered_treasures],
     }
 
     map.image_url(url='icon', x='icon_x', y='icon_y', h=0.8, w=0.8, name='name', source=treasure_data)
@@ -800,6 +838,11 @@ def create_map(player:Character, characters, monsters, treasures, tiles, target:
         show(map)
         map.sizing_mode = 'scale_width'
 
+    map.grid.grid_line_color = "grey"
+    
+    map.xaxis.ticker = AdaptiveTicker(min_interval=1,  mantissas=[1, 2, 5], base=10)
+    map.yaxis.ticker = AdaptiveTicker(min_interval=1,  mantissas=[1, 2, 5], base=10)
+    
     map_script, map_div = components(map)
     return map_script, map_div
 
@@ -889,7 +932,98 @@ MAP PAST TRIES  (DON'T DELETE, PLEASE)
     borde_player = map.rect(name=player.name, x=player_x+0.5, y=player_y+0.5, width=0.8, height=0.8, line_color="green", fill_color='green', fill_alpha=0, line_width=2)
     borde_player.tags = ['player']
 
+'''
 
+'''
+    entity_data = {
+        'x': [entity.x + 0.5 for entity in entities],
+        'y': [entity.y + 0.5 for entity in entities],
+        'raceclass' : [f'{character.character_race} {character.character_class}' if character.character_race != character.character_class else character.character_class for character in characters] + [f'{monster.monster_race} {monster.monster_class}' if monster.monster_race != monster.monster_class else monster.monster_class for monster in monsters],
+        'LVL': [f'LVL: {character.level}' for character in characters]+['' for _ in monsters],
+        'HP': [entity.health for entity in entities],
+        'HP_max': [entity.max_health for entity in entities],
+        'RNG' : [entity.weapon.range for entity in entities],
+        'icon_x': [entity.x +0.1 for entity in entities],
+        'icon_y': [entity.y + 0.9 for entity in entities],
+        'real_x': [entity.x for entity in entities],
+        'real_y': [entity.y for entity in entities],
+        'name': [entity.name for entity in entities],
+        'icon': [entity.icon.url for entity in entities],
+        'weapon_icon': [entity.weapon.image.url for entity in entities],
+        'weapon_name': [f'{entity.weapon.name}+{entity.weapon.level}' if entity.weapon.level != 0 else entity.weapon.name for entity in entities],
+        'weapon_color': ['orange' if entity.weapon.damage_type == 'Physical' else 'cyan' if entity.weapon.damage_type == 'Magical' else 'black' for entity in entities],
+        'color': [('green' if character.id == player.id else 'blue') if character.is_playable else 'gold' for character in characters] + ['deeppink' if monster.is_boss else 'red' for monster in monsters],
+        'dash': ['solid' for _ in characters]+['dashed' if monster.is_key else 'solid' for monster in monsters],
+        'type': ['character' if character.id != player.id else 'player' for character in characters] + ['boss' if monster.is_boss else 'monster' for monster in monsters]
+    }
+'''
+
+'''# Define las coordenadas x e y para el cuadrado exterior
+    x_outer = [[0, player.campaign.size_x, player.campaign.size_x, 0]]
+    y_outer = [[0, 0, player.campaign.size_y, player.campaign.size_y]]
+
+    # Define las coordenadas x e y para el cuadrado interior
+    x_inner = [[player.campaign.size_x/4, 3*player.campaign.size_x/4, 3*player.campaign.size_x/4, player.campaign.size_x/4]]
+    y_inner = [[player.campaign.size_y/4, player.campaign.size_y/4, 3*player.campaign.size_y/4, 3*player.campaign.size_y/4]]
+
+    # Dibuja el cuadrado exterior con un hueco en el medio
+    map.multi_polygons(xs=[x_outer, x_inner], ys=[y_outer, y_inner],
+                    fill_color=['blue', 'white'],
+                    hatch_pattern=['diagonal_cross', None],
+                    hatch_scale=8, 
+                    hatch_weight=0.5,
+                    hatch_color='gray',
+                    hatch_alpha=0.5,
+                    line_alpha=0, 
+                    line_color='white')
+'''
+
+'''
+
+    # Define una función para mover las marcas de graduación a la mitad de las celdas de la cuadrícula
+    formatter = FuncTickFormatter(code="""
+        return (tick + 0.5).toFixed(1);
+    """)
+    #return Math.round(tick + 0.5)
+    
+    minor_ticks = [i + 0.5 for i in range(0, 10)]  # Ajusta el rango según el tamaño de tu cuadrícula
+
+    # Ajusta los major ticks en los ejes x e y
+    map.xaxis.ticker = SingleIntervalTicker(interval=1, num_minor_ticks=0)
+    map.yaxis.ticker = SingleIntervalTicker(interval=1, num_minor_ticks=0)
+
+        # Ajusta los minor ticks en los ejes x e y
+    map.xaxis.minor_ticks = FixedTicker(ticks=minor_ticks)
+    map.yaxis.minor_ticks = FixedTicker(ticks=minor_ticks)
+
+    # Oculta los major ticks
+    map.xaxis.major_label_overrides = {i: '' for i in range(0, 10)}  # Ajusta el rango según el tamaño de tu cuadrícula
+    map.yaxis.major_label_overrides = {i: '' for i in range(0, 10)}  # Ajusta el rango según el tamaño de tu cuadrícula
+
+    map.xaxis.formatter = formatter
+    map.yaxis.formatter = formatter
+    
+    # Define una función para mover las marcas de graduación a la mitad de las celdas de la cuadrícula
+    formatter = FuncTickFormatter(code="""
+        return (tick + 0.5).toFixed(0);
+    """)
+
+    # Ajusta los major ticks en los ejes x e y
+    map.xaxis.ticker = SingleIntervalTicker(interval=1, num_minor_ticks=1)
+    map.yaxis.ticker = SingleIntervalTicker(interval=1, num_minor_ticks=1)
+
+    # Ajusta los minor ticks en los ejes x e y
+    map.xaxis.formatter = formatter
+    map.yaxis.formatter = formatter
+
+    # Oculta los major ticks
+    map.xaxis.major_label_overrides = {i: '' for i in range(0, 10)}  # Ajusta el rango según el tamaño de tu cuadrícula
+    map.yaxis.major_label_overrides = {i: '' for i in range(0, 10)}  # Ajusta el rango según el tamaño de tu cuadrícula
+    
+'''
+
+
+'''
 MAP LABELS
 
 unexpected attribute 'theme' to figure, possible attributes are above, active_drag, active_inspect, active_multi, active_scroll, active_tap, align, aspect_ratio, aspect_scale, attribution, background_fill_alpha, background_fill_color, below, border_fill_alpha, border_fill_color, center, context_menu, css_classes, css_variables, disabled, elements, extra_x_ranges, extra_x_scales, extra_y_ranges, extra_y_scales, flow_mode, frame_align, frame_height, frame_width, height, height_policy, hidpi, hold_render, inner_height, inner_width, js_event_callbacks, js_property_callbacks, left, lod_factor, lod_interval, lod_threshold, lod_timeout, margin, match_aspect, max_height, max_width, min_border, min_border_bottom, min_border_left, min_border_right, min_border_top, min_height, min_width, name, outer_height, outer_width, outline_line_alpha, outline_line_cap, outline_line_color, outline_line_dash, outline_line_dash_offset, outline_line_join, outline_line_width, output_backend, renderers, reset_policy, resizable, right, sizing_mode, styles, stylesheets, subscribed_events, syncable, tags, title, title_location, toolbar, toolbar_inner, toolbar_location, toolbar_sticky, tools, tooltips, visible, width, width_policy, x_axis_label, x_axis_location, x_axis_type, x_minor_ticks, x_range, x_scale, y_axis_label, y_axis_location, y_axis_type, y_minor_ticks, y_range or y_scale

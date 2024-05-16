@@ -1,3 +1,32 @@
+Quizás sería mejor poner la generación de conexiones entre habitaciones a lo último, así no hay pasillos tan largos
+Sería conectar cada habitación con la próxima más cercana que no esté conectada aún
+
+Hueso de regreso
+
+Implementar uso de portales para teletransportarse a otros portales
+
+Puerta que no te deje pasar si no tienes una llave, gastas la llave
+
+Puerta de dungeon que te lleve a otra subcampaña con su propio mapa
+
+Pociones de revivir, propias o para amigos
+
+Moverse con wasd
+
+Meter pescaos y tiles de agua
+
+Bruma de guerra, no se ve la habitación hasta que estás en ella
+
+generar NPCs en las habitaciones también
+
+
+
+
+
+
+
+
+
 ''' DESCRIPTIONS:
 
     BASICS
