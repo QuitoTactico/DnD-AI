@@ -200,3 +200,13 @@
 	background-color: #ff6f6f;
 	color: white;
 }
+
+#promptInput {
+  font-family: 'Sixtyfour', sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+      "BLED" 0,
+      "SCAN" 0;
+}

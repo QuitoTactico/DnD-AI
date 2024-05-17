@@ -132,10 +132,10 @@
 
         <!-- Action -->
         <div class="action">
-            <form action="{% url 'game' %}" method="post">
+            <form action="{% url 'game' %}" method="post" id="actionForm">
                 {% csrf_token %}
                 
-                <input id="font1" class="txtAction" type="text" name="prompt" placeholder="What do you want to do?" />
+                <input class="txtAction" type="text" name="prompt" placeholder="What do you want to do?" id="promptInput" />
 
                 <input id="font1" class="btnAction" type="submit" value="Act" onclick="loading('Loading','game')" />
 
@@ -176,5 +176,6 @@
 
     <script src="{% static 'js/scrollHistory.js' %}"></script>
     <script src="{% static 'js/overflowAnimation.js' %}" defer></script>
+    <script src="{% static 'js/detectKeys.js' %}"></script>
 
 {% endblock content %}
