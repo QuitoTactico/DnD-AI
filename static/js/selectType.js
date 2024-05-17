@@ -50,3 +50,21 @@ function selectGift(event) {
     previusGift = raceSelected; //save the new div
 } 
 
+const stats = document.querySelectorAll('input[type="number"]');
+const amount = document.getElementById("amount");
+
+stats.forEach((stat) => {
+    stat.addEventListener("input", () => {
+        var total = 0;
+        
+        stats.forEach((stat) => {
+            total += parseInt(stat.value);
+        });
+      
+        if (total >= 60) {
+            stat.value = (parseInt(stat.value)-1).toString();
+        }
+
+        amount.textContent = total.toString();
+    });
+});
