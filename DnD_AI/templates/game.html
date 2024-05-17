@@ -132,12 +132,12 @@
 
         <!-- Action -->
         <div class="action">
-            <form action="{% url 'game' %}" method="post">
+            <form action="{% url 'game' %}" method="post" id="actionForm">
                 {% csrf_token %}
                 
-                <input id="font1" class="txtAction" type="text" name="prompt" placeholder="What do you want to do?" />
+                <input class="txtAction" type="text" name="prompt" placeholder="What do you want to do?" id="promptInput" autocomplete="off"/>
 
-                <input id="font1" class="btnAction" type="submit" value="Act" onclick="loading('Loading','game')" />
+                <input id="font1" class="btnAction" type="submit" value="Act" onclick="loading('Loading','game','actionForm')" />
 
                 <input type="hidden" name="campaign_id" value="{{ campaign_id }}" />
 
@@ -148,7 +148,7 @@
 
         <!-- Level -->
         <div class="lvl">
-            <div class="experience-bar" style="width: {{ exp_bar }}%;">
+            {% if exp_bar == 100 %}<div class="experience-bar levelup-animation" style="width: {{ exp_bar }}%;">{% else %}<div class="experience-bar" style="width: {{ exp_bar }}%;">{% endif %}
                 <div class="experience-text">EXP:{{ player.exp }}/{{ player.exp_top }}</div>
             </div>
             <div class="level">LVL:{{ player.level }}</div>
@@ -176,5 +176,6 @@
 
     <script src="{% static 'js/scrollHistory.js' %}"></script>
     <script src="{% static 'js/overflowAnimation.js' %}" defer></script>
+    <script src="{% static 'js/detectKeys.js' %}"></script>
 
 {% endblock content %}

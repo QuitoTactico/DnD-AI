@@ -133,6 +133,22 @@
   white-space: nowrap;
 }
 
+@keyframes colorChange {
+  0%, 100% {
+    background-color: aquamarine;
+  }
+  50% {
+    background-color: orange;
+  }
+}
+
+.levelup-animation {
+  animation-name: colorChange;
+  animation-duration: 2s; /* Ajusta este valor para cambiar la velocidad de la animación */
+  animation-iteration-count: infinite; /* La animación se repetirá indefinidamente */
+  animation-timing-function: ease-in-out; /* Esto hará que la animación tenga un ritmo sinoidal */
+}
+
 .experience-text {
   padding-left: 10px;
   color: white;
@@ -199,4 +215,14 @@
 .btnAction:hover {
 	background-color: #ff6f6f;
 	color: white;
+}
+
+#promptInput {
+  font-family: 'Sixtyfour', sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+      "BLED" 0,
+      "SCAN" 0;
 }
