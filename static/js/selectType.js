@@ -54,6 +54,14 @@ const stats = document.querySelectorAll('input[type="number"]');
 const amount = document.getElementById("amount");
 
 stats.forEach((stat) => {
+    stat.addEventListener('keypress', (event) => {
+        event.preventDefault(); 
+    });
+    
+    stat.addEventListener('keydown', (event) => {
+        event.preventDefault(); 
+    });
+    
     stat.addEventListener("input", () => {
         var total = 0;
         
