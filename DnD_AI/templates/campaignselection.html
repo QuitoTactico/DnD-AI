@@ -28,7 +28,7 @@
             
             <button type="submit" class="btnCampaign">
                 <div class="campaign-title">
-                    <h1 id="font1" style="margin-bottom:0px">{{ campaign.name }}</h1>
+                    <h1 id="font1" style="margin-bottom:0px">{% if campaign.is_completed %}(COMPLETED) {% endif %}{{ campaign.name }}</h1>
                     <h2 id="font1" class="player-count">{{ campaign.player_counter }} players</h2>
                 </div>
                 <ul>

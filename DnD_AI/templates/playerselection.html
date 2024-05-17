@@ -58,7 +58,7 @@
     <hr>
     <form action="{% url 'playerCreation' %}" method="post">
     {% csrf_token %}
-        <input type="hidden" name="campaign_id" value="{{ player.campaign.id }}">
+        <input type="hidden" name="campaign_id" value="{{campaign_id}}">
         <button type="submit" class="btnActionWide" onclick="loading('Loading player creation','playercreation')">
             <h2 id="font1">Create a new player!</h2>
         </button>

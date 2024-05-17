@@ -352,7 +352,7 @@ def action_image_generation(prompt:str, action:str, player:Character, target:Mon
         image_description = f"{player.name}, {player.character_race} {player.character_class} {player.physical_description} running to the {prompt[4:]}"
 
     elif action == 'attack':
-        image_description = f"{player.name}, {player.character_race} {player.character_class} {player.physical_description} using a {player.weapon.weapon_type}, fighting with a {target.monster_race} {target.monster_class} {target.physical_description} who's using a {target.weapon.weapon_type}"
+        image_description = f"{player.name}, {player.character_race} {player.character_class} {player.physical_description} using a {player.weapon.weapon_type} ({player.weapon.name}), fighting with a {target.monster_race} {target.monster_class} {target.physical_description} who's using a {target.weapon.weapon_type} ({target.weapon.name})"
         #image_description = f"{player.character_race} {player.character_class} {player.physical_description} fighting a {target.monster_race} {target.monster_class} {target.physical_description} with a {player.weapon.weapon_type}"
 
     elif action == 'equip':
@@ -666,8 +666,6 @@ def act_move(player:Character, target:Monster, action:list):
     return successful, new_target
 
 
-
-
 # ------------------------------------------------ MAP --------------------------------------------------
 
 
@@ -926,6 +924,30 @@ def create_map(player:Character, characters, monsters, treasures, tiles, target:
     map_script, map_div = components(map)
     return map_script, map_div
 
+
+def place_player_on_spawn(player:Character):
+    tries = 70
+    campaign_id = player.campaign.id
+    spawn_tiles = Tile.objects.filter(campaign_id=campaign_id, tile_type='spawn')
+
+    while tries > 0:
+        chosen_tile = choice(spawn_tiles)
+
+        x = chosen_tile.x
+        y = chosen_tile.y
+
+        existent_player = Character.objects.filter(campaign_id=campaign_id, x=x, y=y)
+        existent_treasure = Treasure.objects.filter(campaign_id=campaign_id, x=x, y=y)
+        
+        if not existent_player and not existent_treasure:
+            player.x = x
+            player.y = y
+            player.save()
+            return True
+        else:
+            tries -= 1
+
+    return False
 
 
 # ---------------------------------------------- RESOURCES ------------------------------------------------

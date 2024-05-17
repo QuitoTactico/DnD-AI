@@ -1,4 +1,5 @@
 from django.shortcuts import render
+#from django.http import HttpResponse
 
 from .models import *
 from .functions import *
@@ -91,71 +92,92 @@ def playerSelection(request):
     - image         (optional) (default = icon)
     '''
 
-    
     if request.method == "POST":
 
         #campaign_id = request.POST['campaign_id'] if 'campaign_id' in request.POST else Campaign.objects.filter(is_completed=False).first().id  # REDUNDANT!
         # Today I've learnt something better than ternary conditional.
         campaign_id = request.POST.get('campaign_id') or Campaign.objects.filter(is_completed=False).first().id
 
-
-        '''  POR AHORA SIN CREACIÓN, AHORITA LO PROBAMOS
-        # This goes here. After the player selects his character info, the button will redirect the player to this view.
-        # So, the button will send the info to this view and not the other one, to create the character.
+        # Check if create_player is in the POST data
         if 'create_player' in request.POST:
-            name = request.POST.get('name')
-            physical_description = request.POST.get('physical_description')
+            #try:
+                name = request.POST.get('name')
+                physical_description = request.POST.get('physical_description')
 
-            weapon_id = request.POST.get('weapon_id')
-            weapon = Weapon.objects.get(id=weapon_id)
+                character_race = request.POST.get('race')
+                character_class = request.POST.get('class') or character_race  # we use the race twice, if no class is selected
 
-            max_health = request.POST.get('max_health')
-            strength = request.POST.get('str')
-            intelligence = request.POST.get('int')
-            recursiveness = request.POST.get('rec')
-            dexterity = request.POST.get('dex')
-            physical_resistance = request.POST.get('phyres')
-            magical_resistance = request.POST.get('magres')
-            constitution = request.POST.get('con')
+                weapon_id = int(request.POST.get('weapon_id'))
+                weapon = Weapon.objects.get(id=weapon_id)
 
-            gift = request.POST.get('gift')
-            inventory = '{"gold": 5}' if gift is None else '{"' + gift + '": 5, "gold": 5}'
+                # stats
+                max_health = int(request.POST.get('max_health', int(request.POST.get('vitality')) * 10))
+                strength = int(request.POST.get('str'))
+                intelligence = int(request.POST.get('int'))
+                dexterity = int(request.POST.get('dex'))
+                physical_resistance = int(request.POST.get('phyres'))
+                magical_resistance = int(request.POST.get('magres'))
 
-            story = request.POST.get('story')
-            
-            character_race = request.POST.get('race')
-            character_class = request.POST.get('class') or character_race  # if there's no class selected, the race is used twice instead
-            
-            icon = request.POST.get('icon')
-            image = request.POST.get('image') or icon  # If there's no image selected, the icon is used instead
-            
-            Character.objects.create(
-                is_playable=True,
-                name=name,
-                physical_description=physical_description,
-                weapon=weapon,
-                max_health=max_health,
-                strength=strength,
-                intelligence=intelligence,
-                recursiveness=recursiveness,
-                dexterity=dexterity,
-                physical_resistance=physical_resistance,
-                magical_resistance=magical_resistance,
-                constitution=constitution,
-                inventory=inventory,
-                story=story,
-                character_race=character_race,
-                character_class=character_class,
-                icon=icon,
-                image=image,
-                campaign_id=campaign_id,
-            ).save()
+                story = request.POST.get('story') or "Default story."
+
+                '''
+                # we need to validate that numerical values do not exceed SQLite limits
+                if max_health > 9223372036854775807 or strength > 9223372036854775807 or intelligence > 9223372036854775807 or dexterity > 9223372036854775807 or physical_resistance > 9223372036854775807 or magical_resistance > 9223372036854775807:
+                    return HttpResponse("STATISTIC TOO BIG", status=400)
+                '''
+
+                # create new player
+                new_player = Character.objects.create(
+                    is_playable=True,
+                    name=name,
+                    physical_description=physical_description,
+                    weapon=weapon,
+                    max_health=max_health,
+                    strength=strength,
+                    intelligence=intelligence,
+                    dexterity=dexterity,
+                    physical_resistance=physical_resistance,
+                    magical_resistance=magical_resistance,
+                    inventory=str({'gold': 10, 'health potion': 5}),
+                    story=story,
+                    character_race=character_race,
+                    character_class=character_class,
+                    campaign_id=campaign_id,
+                    x=0,
+                    y=0,
+                )
+
+                place_player_on_spawn(new_player)
+
+                gift = request.POST.get('gift')
+                loot = {'gold': 50} if gift == 'gold' else {gift: 5}
+                new_player.add_all_to_inventory(loot)
+
+                image_description = f"{new_player.name}, a {new_player.character_race} {new_player.character_class}, {new_player.physical_description}"
+                try:
+                    image_dir_DallE = image_generator_DallE(image_description).replace('media/', '')
+                    new_player.icon = image_dir_DallE
+                    new_player.image = image_dir_DallE
+                except:
+                    try:
+                        image_dir_StabDiff = image_generator_StabDiff(image_description).replace('media/', '')
+                        new_player.icon = image_dir_StabDiff
+                        new_player.image = image_dir_StabDiff
+                    except:
+                        pass
+
+                new_player.save()
+                '''
+                return HttpResponse("Player created successfully.")
+                
+            except OverflowError as e:
+                return HttpResponse(f"Overflow error: {e}", status=500)
+            except ValueError as e:
+                return HttpResponse(f"Value error: {e}", status=400)
             '''
-            
+
     else:
         campaign_id = Campaign.objects.filter(is_completed=False).first().id
-    
-    
 
     players = Character.objects.filter(campaign_id=campaign_id, is_playable=True).order_by('-level')
 
@@ -164,7 +186,8 @@ def playerSelection(request):
                   {
                       'players': players, 
                       'campaign_id': campaign_id
-                      })
+                  })
+
 
 
 
@@ -174,12 +197,20 @@ def playerCreation(request):
     '''
 
     campaign_id = request.POST.get('campaign_id') or Campaign.objects.filter(is_completed=False).first().id
-    weapons = Weapon.objects.filter(is_template=True)
+    #weapons = Weapon.objects.filter(is_template=True)
 
     races = DEFAULT_RACES
     classes = [player_class for player_class in DEFAULT_CLASSES if player_class not in DEFAULT_RACES]
-    weapons_name = DEFAULT_WEAPON_NAMES
-    weapons_with_stats = DEFAULT_WEAPON_STATS
+    weapon_names = DEFAULT_WEAPON_NAMES
+    #weapons_with_stats = DEFAULT_WEAPON_STATS
+
+    weapons = []
+    for weapon_name in weapon_names:
+        default_weapon = Weapon.objects.filter(is_template=True, name=weapon_name).first()
+        if default_weapon:
+            weapons.append(default_weapon)
+
+
     
     return render(request, 'playercreation.html',
                   {
@@ -187,8 +218,8 @@ def playerCreation(request):
                         'races':races,
                         'classes':classes,
                         'weapons':weapons,
-                        'weapons_name':weapons_name,
-                        'weapons_with_stats':weapons_with_stats,
+                        #'weapons_name':weapon_names,
+                        #'weapons_with_stats':weapons_with_stats,
                         })
     
 
