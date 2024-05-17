@@ -99,37 +99,31 @@ def playerSelection(request):
         campaign_id = request.POST.get('campaign_id') or Campaign.objects.filter(is_completed=False).first().id
 
 
-        '''  POR AHORA SIN CREACIÓN, AHORITA LO PROBAMOS
+        # POR AHORA SIN CREACIÓN, AHORITA LO PROBAMOS
         # This goes here. After the player selects his character info, the button will redirect the player to this view.
         # So, the button will send the info to this view and not the other one, to create the character.
         if 'create_player' in request.POST:
             name = request.POST.get('name')
             physical_description = request.POST.get('physical_description')
 
+            character_race = request.POST.get('race')
+            character_class = request.POST.get('class') or character_race  # if there's no class selected, the race is used twice instead
+
             weapon_id = request.POST.get('weapon_id')
             weapon = Weapon.objects.get(id=weapon_id)
 
-            max_health = request.POST.get('max_health')
+            max_health = request.POST.get('max_health') or request.POST.get('vitality')*10
             strength = request.POST.get('str')
             intelligence = request.POST.get('int')
-            recursiveness = request.POST.get('rec')
+            #recursiveness = request.POST.get('rec')
             dexterity = request.POST.get('dex')
             physical_resistance = request.POST.get('phyres')
             magical_resistance = request.POST.get('magres')
-            constitution = request.POST.get('con')
+            #constitution = request.POST.get('con')
 
-            gift = request.POST.get('gift')
-            inventory = '{"gold": 5}' if gift is None else '{"' + gift + '": 5, "gold": 5}'
+            story = request.POST.get('story') or "Default story."
 
-            story = request.POST.get('story')
-            
-            character_race = request.POST.get('race')
-            character_class = request.POST.get('class') or character_race  # if there's no class selected, the race is used twice instead
-            
-            icon = request.POST.get('icon')
-            image = request.POST.get('image') or icon  # If there's no image selected, the icon is used instead
-            
-            Character.objects.create(
+            new_player = Character.objects.create(
                 is_playable=True,
                 name=name,
                 physical_description=physical_description,
@@ -137,26 +131,46 @@ def playerSelection(request):
                 max_health=max_health,
                 strength=strength,
                 intelligence=intelligence,
-                recursiveness=recursiveness,
+                #recursiveness=recursiveness,
                 dexterity=dexterity,
                 physical_resistance=physical_resistance,
                 magical_resistance=magical_resistance,
-                constitution=constitution,
-                inventory=inventory,
+                #constitution=constitution,
+                inventory=str({'gold': 10, 'health potion': 5}),
                 story=story,
                 character_race=character_race,
                 character_class=character_class,
-                icon=icon,
-                image=image,
                 campaign_id=campaign_id,
-            ).save()
-            '''
+                x=0,
+                y=0,
+            )
+
+            place_player_on_spawn(new_player)
+
+            gift = request.POST.get('gift')
+            loot = {'gold': 50} if gift == 'gold' else {gift: 5}
+            new_player.add_all_to_inventory(loot)
+
+            image_description = f"{new_player.name}, a {new_player.character_race} {new_player.character_class}, {new_player.physical_description}"
+            try:
+                image_dir_DallE = image_generator_DallE(image_description).replace('media/', '')
+                new_player.icon = image_dir_DallE
+                new_player.image = image_dir_DallE
+            except:
+                try:
+                    image_dir_StabDiff = image_generator_StabDiff(image_description).replace('media/', '')
+                    new_player.icon = image_dir_StabDiff
+                    new_player.image = image_dir_StabDiff
+                except:
+                    pass
+
+            new_player.save()
+            # the player was created
             
     else:
         campaign_id = Campaign.objects.filter(is_completed=False).first().id
     
     
-
     players = Character.objects.filter(campaign_id=campaign_id, is_playable=True).order_by('-level')
 
     return render(request, 
@@ -174,12 +188,20 @@ def playerCreation(request):
     '''
 
     campaign_id = request.POST.get('campaign_id') or Campaign.objects.filter(is_completed=False).first().id
-    weapons = Weapon.objects.filter(is_template=True)
+    #weapons = Weapon.objects.filter(is_template=True)
 
     races = DEFAULT_RACES
     classes = [player_class for player_class in DEFAULT_CLASSES if player_class not in DEFAULT_RACES]
-    weapons_name = DEFAULT_WEAPON_NAMES
-    weapons_with_stats = DEFAULT_WEAPON_STATS
+    weapon_names = DEFAULT_WEAPON_NAMES
+    #weapons_with_stats = DEFAULT_WEAPON_STATS
+
+    weapons = []
+    for weapon_name in weapon_names:
+        default_weapon = Weapon.objects.filter(is_template=True, name=weapon_name).first()
+        if default_weapon:
+            weapons.append(default_weapon)
+
+
     
     return render(request, 'playercreation.html',
                   {
@@ -187,8 +209,8 @@ def playerCreation(request):
                         'races':races,
                         'classes':classes,
                         'weapons':weapons,
-                        'weapons_name':weapons_name,
-                        'weapons_with_stats':weapons_with_stats,
+                        #'weapons_name':weapon_names,
+                        #'weapons_with_stats':weapons_with_stats,
                         })
     
 

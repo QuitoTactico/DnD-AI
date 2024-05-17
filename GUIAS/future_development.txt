@@ -29,6 +29,15 @@ Una x rosada o blanca para los bosses opcionales y tesoros por fuera del rango�
 
 Quizás pasar de matriz(array) de numpy a matriz(diccionario), la cosa es que no debería de ser tan lento el de array, no es un for de acceso sino de iterator/copia, O quién sabe, probar
 
+poner íconos de estadísticas en player creation, también texto de colores
+
+<input type="hidden" name="campaign_id" value="{{ campaign_id }}">
+
+/see inventory
+
+/talk
+
+
 
 
 ''' DESCRIPTIONS:
