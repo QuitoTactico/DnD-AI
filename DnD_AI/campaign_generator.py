@@ -127,9 +127,12 @@ def generate_monster(campaign_id, tile_type):
     if optional_boss:
         weapon = generate_unique_weapon()
         multiplier = random.randint(3, 5)
+        inventory=str({'gold':50, 'health potion': 3, 'go back bone': 1, 'key': 1})
     else:
         weapon = get_default_weapon(entity_class=monster_class) if random.random() < 0.5 else get_default_weapon(entity_class=monster_race)
         multiplier = 1
+        inventory_random = random.random()
+        inventory=str({'gold':random.randint(10,20)}) if inventory_random < 0.25 else str({'health potion': random.randint(1,3)}) if inventory_random < 0.5 else str({'go back bone': 1}) if inventory_random < 0.75 else str({'key': 1})
 
 
     monster = Monster.objects.create(
@@ -147,6 +150,7 @@ def generate_monster(campaign_id, tile_type):
             magical_resistance=magical_result,
             constitution=survival_result,
             exp_drop=random.randint(20,40)*multiplier,
+            inventory=inventory,
             x=0,
             y=0,
         )
@@ -163,7 +167,7 @@ def generate_monster(campaign_id, tile_type):
         monster.icon = icon
 
 
-    if random.random() < 0.1:
+    if random.random() < 0.05:
         monster.name = random.choice(COOL_NAMES)
 
     monster.save()
@@ -192,13 +196,13 @@ def generate_object(campaign_id, room, object_type, entity=None, x=None, y=None)
                 if random.random() < 0.5:
                     Treasure.objects.create(campaign_id=campaign_id, treasure_type='Chest', x=x, y=y,
                                             inventory=str(
-                                                {'gold': random.randint(30, 100), 'health potion': random.randint(3, 5)}
+                                                {'gold': random.randint(30, 100), 'health potion': random.randint(3, 5), 'go back bone': random.randint(1, 3)}
                                                 ))
                 else:
                     Treasure.objects.create(campaign_id=campaign_id, treasure_type='Weapon', x=x, y=y,
                                             weapon=generate_unique_weapon(common_too=True),
                                             inventory=str(
-                                                {'gold': random.randint(1, 50), 'health potion': random.randint(1, 3)}
+                                                {'gold': random.randint(1, 50), 'health potion': random.randint(1, 3), 'go back bone': 1}
                                                 ))
                 break
             else:
@@ -214,11 +218,11 @@ def generate_object(campaign_id, room, object_type, entity=None, x=None, y=None)
             if not existent_player and not existent_treasure and not existent_monster:
                 spawn = random.random()
                 if spawn < 0.33:
-                    inventory = str({'health potion': random.randint(1, 2)}) if spawn < 0.25 else str({'gold': random.randint(1,10)})
+                    inventory = str({'health potion': random.randint(1, 2)}) if spawn < 0.11 else str({'gold': random.randint(3,10)}) if spawn < 0.22 else str({'go back bone': 1})
                     Treasure.objects.create(campaign_id=campaign_id, treasure_type='Bag', x=x, y=y,
                                             inventory=inventory)
                 elif spawn < 0.66:
-                    inventory = str({'gold': random.randint(5, 20)})
+                    inventory = str({'gold': random.randint(10, 20)})
                     Treasure.objects.create(campaign_id=campaign_id, treasure_type='Gold', x=x, y=y,
                                             inventory=inventory)
                 else:
@@ -250,8 +254,9 @@ def generate_object(campaign_id, room, object_type, entity=None, x=None, y=None)
         if object_type == 'player':
             existent_player = Character.objects.filter(campaign_id=campaign_id, x=x, y=y)
             existent_treasure = Treasure.objects.filter(campaign_id=campaign_id, x=x, y=y)
+            existent_monster = Monster.objects.filter(campaign_id=campaign_id, x=x, y=y)
             
-            if not existent_player and not existent_treasure:
+            if not existent_player and not existent_treasure and not existent_monster:
                 entity.x = x
                 entity.y = y
                 entity.save()
@@ -288,8 +293,8 @@ def generate_dungeon_map(campaign: Campaign) -> bool:
     #campaign = Campaign.objects.get(id=campaign_id)
     #print(campaign)
     campaign_id = campaign.id
-    dimx = campaign.size_x
-    dimy = campaign.size_y
+    dimx = int(campaign.size_x)
+    dimy = int(campaign.size_y)
 
     if dimx * dimy > 500000:
         print('Mapa demasiado grande')
@@ -475,6 +480,7 @@ def generate_key_bosses(campaign_id, n:int = 3):
             physical_resistance=random.randint(10,15), 
             magical_resistance=random.randint(10,15),
             constitution=random.randint(10,15),
+            inventory=str({'gold':500, 'health potion': 10, 'go back bone': 5, 'key': 5}),
             exp_drop=1000,
             x=random.randint(0,10),
             y=random.randint(0,10),
