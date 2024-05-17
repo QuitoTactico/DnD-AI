@@ -352,7 +352,7 @@ def action_image_generation(prompt:str, action:str, player:Character, target:Mon
         image_description = f"{player.name}, {player.character_race} {player.character_class} {player.physical_description} running to the {prompt[4:]}"
 
     elif action == 'attack':
-        image_description = f"{player.name}, {player.character_race} {player.character_class} {player.physical_description} using a {player.weapon.weapon_type}, fighting with a {target.monster_race} {target.monster_class} {target.physical_description} who's using a {target.weapon.weapon_type}"
+        image_description = f"{player.name}, {player.character_race} {player.character_class} {player.physical_description} using a {player.weapon.weapon_type} ({player.weapon.name}), fighting with a {target.monster_race} {target.monster_class} {target.physical_description} who's using a {target.weapon.weapon_type} ({target.weapon.name})"
         #image_description = f"{player.character_race} {player.character_class} {player.physical_description} fighting a {target.monster_race} {target.monster_class} {target.physical_description} with a {player.weapon.weapon_type}"
 
     elif action == 'equip':
@@ -946,7 +946,7 @@ def place_player_on_spawn(player:Character):
             return True
         else:
             tries -= 1
-            
+
     return False
 
 

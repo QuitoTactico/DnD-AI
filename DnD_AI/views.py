@@ -99,7 +99,7 @@ def playerSelection(request):
         campaign_id = request.POST.get('campaign_id') or Campaign.objects.filter(is_completed=False).first().id
 
 
-        '''  POR AHORA SIN CREACIÓN, AHORITA LO PROBAMOS
+        # POR AHORA SIN CREACIÓN, AHORITA LO PROBAMOS
         # This goes here. After the player selects his character info, the button will redirect the player to this view.
         # So, the button will send the info to this view and not the other one, to create the character.
         if 'create_player' in request.POST:
@@ -112,8 +112,7 @@ def playerSelection(request):
             weapon_id = request.POST.get('weapon_id')
             weapon = Weapon.objects.get(id=weapon_id)
 
-            vitality = request.POST.get('vitality')
-            max_health = vitality*10
+            max_health = request.POST.get('max_health') or request.POST.get('vitality')*10
             strength = request.POST.get('str')
             intelligence = request.POST.get('int')
             #recursiveness = request.POST.get('rec')
@@ -122,7 +121,7 @@ def playerSelection(request):
             magical_resistance = request.POST.get('magres')
             #constitution = request.POST.get('con')
 
-            story = request.POST.get('story')
+            story = request.POST.get('story') or "Default story."
 
             new_player = Character.objects.create(
                 is_playable=True,
@@ -137,7 +136,7 @@ def playerSelection(request):
                 physical_resistance=physical_resistance,
                 magical_resistance=magical_resistance,
                 #constitution=constitution,
-                inventory=str({'gold': 10, health_potion: 5}),
+                inventory=str({'gold': 10, 'health potion': 5}),
                 story=story,
                 character_race=character_race,
                 character_class=character_class,
@@ -150,21 +149,23 @@ def playerSelection(request):
 
             gift = request.POST.get('gift')
             loot = {'gold': 50} if gift == 'gold' else {gift: 5}
-            player.add_all_to_inventory(loot)
+            new_player.add_all_to_inventory(loot)
 
             image_description = f"{new_player.name}, a {new_player.character_race} {new_player.character_class}, {new_player.physical_description}"
             try:
                 image_dir_DallE = image_generator_DallE(image_description).replace('media/', '')
                 new_player.icon = image_dir_DallE
+                new_player.image = image_dir_DallE
             except:
                 try:
                     image_dir_StabDiff = image_generator_StabDiff(image_description).replace('media/', '')
                     new_player.icon = image_dir_StabDiff
+                    new_player.image = image_dir_StabDiff
                 except:
                     pass
 
             new_player.save()
-            '''
+            # the player was created
             
     else:
         campaign_id = Campaign.objects.filter(is_completed=False).first().id
@@ -187,12 +188,20 @@ def playerCreation(request):
     '''
 
     campaign_id = request.POST.get('campaign_id') or Campaign.objects.filter(is_completed=False).first().id
-    weapons = Weapon.objects.filter(is_template=True)
+    #weapons = Weapon.objects.filter(is_template=True)
 
     races = DEFAULT_RACES
     classes = [player_class for player_class in DEFAULT_CLASSES if player_class not in DEFAULT_RACES]
-    weapons_name = DEFAULT_WEAPON_NAMES
-    weapons_with_stats = DEFAULT_WEAPON_STATS
+    weapon_names = DEFAULT_WEAPON_NAMES
+    #weapons_with_stats = DEFAULT_WEAPON_STATS
+
+    weapons = []
+    for weapon_name in weapon_names:
+        default_weapon = Weapon.objects.filter(is_template=True, name=weapon_name).first()
+        if default_weapon:
+            weapons.append(default_weapon)
+
+
     
     return render(request, 'playercreation.html',
                   {
@@ -200,8 +209,8 @@ def playerCreation(request):
                         'races':races,
                         'classes':classes,
                         'weapons':weapons,
-                        'weapons_name':weapons_name,
-                        'weapons_with_stats':weapons_with_stats,
+                        #'weapons_name':weapon_names,
+                        #'weapons_with_stats':weapons_with_stats,
                         })
     
 

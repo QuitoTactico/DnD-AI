@@ -31,6 +31,8 @@ Quizás pasar de matriz(array) de numpy a matriz(diccionario), la cosa es que no
 
 poner íconos de estadísticas en player creation, también texto de colores
 
+<input type="hidden" name="campaign_id" value="{{ campaign_id }}">
+
 /see inventory
 
 /talk
