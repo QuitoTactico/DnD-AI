@@ -236,10 +236,12 @@ def create_initial_stories_gemini(prompt:str="", n:int=3) -> list:
     prompt = prompt or ""   # if prompt is None, then it will be an empty string
     stories = []
     world_type = ["fantasy", "sci-fi", "medieval", "cyberpunk", "post-apocalyptic", "steampunk", "futuristic", "dystopian", "utopian", "magical", "mystical", "mythical", "legendary", "historical", "modern"]
+    #render_format = "Use the html tag for underline instead of **"
+    render_format = ". Write it using the HTML formats when underlining or bolding. No other format is allowed."
 
     for _ in range(n):
         try:
-            story = gemini_model.generate_content(f"Tell me a story about a {choice(world_type)} world where i have to defeat some strong enemies and bosses to win, this is a initial story of a game. Also tell me at least three names of key bosses and it's race and class to be defeated, and why i have to defeat them. Don't talk about a protagonist or a specific hero, just leave it like a mission to fulfill for 'anyone' or 'you (talking to the player)'. "+prompt+"Use the html tag for underline instead of **",
+            story = gemini_model.generate_content(f"Tell me a story about a {choice(world_type)} world where i have to defeat some strong enemies and bosses to win, this is a initial story of a game. Also tell me at least three names of key bosses and it's race and class to be defeated, and why i have to defeat them. Don't talk about a protagonist or a specific hero, just leave it like a mission to fulfill for 'anyone' or 'you (talking to the player)'. "+prompt+render_format,
                                               safety_settings=safety_settings)
             initial_story = story.text.replace("\n", "<br>")
         except:
@@ -260,8 +262,9 @@ def continue_history_gemini(prompt:str="", campaign_story:str="", campaign_achie
 
 
 def ask_world_info_gemini(prompt:str="about what to do next", campaign_story:str="", campaign_achievements:str="") -> str:
+    render_format = ". Write it using the HTML formats when underlining or bolding. No other format is allowed."
     try:
-        response = gemini_chat.send_message(f"Tell me {prompt}. Answer taking in count that i've already achieved this: [{campaign_achievements}].\nIn this world: [{campaign_story}]\n."+"Use the html tag for underline instead of **",
+        response = gemini_chat.send_message(f"Tell me {prompt}. Answer taking in count that i've already achieved this: [{campaign_achievements}].\nIn this world: [{campaign_story}]\n."+render_format,
                                             safety_settings=safety_settings)
         return response.text
     except:

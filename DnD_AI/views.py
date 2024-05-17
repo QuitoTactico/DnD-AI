@@ -30,8 +30,8 @@ def campaignSelection(request):
             from .campaign_generator import generate_dungeon_map
             name = request.POST.get('name')
             initial_story = request.POST.get('initial_story')
-            size_x = request.POST.get('size_x')
-            size_y = request.POST.get('size_y')
+            size_x = int(request.POST.get('size_x'))
+            size_y = int(request.POST.get('size_y'))
             
             campaign = Campaign.objects.create(name=name, 
                                     initial_story=initial_story,
@@ -167,6 +167,8 @@ def playerSelection(request):
                         pass
 
                 new_player.save()
+
+                History.objects.create(campaign_id=campaign_id, author='SYSTEM', text=f"{new_player.name} has joined the party!").save()
                 '''
                 return HttpResponse("Player created successfully.")
                 

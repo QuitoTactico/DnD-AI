@@ -348,11 +348,12 @@ def target_selection_by_id(monster_id):
 
 def action_image_generation(prompt:str, action:str, player:Character, target:Monster = None):
 
+    # deprecated
     if action == 'move':
         image_description = f"{player.name}, {player.character_race} {player.character_class} {player.physical_description} running to the {prompt[4:]}"
 
     elif action == 'attack':
-        image_description = f"{player.name}, {player.character_race} {player.character_class} {player.physical_description} using a {player.weapon.weapon_type} ({player.weapon.name}), fighting with a {target.monster_race} {target.monster_class} {target.physical_description} who's using a {target.weapon.weapon_type} ({target.weapon.name})"
+        image_description = f"{player.name}, the {player.character_race} {player.character_class} {player.physical_description} using a {player.weapon.weapon_type} ({player.weapon.name}), fighting with a {target.monster_race} {target.monster_class} {target.physical_description} who's using a {target.weapon.weapon_type} ({target.weapon.name})"
         #image_description = f"{player.character_race} {player.character_class} {player.physical_description} fighting a {target.monster_race} {target.monster_class} {target.physical_description} with a {player.weapon.weapon_type}"
 
     elif action == 'equip':
@@ -361,10 +362,10 @@ def action_image_generation(prompt:str, action:str, player:Character, target:Mon
         # holding up a {weapon_name}
 
     elif action == 'chest':
-        image_description = f"{player.name}, {player.character_race} {player.character_class} {player.physical_description} is opening a chest with amazement, surprised face"
+        image_description = f"{player.name}, the {player.character_race} {player.character_class} {player.physical_description} is opening a chest with amazement, surprised face"
 
     elif action == 'portal':
-        image_description = f"{player.name}, {player.character_race} {player.character_class} {player.physical_description} with a surprised face, is discovering a PORTAL with amazement"
+        image_description = f"{player.name}, the {player.character_race} {player.character_class} {player.physical_description} with a surprised face, is discovering a PORTAL with amazement"
     
     # take, use, levelup, info
     else:
@@ -425,7 +426,7 @@ def command_executer(prompt:str|list, player:Character, target:Monster) -> tuple
         History.objects.create(campaign=player.campaign, author='SYSTEM', text="The player stood still").save()
         successful = False
 
-    elif action[0] == 'move':
+    elif action[0] == 'move' or action[0] == 'go':
         successful, new_target = act_move(player, target, action)
 
     elif action[0] == 'attack':
@@ -618,7 +619,8 @@ def act_attack(player:Character, target:Monster, action:list):
                     else:
                         target = possible_targets[0]
                         History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"There's no monster called {target_id} in your range, attacking {target.name} instead.").save()
-
+        elif not target:
+            History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"There's no monsters in your range.").save()
 
         result = combat_turn(player=player, monster=target, player_dice=roll_dice(), monster_dice=roll_dice())
 
