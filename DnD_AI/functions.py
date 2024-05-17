@@ -666,8 +666,6 @@ def act_move(player:Character, target:Monster, action:list):
     return successful, new_target
 
 
-
-
 # ------------------------------------------------ MAP --------------------------------------------------
 
 
@@ -926,6 +924,30 @@ def create_map(player:Character, characters, monsters, treasures, tiles, target:
     map_script, map_div = components(map)
     return map_script, map_div
 
+
+def place_player_on_spawn(player:Character):
+    tries = 70
+    campaign_id = player.campaign.id
+    spawn_tiles = Tile.objects.filter(campaign_id=campaign_id, tile_type='spawn')
+
+    while tries > 0:
+        chosen_tile = choice(spawn_tiles)
+
+        x = chosen_tile.x
+        y = chosen_tile.y
+
+        existent_player = Character.objects.filter(campaign_id=campaign_id, x=x, y=y)
+        existent_treasure = Treasure.objects.filter(campaign_id=campaign_id, x=x, y=y)
+        
+        if not existent_player and not existent_treasure:
+            player.x = x
+            player.y = y
+            player.save()
+            return True
+        else:
+            tries -= 1
+            
+    return False
 
 
 # ---------------------------------------------- RESOURCES ------------------------------------------------
