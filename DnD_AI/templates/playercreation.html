@@ -15,7 +15,7 @@
     </div>
     <div style="text-align: center;">
         <h1>Player Creation</h1>
-        <h4>How's the hero who will save the world?</h4>
+        <h4>Who's the hero who will save the world?</h4>
     </div>
 
     <br>
@@ -24,107 +24,117 @@
         {% csrf_token %}
     
         <h2>1. Choose your name:</h2>
-        <input class="textInput" id="font2" type="text" name="name" placeholder="Write the name of your player." required>
+        <input class="textInput" id="font2" type="text" name="name" placeholder="Write the name of your player." autocomplete="off" required>
 
-        <!-- 
-        cuadro rojo redondeado, con hover, se pueden poner muchos en la misma fila 
-        quién sabe cómo lo harás, pero se pueden ver muy pequeños si quieres
-        ojalá no se vea el circulo de selección, pero si se ve, no importa
-        pensaba en si se podía poner un borde rojo alrededor del cuadro seleccionado, pero no sé si se puede
-        -->
+        <br>
+        <br>
+
         <h2>2. Choose your race:</h2>
         <div class="itemList">
         {% for race in races %}
         <div class="listItem" onclick="selectRace(event)">
-            <img height=50 src="media/entity/icons/default/{{race|lower}}.png" alt="{{ race }} img">
-            <h2 id="font2">{{ race }}</h2>
+            <h2 align="center"><img align="center" height=50 src="media/entity/icons/default/{{race|lower}}.png" alt="{{ race }} img"></h2>
+            <h2 align="center" id="font2">{{ race }}</h2>
             <input type="radio" name="race" value="{{ race }}" 
             {% if forloop.first %}required{% endif %}/>
         </div>
         {% endfor %}
         </div>
 
-        <!-- haz lo mismo que con el de arriba -->
-        <!-- este no es requerido. Si no pones nada, se coloca la raza, 
-            por ejemplo si quieres ser una rata simple -->
+        <br>
+
         <h2>3. Choose your class:</h2>
+        <h4>(Optional)</h4>
         <div class="itemList">
             {% for class in classes %}
             <div class="listItem" onclick="selectItem(event)">
-                <img height=50 src="media/entity/icons/default/{{class|lower}}.png" alt="{{ class }} img">
-                <h2 id="font2">{{ class }}</h2>
+                <h2 align="center"><img align="center" height=50 src="media/entity/icons/default/{{class|lower}}.png" alt="{{ class }} img"></h2>
+                <h2 align="center" id="font2">{{ class }}</h2>
                 <input type="radio" name="class" value="{{ class }}"/>
             </div>
             {% endfor %}
         </div>
 
-        <!-- haz lo mismo que con el de arriba -->
+        <br>
+
         <h2>4. Choose your weapon:</h2>
         <div class="weaponList">
             {% for weapon in weapons %}
             <div class="listWeapon" onclick="selectWeapon(event)">
-                <h2 id="font2">name: {{weapon.name}}</h2>
-                <h2 id="font2">image: <img height=50 src="{{weapon.image.url}}" alt="{{weapon.name}} image"></h2>
-                <h2 id="font2">is_ranged: {{weapon.is_ranged}}</h2>
-                <h2 id="font2">damage_type: {{weapon.damage_type}}</h2>
-                <h2 id="font2">damage: {{weapon.damage}}</h2>
-                <h2 id="font2">range: {{weapon.range}}</h2>
-                <input type="radio" name="weapon_id" value="{{ weapon.id }}"/>
+                <h1 align="center" id="font2">{{weapon.name}}</h1>
+                <h2 align="center" id="font2"><img align="center" height=75 src="{{weapon.image.url}}" alt="{{weapon.name}} image"></h2>
+                <h2 align="center" id="font2">Damage:
+                    {% if weapon.damage_type == "Physical" %}
+                        <span style="color: orange">{{ weapon.damage }}</span>
+                    {% else %}
+                        <span style="color: cyan">{{ weapon.damage }}</span>
+                    {% endif %}</h2>
+                <h2 align="center" id="font2">Range: {{weapon.range}}</h2>
+                <h2 align="center" id="font2">{% if weapon.is_ranged %}RANGED{% else %}MELEE{% endif %}</h2>
+                <input type="radio" name="weapon_id" value="{{ weapon.id }}"
+                {% if forloop.first %}required{% endif %}/>
             </div>
             {% endfor %}
         </div>
 
-        <!--
-            'stat limit'
-        -->
-        
-        <h2>5. Choose your stats:</h2>
-        <h2 id="amount">30</h2>
+        <br>
 
-        <div class="statsList" id="items">
+        <h2>5. Choose your stats:</h2>
+        
+        <p align="center">
+            <h4 align="center">You have <span align="center" id="amount">30</span> points to spend</h4>
+        </p>
+
+        <div align="center" class="statsList" id="items">
             <div class="statItem">
                 <h2 id="font2">VITALITY</h2>
-                <div>
-                    <input type="number" name="vitality" value="5" min="5" max="35" id="font2">
+                <div align="center">
+                    <input align="center" type="number" name="vitality" value="5" min="5" max="35" id="font2">
                 </div>
             </div>
             <div class="statItem">
                 <h2 id="font2">STR</h2>
-                <div>
+                <div align="center">
                     <input type="number" name="str" value="5" min="5" max="35" id="font2">
                 </div>
             </div>
             <div class="statItem">
                 <h2 id="font2">INT</h2>
-                <div>
+                <div align="center">
                     <input type="number" name="int" value="5" min="5" max="35" id="font2">
                 </div>
             </div>
             <div class="statItem">
                 <h2 id="font2">DEX</h2>
-                <div>
+                <div align="center">
                     <input type="number" name="dex" value="5" min="5" max="35" id="font2">
                 </div>
             </div>
             <div class="statItem">
                 <h2 id="font2">P_RES</h2>
-                <div>
+                <div align="center">
                     <input type="number" name="phyres" value="5" min="5" max="35" id="font2">
                 </div>
             </div>
             <div class="statItem">
                 <h2 id="font2">M_RES</h2>
-                <div>
+                <div align="center">
                     <input type="number" name="magres" value="5" min="5" max="35" id="font2">
                 </div>
             </div>
         </div>
 
-        <h2>6. Describe your character:</h2>
-        <input class="textInput" id="font2" type="text" name="physical_description" placeholder="Describe everything." required>
+        <br>
+
+        <h2>6. Describe yourself:</h2>
+        <input class="textInput" id="font2" type="text" name="physical_description" placeholder="Add a physical description for image generation" autocomplete="off" required>
+
+        <br>
+        <br>
+        <br>
 
         <h2>7. Select a gift from the gods:</h2>
-        <div class="weaponList">
+        <div align="center" class="weaponList">
             <div class="listWeapon" onclick="selectGift(event)">
                 <h2 id="font2">GOLD x50</h2>
                 <input type="radio" name="gift" value="gold"/>
@@ -143,10 +153,15 @@
             </div>
         <div>
 
-        <h2>8. What's yout story:</h2>
-        <input class="textInput" id="font2" type="text" name="story" placeholder="Once upon a time." required>
+        <br>
+
+        <h2 align="left">8. What's your initial story?</h2>
+        <input class="textInput" id="font2" type="text" name="story" placeholder="Once upon a time..." autocomplete="off" required>
         
-        <h2>9. That's all!</h2>
+        <br>
+        <br>
+
+        <h2 align="left">9. That's all!</h2>
         <input type="hidden" name="create_player" value="True">
         <input type="hidden" name="campaign_id" value="{{campaign_id}}">
         <input class="btnSubmit" id="font1" type="submit" value="Create player!" onclick="loading('Creating player','playerselection','playerinfo')">

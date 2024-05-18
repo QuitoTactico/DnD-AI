@@ -69,10 +69,16 @@ stats.forEach((stat) => {
             total += parseInt(stat.value);
         });
       
-        if (total >= 60) {
+        if (total > 60) {
             stat.value = (parseInt(stat.value)-1).toString();
         }
 
-        amount.textContent = total.toString();
+        var total = 0;
+        
+        stats.forEach((stat) => {
+            total += parseInt(stat.value);
+        });
+
+        amount.textContent = 60 - total.toString();
     });
 });
