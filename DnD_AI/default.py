@@ -90,6 +90,7 @@ DEFAULT_WEAPON_PER_CLASS = {
     'Barbarian': 'Axe',
     'Bard': 'Dagger',
     'Blacksmith': 'Warhammer',
+    'Brute': 'Mace',
     'Cleric': 'Mace',
     'Cowboy': 'Revolver',
     'Farmer': 'Trident',
@@ -838,6 +839,8 @@ COOL_NAMES = [
     'Pocoyó',
     'aksfbjdfsjdfjsdsjdkhfksd',
     'Marrano Agua',
+    'Jugador de LoL',
+    'El Capitalismo',
 
     'Lettuce Boy',
     'Lettuce Man',
