@@ -30,7 +30,7 @@
         <br>
 
         <h2>2. Choose your race:</h2>
-        <div class="itemList">
+        <div align="center" class="itemList">
         {% for race in races %}
         <div class="listItem" onclick="selectRace(event)">
             <h2 align="center"><img align="center" height=50 src="media/entity/icons/default/{{race|lower}}.png" alt="{{ race }} img"></h2>
@@ -45,7 +45,7 @@
 
         <h2>3. Choose your class:</h2>
         <h4>(Optional)</h4>
-        <div class="itemList">
+        <div align="center" class="itemList">
             {% for class in classes %}
             <div class="listItem" onclick="selectItem(event)">
                 <h2 align="center"><img align="center" height=50 src="media/entity/icons/default/{{class|lower}}.png" alt="{{ class }} img"></h2>
@@ -58,7 +58,7 @@
         <br>
 
         <h2>4. Choose your weapon:</h2>
-        <div class="weaponList">
+        <div align="center" class="weaponList">
             {% for weapon in weapons %}
             <div class="listWeapon" onclick="selectWeapon(event)">
                 <h1 align="center" id="font2">{{weapon.name}}</h1>
@@ -80,7 +80,7 @@
         <br>
 
         <h2>5. Choose your stats:</h2>
-        
+
         <p align="center">
             <h4 align="center">You have <span align="center" id="amount">30</span> points to spend</h4>
         </p>
@@ -88,39 +88,39 @@
         <div align="center" class="statsList" id="items">
             <div class="statItem">
                 <h2 id="font2">VITALITY</h2>
-                <div align="center">
+                <h2 align="center">
                     <input align="center" type="number" name="vitality" value="5" min="5" max="35" id="font2">
-                </div>
+                </h2>
             </div>
             <div class="statItem">
                 <h2 id="font2">STR</h2>
-                <div align="center">
+                <h2 align="center">
                     <input type="number" name="str" value="5" min="5" max="35" id="font2">
-                </div>
+                </h2>
             </div>
             <div class="statItem">
                 <h2 id="font2">INT</h2>
-                <div align="center">
+                <h2 align="center">
                     <input type="number" name="int" value="5" min="5" max="35" id="font2">
-                </div>
+                </h2>
             </div>
             <div class="statItem">
                 <h2 id="font2">DEX</h2>
-                <div align="center">
+                <h2 align="center">
                     <input type="number" name="dex" value="5" min="5" max="35" id="font2">
-                </div>
+                </h2>
             </div>
             <div class="statItem">
-                <h2 id="font2">P_RES</h2>
-                <div align="center">
+                <h2 id="font2">PHY RES</h2>
+                <h2 align="center">
                     <input type="number" name="phyres" value="5" min="5" max="35" id="font2">
-                </div>
+                </h2>
             </div>
             <div class="statItem">
-                <h2 id="font2">M_RES</h2>
-                <div align="center">
+                <h2 id="font2">MAG RES</h2>
+                <h2 align="center">
                     <input type="number" name="magres" value="5" min="5" max="35" id="font2">
-                </div>
+                </h2>
             </div>
         </div>
 
@@ -129,7 +129,6 @@
         <h2>6. Describe yourself:</h2>
         <input class="textInput" id="font2" type="text" name="physical_description" placeholder="Add a physical description for image generation" autocomplete="off" required>
 
-        <br>
         <br>
         <br>
 
