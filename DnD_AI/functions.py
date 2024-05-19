@@ -531,11 +531,15 @@ def act_use(player:Character, action:list):
         successful = player.use_from_inventory(item_to_use, amount = 1)
         player.save()
         if successful:
-            random_portal = choice(Treasure.objects.filter(campaign=player.campaign, treasure_type='Portal', discovered=True))
-            player.x, player.y = random_portal.x, random_portal.y
-            player.save()
-            History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'{player.name} used a go back bone.').save()
-            return True
+            try:
+                random_portal = choice(Treasure.objects.filter(campaign=player.campaign, treasure_type='Portal', discovered=True))
+                player.x, player.y = random_portal.x, random_portal.y
+                player.save()
+                History.objects.create(campaign=player.campaign, author='SYSTEM', text=f'{player.name} used a go back bone.').save()
+                return True
+            except:
+                History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"There's no portals.").save()
+                return False
 
     #elif item_to_use == 'mana potion':, or something like that for each item
         # probably is not the best way, it would be better to be implemented on Character.use_from_inventory()
@@ -928,15 +932,36 @@ def create_map(player:Character, characters, monsters, treasures, tiles, target:
 
 
 def place_player_on_spawn(player:Character):
-    tries = 70
+    tries = 50
     campaign_id = player.campaign.id
     spawn_tiles = Tile.objects.filter(campaign_id=campaign_id, tile_type='spawn')
 
-    while tries > 0:
-        chosen_tile = choice(spawn_tiles)
+    try:
+        while tries > 0:
+            chosen_tile = choice(spawn_tiles)
 
-        x = chosen_tile.x
-        y = chosen_tile.y
+            x = chosen_tile.x
+            y = chosen_tile.y
+
+            existent_player = Character.objects.filter(campaign_id=campaign_id, x=x, y=y)
+            existent_treasure = Treasure.objects.filter(campaign_id=campaign_id, x=x, y=y)
+            
+            if not existent_player and not existent_treasure:
+                player.x = x
+                player.y = y
+                player.save()
+                return True
+            else:
+                tries -= 1
+    except:
+        History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"Couldn't place {player.name} on the map. Maybe there's no map...").save()
+        return False
+        
+    # if that didn't work...
+
+    for tile in spawn_tiles:
+        x = tile.x
+        y = tile.y
 
         existent_player = Character.objects.filter(campaign_id=campaign_id, x=x, y=y)
         existent_treasure = Treasure.objects.filter(campaign_id=campaign_id, x=x, y=y)
@@ -946,8 +971,6 @@ def place_player_on_spawn(player:Character):
             player.y = y
             player.save()
             return True
-        else:
-            tries -= 1
 
     return False
 

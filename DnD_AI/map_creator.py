@@ -159,12 +159,12 @@ def generate_monster(campaign_id, tile_type):
         monster_name = random.choice(COOL_BOSSES_WITH_ICON)
         monster_physical_description = monster_name
 
-        icon_path = monster_name.replace(' ', '-').lower()
-        icon = f"entity/icons/boss_icons/{icon_path}.png"
+        icon_name = monster_name.replace(' ', '-').lower()
+        icon_path = f"entity/icons/boss_icons/{icon_name}.png"
 
         monster.name = monster_name
         monster.physical_description = monster_physical_description
-        monster.icon = icon
+        monster.icon = icon_path
 
 
     if random.random() < 0.05:
@@ -404,6 +404,9 @@ def generate_dungeon_map(campaign: Campaign) -> bool:
         generate_object(campaign_id, random.choice(non_spawn_rooms), 'monster', monster)
     '''
     
+    # we delete everythong in 0,0
+    Monster.objects.filter(campaign_id=campaign_id, x=0, y=0, is_key = False).delete()
+    Treasure.objects.filter(campaign_id=campaign_id, x=0, y=0).delete()
 
     return True
 

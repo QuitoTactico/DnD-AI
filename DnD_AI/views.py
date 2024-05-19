@@ -27,7 +27,7 @@ def campaignSelection(request):
 
     if request.method == "POST":
         if 'create_campaign' in request.POST:
-            from .campaign_generator import generate_dungeon_map
+            from .map_creator import generate_dungeon_map
             name = request.POST.get('name')
             initial_story = request.POST.get('initial_story')
             size_x = int(request.POST.get('size_x'))
@@ -138,7 +138,7 @@ def playerSelection(request):
                     dexterity=dexterity,
                     physical_resistance=physical_resistance,
                     magical_resistance=magical_resistance,
-                    inventory=str({'gold': 10, 'health potion': 5}),
+                    inventory=str({'gold': 20, 'health potion': 5, 'go back bone': 3, 'key': 3}),
                     story=story,
                     character_race=character_race,
                     character_class=character_class,
@@ -147,7 +147,10 @@ def playerSelection(request):
                     y=0,
                 )
 
-                place_player_on_spawn(new_player)
+                try:
+                    place_player_on_spawn(new_player)
+                except:
+                    new_player.save()
 
                 gift = request.POST.get('gift')
                 loot = {'gold': 50} if gift == 'gold' else {gift: 5}

@@ -491,7 +491,7 @@ UNIQUE_WEAPON_STATS = {
         'is_ranged': True,
         'physical_description': 'A deadly flamethrower that spews fire at a distance',
         'image': 'weapon/images/boss_weapons/flamethrower.png',
-        'damage_type': 'Fire'
+        'damage_type': 'Physical'
     },
     'Flaming Trident': {
         'weapon_type': 'Trident',
@@ -500,7 +500,7 @@ UNIQUE_WEAPON_STATS = {
         'is_ranged': False,
         'physical_description': 'A trident wreathed in flames, capable of burning as well as piercing',
         'image': 'weapon/images/boss_weapons/flaming-trident.png',
-        'damage_type': 'Fire'
+        'damage_type': 'Magical'
     },
     'Knife Fork': {
         'weapon_type': 'Knife',
@@ -518,7 +518,7 @@ UNIQUE_WEAPON_STATS = {
         'is_ranged': True,
         'physical_description': 'A saber that crackles with electric energy',
         'image': 'weapon/images/boss_weapons/lightning-saber.png',
-        'damage_type': 'Electric'
+        'damage_type': 'Magical'
     },
     'Panzerfaust': {
         'weapon_type': 'Launcher',
@@ -527,7 +527,7 @@ UNIQUE_WEAPON_STATS = {
         'is_ranged': True,
         'physical_description': 'A powerful rocket launcher with devastating impact',
         'image': 'weapon/images/boss_weapons/panzerfaust.png',
-        'damage_type': 'Explosive'
+        'damage_type': 'Physical'
     },
     'Reaper Scythe': {
         'weapon_type': 'Scythe',
@@ -536,7 +536,7 @@ UNIQUE_WEAPON_STATS = {
         'is_ranged': False,
         'physical_description': 'A dark, menacing scythe that reaps souls',
         'image': 'weapon/images/boss_weapons/reaper-scythe.png',
-        'damage_type': 'Physical'
+        'damage_type': 'Magical'
     },
     'Relic Blade': {
         'weapon_type': 'Sword',
@@ -626,7 +626,7 @@ UNIQUE_WEAPON_STATS = {
         'is_ranged': True,
         'physical_description': 'A device that emits powerful shockwaves to strike opponents',
         'image': 'weapon/images/boss_weapons/wave-strike.png',
-        'damage_type': 'Shockwave'
+        'damage_type': 'Magical'
     },
     'Winged Sword': {
         'weapon_type': 'Sword',
@@ -740,8 +740,6 @@ COOL_NAMES = [
     'El Chavo',
     'Don Octavio',
     'Le Pegué Una Machetera Que Hasta Yo Quedé Asustado',
-    'La Paja',
-    'Excesive Masturbation',
     'Tilín', 
     'Eminem', 
     'Yourself', 
@@ -841,6 +839,8 @@ COOL_NAMES = [
     'Marrano Agua',
     'Jugador de LoL',
     'El Capitalismo',
+    'Never Gonna Give You Up, Never Gonna Let You Down...',
+    'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
 
     'Lettuce Boy',
     'Lettuce Man',
@@ -853,8 +853,12 @@ COOL_NAMES = [
     'Lotus Avenger',
 ]
 
-COOL_BOSSES_WITH_ICON = ['Anubis', 'Australia', 'Bird Mask', 'Bolivia', 'Brazil', 'Caesar', 'Croc Jaws', 'Crystal Eye', 'Delighted', 'Diamonds Smile', 'Dracula', 'Evil Minion', 'Fetus', 'Frankenstein Creature', 'Gaze', 'Gluttonous Smile', 'Grim Reaper', 'Honeycomb', 'Horned Reptile', 'Hunter Eyes', 'Insect Jaws', 'Kenku Head', 'Kraken Tentacle', 'Mad Scientist', 'Maze Cornea', 'Mecha Mask', 'Metal Golem Head', 'Mewing', 'Octogonal Eye', 'One Eyed', 'Overlord', 'Paranoia', 'Pick Of Destiny', 'Pou', 'Pummeled', 'Purple Tentacle', 'Skeleton King', 'Sphinx', 'Spiked Armor', 'Swallow', 'Tangerine', 'Tear Tracks', 'Thunder Struck', 'Toad Teeth', 
-'Triton Head']
+COOL_BOSSES_WITH_ICON = ['Anubis', 'Australia', 'Bird Mask', 'Bolivia', 'Brazil', 'Caesar', 'Croc Jaws', 'Crystal Eye', 'Delighted', 'Diamonds Smile', 'Dracula', 'Evil Minion', 'Fetus', 'Frankenstein Creature', 'Gaze', 'Gluttonous Smile', 'Grim Reaper', 'Honeycomb', 'Horned Reptile', 'Hunter Eyes', 'Insect Jaws', 'Kenku Head', 'Kraken Tentacle', 'Mad Scientist', 'Maze Cornea', 'Mecha Mask', 'Metal Golem Head', 'Mewing', 'Octogonal Eye', 'One Eyed', 'Overlord', 'Paranoia', 'Pick Of Destiny', 'Pou', 'Pummeled', 'Purple Tentacle', 'Skeleton King', 'Sphinx', 'Spiked Armor', 'Swallow', 'Tangerine', 'Tear Tracks', 'Thunder Struck', 'Toad Teeth', 'Triton Head', 
+                         
+'177013', 'Ahuevo', 'Alien Bug', 'Android', 'Apocalipsis Rider', 'At Field', 'Bad Gnome', 'Balkenkreuz', 'Battle Tank', 'Best Waifu', 'Bloque 20', 'Bts', 'Buenos Dias', 'Bullet Bill', 'C Mamut', 'Caries', 'Carlos', 'Cat God', 'Chad', 'Chayanne', 'Chernobil Survivor', 'Circular 303', 'Cj', 'Coconut', 'Colombian Statue', 'Completely Normal Qr', 'Corn', 'Cristobal Colon', 'Crystal Queen', 'Dakimakura', 'Dead Man', 'Depression', 'Diablo', 'Did You Know', 'Dinosaur Rex', 'Double Dragon', 'Drip', 'Drugs', 'Economy', 'El Corazon Tucun', 'El Fin Se Acerca', 'Estafadora', 'Evil Tree', 'Family', 'Fat', 'Freddy Mercury', 'Frog Prince', 'Furro Triste', 'Furry Gang', 'Gallo Con Tenis', 'Gargoyle', 'Get Rickrolled', 'Gigachad', 'Girlfriend', 'God', 'Goku According To Tablos', 'Gooey Daemon', 'Gorda De Botero', 'Guebo', 'Hehe', 'Hentai', 'Hola', 'Hora De Ver La Hora', 'Human Pyramid', 'Ice Golem', 'Idk Whats This', 'If You Know You Know', 'Illuminati', 'Intel', 'Jesus', 'Juan Pis', 'Kamikaze', 'Kanye West', 'Kys Now', 'Lambda', 'Leonidas', 'Loss', 'Lynx', 'Malenia', 'Mantis', 'Marselo', 'Me Right Now', 'Me Seeing You Through The Cam', 'Megachad', 'Messi', 'Metamorphosis', 'Mexican', 'Momazos Diego', 'Mona Lisa', 'Mondongo', 'Mr Beast', 'My Dog', 'My Mom Dissapointed', 'Natural Selection', 'Number One', 'Nyanyame Nyanyaju Nyanyado No Nyarabi De Nyakunyaku Inyanyaku Nyanyahan Nyanya Dai Nyannyaku Nyarabete Nyagannyagame', 'O O', 'Odin', 'Omg', 'Paid Developers (Not Us)', 'Penguin', 'Pharaoh', 'Pimiento', 'Pinata', 'Pineapple', 'Plague Doctor', 'Plato', 'Pn', 'Pope', 'Prisoner', 'Que Pro', 'Reproductive Activities', 'Robin Hood', 'Saber Toothed Cat', 'Samus', 'Sasquatch', 'Satanic', 'Sayori', 'Sherlock Holmes', 'Shrimp', 'Si', 'Sisyphus', 'Spaggueti God', 'Sun Priest', 'Sus', 'Tabien', 'Taco', 'The Default Image', 'The Game', 'The People Who Plays This Shit', 'They Are More Powerful Than You', 'This Game Sucks', 'Thwomp', 'Tombos', 'Trauma', 'Troglodyte', 'U Gae', 'Udea', 'Ur Mom', 'Usa Crimes', 'Usa', 'Venus Of Willendorf', 'Verstappen', 'Vitruvian Man', 'War Criminal', 'What Have You Done To My Precious Game', 'When Te Ries', 'When', 'Witch Queen', 'Wtf', 'Wyvern', 'You Dont Want To Know Whats This', 'You Guys Seeing My Memes', 'You Reacting At My Bad Jokes', 'Your Dad',
+
+'06 08 1945', 'A Man', 'Api Key Bully', 'Are You On A Chair', 'Arthur King (But Better)', 'Astolfo', 'Baldurs Gate Bear', 'Bwis', 'Camaron Mantis', 'Camaron Pistola', 'Default Guy', 'Eso Tilin', 'Even Flow', 'Flying Cockroach', 'Frieren', 'God Will Not Forgive This', 'Goty', 'John China', 'Joven', 'Kill Me Pls', 'League Of Legends', 'Loadiiiiing', 'Ohno', 'Rat Master', 'Stop Playing This', 'Teto', 'Twingo', 'What', 'Xd', 'You Thought This Was A Boss But Its Me Dio'
+]
 
 COOL_SORCERY_NAMES = [
     "Qui's Crotolamo",
