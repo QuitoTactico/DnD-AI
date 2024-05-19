@@ -175,12 +175,12 @@ def generate_monster(campaign_id, tile_type):
     return monster
     
 
-def generate_object_in_coords(campaign_id, x, y, tile_type):
+def generate_object_in_coords(campaign_id, x, y, tile_type, room=None):
     if random.random() < 0.3:
-        generate_object(campaign_id, None, 'small_treasure', entity=None, x=x, y=y)
+        generate_object(campaign_id, room, 'small_treasure', entity=None, x=x, y=y)
     else:
         monster = generate_monster(campaign_id, tile_type)
-        generate_object(campaign_id, None, 'monster', monster, x=x, y=y)
+        generate_object(campaign_id, room, 'monster', monster, x=x, y=y)
 
 
 def generate_object(campaign_id, room, object_type, entity=None, x=None, y=None):
@@ -209,7 +209,6 @@ def generate_object(campaign_id, room, object_type, entity=None, x=None, y=None)
             else:
                 tries -= 1
 
-
         # gold = 33%, bag = 33%, key = 33%
         elif object_type == 'small_treasure':
             existent_player = Character.objects.filter(campaign_id=campaign_id, x=x, y=y)
@@ -234,7 +233,6 @@ def generate_object(campaign_id, room, object_type, entity=None, x=None, y=None)
             else:
                 tries -= 1
 
-
         elif object_type == 'portal':
             existent_treasure = Treasure.objects.filter(campaign_id=campaign_id, x=x, y=y)
             if not existent_treasure:
@@ -251,8 +249,7 @@ def generate_object(campaign_id, room, object_type, entity=None, x=None, y=None)
             else:
                 tries -= 1
 
-
-        if object_type == 'player':
+        elif object_type == 'player':
             existent_player = Character.objects.filter(campaign_id=campaign_id, x=x, y=y)
             existent_treasure = Treasure.objects.filter(campaign_id=campaign_id, x=x, y=y)
             existent_monster = Monster.objects.filter(campaign_id=campaign_id, x=x, y=y)
@@ -265,8 +262,7 @@ def generate_object(campaign_id, room, object_type, entity=None, x=None, y=None)
             else:
                 tries -= 1
 
-
-        if object_type == 'monster':
+        elif object_type == 'monster':
             existent_player = Character.objects.filter(campaign_id=campaign_id, x=x, y=y)
             existent_treasure = Treasure.objects.filter(campaign_id=campaign_id, x=x, y=y)
             existent_monster = Monster.objects.filter(campaign_id=campaign_id, x=x, y=y)
@@ -278,13 +274,15 @@ def generate_object(campaign_id, room, object_type, entity=None, x=None, y=None)
                 break
             else:
                 tries -= 1
-
 
         elif object_type == 'boss':
             entity.x = x
             entity.y = y
             entity.save()
             break
+
+        x, y = None, None
+
     if tries == 0:
         return False
     return True
@@ -325,7 +323,7 @@ def generate_dungeon_map(campaign: Campaign) -> bool:
             rooms.append(new_room)
             mapa[new_room.y:new_room.y + new_room.h, new_room.x:new_room.x + new_room.w] = new_room.room_type
 
-    # Designar rooms para spawn de jugadores, jefes y tesoros
+    # Designar habitaciones para spawn de jugadores, jefes y tesoros
     designar_habitaciones_especiales(rooms)
 
     boss_counter = 0
@@ -368,21 +366,7 @@ def generate_dungeon_map(campaign: Campaign) -> bool:
             elif how_much < 0.2:
                 generate_object(campaign_id, room, 'treasure')
 
-        for x in range(room.x, room.x + room.w):
-            for y in range(room.y, room.y + room.h):
-                Tile.objects.update_or_create(campaign_id=campaign_id, x=x, y=y, defaults={'tile_type': tile_type})
-
-                if tile_type not in ['spawn', 'boss']:
-                    spawn = random.random()
-                    if spawn < 0.05:
-                        generate_object_in_coords(campaign_id, x, y, tile_type)
-                    #elif spawn > 1-0.003:
-                    #    generate_object_in_coords(campaign_id, x, y, tile_type) NPCCCC
-                    #    la idea es generar un NPC
-
-        # así se asegura que haya al menos una cosa interesante en cada habitación
-        if tile_type not in ['spawn', 'boss']:
-            generate_object_in_coords(campaign_id, x, y, tile_type)
+        fill_room(campaign_id, room, tile_type)
 
                 
 
@@ -410,6 +394,25 @@ def generate_dungeon_map(campaign: Campaign) -> bool:
     Treasure.objects.filter(campaign_id=campaign_id, x=0, y=0).delete()
 
     return True
+
+def fill_room(campaign_id, room, tile_type):
+    for x in range(room.x, room.x + room.w):
+        for y in range(room.y, room.y + room.h):
+            Tile.objects.update_or_create(campaign_id=campaign_id, x=x, y=y, defaults={'tile_type': tile_type})
+
+            if tile_type not in ['spawn', 'boss']:
+                spawn = random.random()
+                if spawn < 0.05:
+                    generate_object_in_coords(campaign_id, x, y, tile_type, room)
+                #elif spawn > 1-0.003:
+                    #    generate_object_in_coords(campaign_id, x, y, tile_type) NPCCCC
+                    #    la idea es generar un NPC
+
+    # así se asegura que haya al menos una cosa interesante en cada habitación
+    if tile_type not in ['spawn', 'boss']:
+        x = random.randint(room.x, room.x + room.w - 1)
+        y = random.randint(room.y, room.y + room.h - 1)
+        generate_object_in_coords(campaign_id, x, y, tile_type, room)
 
 # Ejemplo de uso
 # no más de 500.000 tiles

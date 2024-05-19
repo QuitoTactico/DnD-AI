@@ -143,7 +143,7 @@ class Weapon(models.Model):
         str_is_ranged = 'Ranged' if self.is_ranged else 'Melee'
         str_is_template = 'TEMPLATE' if self.is_template else 'UNIQUE'
         str_level = f'+{self.level}' if self.level != 0 else ''
-        return f'[{self.id}] WEAPON, {str_is_template}, {self.name}{str_level}, {str_is_ranged}, {self.weapon_type}, {self.damage_type}, {self.damage}'
+        return f'[{self.id}] WPN, {str_is_template}, {self.name}{str_level}, {str_is_ranged}, {self.weapon_type}, {self.damage_type}, {self.damage}'
 
 
 # Characters and Monsters share too much things, so this is for good practice
@@ -515,9 +515,9 @@ class Character(Entity, models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        str_is_playable = 'PLAYER' if self.is_playable else 'NPC'
+        str_is_playable = 'PLYR' if self.is_playable else 'NPC'
         raceclass = f'{self.character_race} {self.character_class}' if self.character_race != self.character_class else self.character_class
-        return f'{{{self.campaign.id}}} [{self.id}] ({self.x},{self.y}) {str_is_playable}, {self.name}, {raceclass}, HP: {self.health}, Level: {self.level}, Weapon: [{self.weapon}]'
+        return f'{{{self.campaign.id}}} [{self.id}] ({self.x},{self.y}) {str_is_playable}, {self.name}, {raceclass}, HP: {self.health}, LVL: {self.level}_____________({self.weapon})'
 
 
 class Monster(Entity, models.Model):
@@ -595,8 +595,8 @@ class Monster(Entity, models.Model):
     def __str__(self):
         raceclass = f'{self.monster_race} {self.monster_class}' if self.monster_race != self.monster_class else self.monster_class
         key_str = 'KEY ' if self.is_key else ''
-        boss_str = 'BOSS' if self.is_boss else 'MONSTER'
-        return f'{{{self.campaign.id}}} [{self.id}] ({self.x},{self.y}) {key_str}{boss_str}, {self.name}, {raceclass}, [{self.weapon}]'
+        boss_str = 'BOSS' if self.is_boss else 'MNSTR'
+        return f'{{{self.campaign.id}}} [{self.id}] ({self.x},{self.y}) {key_str}{boss_str}, {self.name}, {raceclass}_____________({self.weapon})'
     
 
 class Treasure(models.Model):

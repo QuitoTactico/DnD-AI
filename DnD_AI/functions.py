@@ -349,7 +349,7 @@ def target_selection_by_id(monster_id):
 def action_image_generation(prompt:str, action:str, player:Character, target:Monster = None):
 
     # deprecated
-    if action == 'move':
+    if action in ['move','go']:
         image_description = f"{player.name}, {player.character_race} {player.character_class} {player.physical_description} running to the {prompt[4:]}"
 
     elif action == 'attack':
@@ -412,7 +412,7 @@ def command_executer(prompt:str|list, player:Character, target:Monster) -> tuple
     # if the prompt is a string, it will be split into a list
     action = prompt.split(' ') if type(prompt) == str else prompt
 
-    if action[0] not in ['move', 'attack', 'take']:
+    if action[0] not in ['move', 'go', 'attack', 'take']:
         action_image_generation(prompt, action[0], player, target)
 
     # for each action, the turns on the campaign will be increased
