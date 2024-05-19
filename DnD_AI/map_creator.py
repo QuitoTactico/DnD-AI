@@ -155,6 +155,9 @@ def generate_monster(campaign_id, tile_type):
             y=0,
         )
     
+    if random.random() < 0.05:
+        monster.name = random.choice(COOL_NAMES)
+    
     if optional_boss:
         monster_name = random.choice(COOL_BOSSES_WITH_ICON)
         monster_physical_description = monster_name
@@ -165,10 +168,8 @@ def generate_monster(campaign_id, tile_type):
         monster.name = monster_name
         monster.physical_description = monster_physical_description
         monster.icon = icon_path
-
-
-    if random.random() < 0.05:
-        monster.name = random.choice(COOL_NAMES)
+        monster.monster_race = ''
+        monster.monster_class = ''
 
     monster.save()
     return monster

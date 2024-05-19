@@ -281,7 +281,7 @@ def game(request):
 
                     prompt = action_interpreter(prompt)
                     command = True
-                    History.objects.create(campaign_id=campaign_id, author='ACTION', text=prompt).save()
+                    History.objects.create(campaign_id=campaign_id, author='ACTION', color='gray', text=prompt).save()
 
 
         # ------------------------- GETTING PLAYER AND TARGET -----------------------------
