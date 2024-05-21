@@ -368,10 +368,7 @@ def action_image_generation(prompt:str, action:str, player:Character, target:Mon
         image_description = f"{player.name}, the {player.character_race} {player.character_class} {player.physical_description} with a surprised face, is discovering a PORTAL with amazement"
     
     elif action == 'see':
-        if {prompt[3:]} == "inventory":
-            return
-        else:
-            image_description = f"{player.name}, the {player.character_race} {player.character_class} {player.physical_description} is seeing his {prompt[3:]}"
+        image_description = f"{player.name}, the {player.character_race} {player.character_class} {player.physical_description} is seeing his {prompt[4:]}"
 
     # take, use, levelup, info
     else:
@@ -1116,8 +1113,9 @@ def place_player_on_spawn(player:Character):
 
             existent_player = Character.objects.filter(campaign_id=campaign_id, x=x, y=y)
             existent_treasure = Treasure.objects.filter(campaign_id=campaign_id, x=x, y=y)
+            existent_monster = Monster.objects.filter(campaign_id=campaign_id, x=x, y=y)
             
-            if not existent_player and not existent_treasure:
+            if not existent_player and not existent_treasure and not existent_monster:
                 player.x = x
                 player.y = y
                 player.save()

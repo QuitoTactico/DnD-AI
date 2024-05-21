@@ -153,7 +153,7 @@ def playerSelection(request):
                     new_player.save()
 
                 gift = request.POST.get('gift')
-                loot = {'gold': 50} if gift == 'gold' else {gift: 5}
+                loot = {'gold': 50} if gift == 'gold' or gift is None else {gift: 5}
                 new_player.add_all_to_inventory(loot)
 
                 image_description = f"{new_player.name}, a {new_player.character_race} {new_player.character_class}, {new_player.physical_description}"
