@@ -472,9 +472,33 @@ def command_executer(prompt:str|list, player:Character, target:Monster) -> tuple
 
 
 def act_talk(player:Character, target:Monster, action:list):
-    if len(action) == 2:
-        pass
+    if target is None:
+        alone_responses = [
+            "You can't talk alone.",
+            "You like talking alone, don't you?",
+            "You don't seem like someone with many friends..."
+        ]
+        response = choice(alone_responses)
+        History.objects.create(campaign=player.campaign, author='SYSTEM', text=response).save()
+        return False
 
+    if len(action) > 1:
+        try:
+            target_id = action[1]
+            if target_id.isdigit():
+                target_id = int(target_id)
+                target = target_selection_by_id(target_id)
+            else:
+                target = target_selection_by_name(target_id, player=player)
+                if target is None:
+                    possible_targets = player.get_monsters_in_range()
+                    if len(possible_targets) == 0:
+                        History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"There's no monster called {target_id} in your range.").save()
+                    else:
+                        target = possible_targets[0]
+                        History.objects.create(campaign=player.campaign, author='SYSTEM', text=f"There's no monster called {target_id} in your range, talking to {target.name} instead.").save()
+        except:
+            pass
      
     was_understansable = False
     if target.monster_race == player.character_race or target.monster_class == player.character_class or target.monster_race == "Human" or target.is_boss or "traductor" in player.get_inventory().keys():
