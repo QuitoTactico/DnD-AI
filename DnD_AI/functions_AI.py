@@ -275,66 +275,7 @@ def ask_world_info_gemini(prompt:str="about what to do next", campaign_story:str
 
 # ------------------ GOOGLE (GEMINI) ------------------
 
-def action_interpreter(prompt_input) -> str:
-    instruction = """I need you to categorize this natural language desired action into a function (act) according to this definitions. And depending on the function, I need its inputs too, all in just a line, no more. Always add the function at the beginning of the line. Never write the inputs name. Just write something like "attack skeleton james". For move, use specifically its valid values. Here are the functions and their inputs:
-    
-    "levelup <stat_or_weaponstat> <weapon_name(optional)>"
-    "use <item_name>"
-    "equip <weapon_name(optional)>"
-    "take <treasure_name(optional)>"
-    "attack <target(optional)>"
-    "move <direction>"
-    "info <question>"
-
-    valid values for:
-    stat_or_weaponstat: "health", "strength", "intelligence", "recursiveness", "dexterity", "phyres", "magres", "constitution", "damage", "range", "weapon"
-    direction: "up", "down", "left", "right", "upright", "upleft", "downright", "downleft"
-    treasure_name: "gold", "bag", "chest", "key", "weapon", "tombstone"
-    target: literally anyone, the desired target that was said by the player
-    weapon_name: literally anything, the desired weapon that was said by the player. If it's not said, don't put it.
-    question: literally anything, the desired information interest that was said by the player
-    item_name: "health potion", "go back bone"
-
-    output examples:
-    "duuude, i want to move up" -> "move up"
-    "attack Dragon Jessica"
-    "attack"
-    "move upleft"
-    "take gold"
-    "take"
-    "i want to know about where to go next" -> "info where to go next"
-    "level up my Super Excalibur" -> "levelup damage Super Excalibur"
-    "make my Revolver's range bigger" -> "levelup range Revolver"
-    without saying the function
-    """
-    #about_what: "player", "enemies", "bosses", "world", "game", "story", "quests", "items", "weapons", "enemies", "bosses", "npcs",
-
-    prompt = f"{instruction} So... now categorize this: {prompt_input}"
-
-    try:
-        response = gemini_model.generate_content(prompt,
-                                        safety_settings=safety_settings)
-        try:
-            return response.text 
-        except ValueError:
-            # If the response doesn't contain text, check if the prompt was blocked.
-            # Also check the finish reason to see if the response was blocked.
-            # If the finish reason was SAFETY, the safety ratings have more details.
-            return  f"""{response.prompt_feedback}
-                        {response.candidates[0].finish_reason}
-                        {response.candidates[0].safety_ratings}"""
-    except:
-        '''
-        return f"""{NO_API_KEYS_STR}
-        
-        But if you want to play anyways, there's the list of commands. they all starts with /
-        
-        {('zzzul'+instruction[377:-33]+'zzzulf').replace("\n", "zzzlifzzzli")}
-        
-        all starting with /""".replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>").replace('zzzulf', '</ul>').replace('zzzul', '<ul>').replace('zzzlif', '</li>').replace('zzzli', '<li>')
-        '''
-
-        TUTORIAL = """<ul>
+TUTORIAL = """<ul>
                 <li>/levelup &lt;stat_or_weaponstat&gt;</li>
                 <li>/use &lt;item_name&gt;</li>
                 <li>/equip &lt;weapon_name(optional)&gt;</li>
@@ -342,6 +283,9 @@ def action_interpreter(prompt_input) -> str:
                 <li>/attack &lt;target(optional)&gt;</li>
                 <li>/move &lt;direction&gt;</li>
                 <li>/info &lt;question&gt;</li>
+                <li>/see &lt;interest&gt;</li>
+                <li>/talk &lt;target(optional)&gt;</li>
+                <li>/help</li>
             </ul>
 
             <p>Valid values for:</p>
@@ -403,7 +347,79 @@ def action_interpreter(prompt_input) -> str:
                         <li>"go back bone"</li>
                     </ul>
                 </li>
+                <li>interest:
+                    <ul>
+                        <li>"inventory"</li>
+                        <li>"story"</li>
+                        <li>"achievements"</li>
+                        <li>"objectives"</li>
+                        <li>"turns"</li>
+                        <li>"physical_description"</li>
+                    </ul>
             </ul>"""
+
+def action_interpreter(prompt_input) -> str:
+    instruction = """I need you to categorize this natural language desired action into a function (act) according to this definitions. And depending on the function, I need its inputs too, all in just a line, no more. Always add the function at the beginning of the line. Never write the inputs name. Just write something like "attack skeleton james". For move, use specifically its valid values. Here are the functions and their inputs:
+    
+    "levelup <stat_or_weaponstat> <weapon_name(optional)>"
+    "use <item_name>"
+    "equip <weapon_name(optional)>"
+    "take <treasure_name(optional)>"
+    "attack <target(optional)>"
+    "move <direction>"
+    "info <question>"
+    "see <interest>"
+    "talk <target(optional)>"
+    "help"
+
+    valid values for:
+    stat_or_weaponstat: "health", "strength", "intelligence", "recursiveness", "dexterity", "phyres", "magres", "constitution", "damage", "range", "weapon"
+    direction: "up", "down", "left", "right", "upright", "upleft", "downright", "downleft"
+    treasure_name: "gold", "bag", "chest", "key", "weapon", "tombstone"
+    target: literally anyone, the desired target that was said by the player
+    weapon_name: literally anything, the desired weapon that was said by the player. If it's not said, don't put it.
+    question: literally anything, the desired information interest that was said by the player
+    item_name: "health potion", "go back bone"
+    interest: "inventory", "story", "achievements", "objectives", "turns", "physical_description", "description"
+
+    output examples:
+    "duuude, i want to move up" -> "move up"
+    "attack Dragon Jessica"
+    "attack"
+    "move upleft"
+    "take gold"
+    "take"
+    "i want to know about where to go next" -> "info where to go next"
+    "level up my Super Excalibur" -> "levelup damage Super Excalibur"
+    "make my Revolver's range bigger" -> "levelup range Revolver"
+    without saying the function
+    """
+    #about_what: "player", "enemies", "bosses", "world", "game", "story", "quests", "items", "weapons", "enemies", "bosses", "npcs",
+
+    prompt = f"{instruction} So... now categorize this: {prompt_input}"
+
+    try:
+        response = gemini_model.generate_content(prompt,
+                                        safety_settings=safety_settings)
+        try:
+            return response.text 
+        except ValueError:
+            # If the response doesn't contain text, check if the prompt was blocked.
+            # Also check the finish reason to see if the response was blocked.
+            # If the finish reason was SAFETY, the safety ratings have more details.
+            return  f"""{response.prompt_feedback}
+                        {response.candidates[0].finish_reason}
+                        {response.candidates[0].safety_ratings}"""
+    except:
+        '''
+        return f"""{NO_API_KEYS_STR}
+        
+        But if you want to play anyways, there's the list of commands. they all starts with /
+        
+        {('zzzul'+instruction[377:-33]+'zzzulf').replace("\n", "zzzlifzzzli")}
+        
+        all starting with /""".replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>").replace('zzzulf', '</ul>').replace('zzzul', '<ul>').replace('zzzlif', '</li>').replace('zzzli', '<li>')
+        '''
 
         return f"""{NO_API_KEYS_STR}
         

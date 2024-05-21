@@ -448,6 +448,17 @@ def command_executer(prompt:str|list, player:Character, target:Monster) -> tuple
     elif action[0] == 'info':
         successful = act_info(player, action)
 
+    elif action[0] == 'see':
+        successful = act_see(player, action)
+
+    elif action[0] == 'talk':
+        successful = act_talk(player, target, action)
+
+    elif action[0] == 'help':
+        from DnD_AI.functions_AI import TUTORIAL
+        History.objects.create(campaign=player.campaign, author='SYSTEM', text=TUTORIAL).save()
+        successful = True
+
         
     return successful, {
         'player_died': player_died,
@@ -455,6 +466,205 @@ def command_executer(prompt:str|list, player:Character, target:Monster) -> tuple
         'target_died': target_died,
         'new_target': new_target, 
     }
+
+
+def act_talk(player:Character, target:Monster, action:list):
+    if len(action) == 2:
+        pass
+
+     
+    was_understansable = False
+    if target.monster_race == player.character_race or target.monster_class == player.character_class or target.monster_race == "Human" or target.is_boss() or "traductor" in player.get_inventory().keys():
+        was_understansable = True
+        understandable_responses = [
+            "Who the hell are you?",
+            "Who let this guy to enter!?",
+            "I'm going to crush all your bones.",
+            "I'm going to eat you alive!",
+            "I'm going to crush you like a bug.",
+            "Sorry dude, they pay too well...",
+            "I mean, it's not personal, but I have to kill you",
+            "Shut up, don't make it more difficult for me...",
+            """LOOK BEHIND YOU!... Gotcha!
+Naah you didn't look, how boring...""",
+            'I was bored in my house, okay?, sorry for this',
+            'XDDDDDDDD, WHAT THE FUCK, YOU CAN TALK?',
+            "I'm starting to feel something for you...",
+            'I need to kill you before I fall in love.',
+            'The Game',
+            'hehe, your mom',
+            'E-eeeto... Nyan?',
+            'Nyanyame nyanyaju nyanyado no nyarabi de nyakunyaku inyanyaku nyanyahan nyanya-dai nyannyaku nyarabete nyagannyagame',
+            'Sowwwyy u///u (wants to kill you)',
+            "miaw (cute, isn't?). Oh, you don't like it?, die then."
+            'When they hired me, they told me that I was going to fight with a strong warrior... But, when I see you, I only see fear.',
+            'I am not in danger, Skyler, I AM THE DANGER',
+            'DAAAAMN, YOU SMELL HORRIBLE',
+            'Never gonna give you up... Never gonna let you down...',
+            'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+            'https://www.youtube.com/watch?v=vVaFS739skE',
+            'XDDDD, so small...',
+            "LET'S FUUUUCK, WOOOOOOOOOH",
+            'What do you think about interspecies relationships?',
+            'Eh, uhm... Are you single?',
+            "Go talk with people outside.",
+            "Do you have no friends or what?",
+            "DON'T TALK TO ME, YOU LOSER",
+            "Y-you scare me T-T",
+            "So you just killed all my family, and now you just want to talk?",
+            "Let's see after you finish... :)",
+            "Why are you so cruel with everybody...",
+            "THEY WERE NOT EVEN HURTING YOU, I HAVE TO STOP YOU OR NO-ONE WILL",
+            "I feel my death close...",
+            "I'm starting to feel... Free. Thank you, for killing me.",
+            "Jesus christ, you are a monster...",
+            "Jesus christ, and I am the monster!?",
+            "Jesus christ, you are a terrible person...",
+            "Jesus christ, do you really think you are the hero?",
+        ]
+        response = choice(understandable_responses)
+    else:    
+        number = randint(2, 20)
+        not_understandable_responses = [
+            'ra '*number,
+            'k'*number,
+            'kak '*number,
+            'la lla'*number,
+            'ajskd'*number,
+            'sdfd'*number,
+            'a'*number,
+            'A'*number,
+            'A'*number+'GGHH',
+            'AaAaaA'*number,
+            'aAAA'*number,
+            '?'*number,
+            'ñ',
+            'ñ'*number,
+            '¿?',
+            '¿?'*number,
+            '55'*number,
+            'mdr '*number,
+            'ha3'*number,
+            'UwU '*number,
+            'OwO '*number,
+            'Nyan-'*number,
+            'Nyan '*number,
+            'Nyanyame nyanyaju nyanyado no nyarabi de nyakunyaku inyanyaku nyanyahan nyanya-dai nyannyaku nyarabete nyagannyagame',
+            'w'*number, 
+            'weqeqwqewqew',
+            '哈'*number,
+            '呵'*number,
+            'ہا'*number,
+            '笑う'*number,
+            '笑い'*number,
+            '草'*number,
+            'TmV2ZXIgZ29ubmEgZ2l2ZSB5b3UgdXAuLi4=',
+            'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+            'https://www.youtube.com/watch?v=vVaFS739skE',
+            'gebe dich nie auf',
+            'никогда тебя не брошу',
+            '绝不会放弃你',
+            '絕對不會放棄你',
+            'あなたを決してあきらめない',
+            'नेवर गोना गिव यू अप',
+            'mai bao duoc',
+            'nigdy się nie poddawaj',
+            'tak akan menyerahkanmu',
+            'ನಿಮ್ಮನ್ನು ಎಂದಿಗೂ ಬಿಟ್ಟುಕೊಡುವುದಿಲ್ಲ',
+            'ඞ'*(number-1),
+            'ඞ',
+            'nikdy se tě nevzdám',
+            'non te deseram',
+            'nigdy cię nie opuszczę',
+            'Tôi không đời nào bỏ cậu đâu',
+            'чамд хэзээ ч бууж өгөхгүй',
+            '절대 포기하지 않을 거야 yoy',
+            'ніколі не здамся',
+            'nunca vou desistir de você',
+            'nigdy się nie poddam',
+            'երբեք չեմ հանձնվի',
+            'לעולם לא אוותר על יואי',
+            'ποτέ δεν θα τα παρατήσεις',
+            'vil aldri gi deg opp',
+            'لن تتخلى أبدا عن يو',
+            'mai te tuku iho i a koe',
+            "mana hayk'aqpas yoy up",
+            'heç vaxt təslim olmayacaq',
+            "ʻaʻole loa e hāʻawi iā ʻoe",
+            'هرگز تسلیم نخواهم شد',
+            '-. . ...- . .-. / --. --- -. -. .- / --. .. ...- . / -.-- --- ..- / ..- .--. .-.-.',
+            '-.-- --- ..- / .- .-. . / --. .- -.-- .-.-.',
+            '01101110 01100101 01110110 01100101 01110010 00100000 01100111 01101111 01101110 01101110 01100001 00100000 01100111 01101001 01110110 01100101 00100000 01111001 01101111 01110101 00100000 01110101 01110000',
+            '01111001 01101111 01110101 00100000 01100001 01110010 01100101 00100000 01100111 01100001 01111001'
+            '01110100 01101000 01100101 00100000 01100111 01100001 01101101 01100101',
+            'dGhlIGdhbWU=',
+            'bmV2ZXIgZ29ubmEgZ2l2ZSB5b3UgdXA=',
+            'bm8gb25lIGNhbiBlc2NhcGUgdGhlIGhlbGwu'
+        ]
+        response = choice(not_understandable_responses)
+
+
+    History.objects.create(campaign=player.campaign, author=target.name, color="red", text=response)
+
+
+    if was_understansable:
+        successful_responses = [
+            f"{target.name} is not in the mood to talk.",
+            f"{target.name} is ignoring you.",
+            f"{target.name} is too busy to talk to you.",
+            f"{target.name} is not interested in talking to you.",
+            f"{target.name} is still a monster.",
+            f"{target.name} loves you secretly.",
+            f"{target.name} knows that you will kill him.",
+            f"{target.name} feels sad.",
+            f"{target.name} is busy thinking on ways to win and save his family from you.",
+            "That was still not useful.",
+            "That was a waste of time, again.",
+            "You like wasting your time, don't you?",
+            "Go talk with people outside."
+        ]
+        response = choice(successful_responses)
+    else:
+        not_successful_responses = [
+            f"{target.name} is not a {player.character_race}",
+            f"{target.name} can't understand {player.character_race} language.",
+            f"{player.name} is not a {target.monster_race}",
+            f"{player.name} can't understand {target.monster_race} language.",
+            "You can't understand that language.",
+            'You have no traductors in your inventory.',
+            'Go find a traductor first.',
+            'You are not capable to understand that language. (loser...)',
+            'You were not capable to understand it. (loser...)',
+            "That was a waste of time.",
+            "That wasn't useful at all.",
+            "You like wasting your time, don't you?",
+        ]
+        response = choice(not_successful_responses)
+    
+    History.objects.create(campaign=player.campaign, author='SYSTEM', text=response)
+    
+    return True
+
+
+def act_see(player:Character, action:list):
+    if len(action) == 1:
+        response = player.inventory
+    elif action[1] == 'inventory':
+        response = player.inventory
+    elif action[1] in ['initial', 'story', 'initial_story']:
+        response = player.campaign.initial_story
+    elif action[1] == 'achievements':
+        response = player.campaign.achievements
+    elif action[1] == 'objectives':
+        response = player.campaign.objectives_remaining
+    elif action[1] == 'turns':
+        response = player.campaign.turns
+    elif action[1] in ['physical', 'physical_description', 'description']:
+        response = player.physical_description
+    else:
+        response = player.get_inventory(action[1])
+    History.objects.create(campaign=player.campaign, author='SYSTEM', text=response).save()
+    return True
 
 
 def act_info(player:Character, action:list):
