@@ -367,6 +367,12 @@ def action_image_generation(prompt:str, action:str, player:Character, target:Mon
     elif action == 'portal':
         image_description = f"{player.name}, the {player.character_race} {player.character_class} {player.physical_description} with a surprised face, is discovering a PORTAL with amazement"
     
+    elif action == 'see':
+        if {prompt[3:]} == "inventory":
+            return
+        else:
+            image_description = f"{player.name}, the {player.character_race} {player.character_class} {player.physical_description} is seeing his {prompt[3:]}"
+
     # take, use, levelup, info
     else:
         if action == 'info':
@@ -412,7 +418,7 @@ def command_executer(prompt:str|list, player:Character, target:Monster) -> tuple
     # if the prompt is a string, it will be split into a list
     action = prompt.split(' ') if type(prompt) == str else prompt
 
-    if action[0] not in ['move', 'go', 'attack', 'take']:
+    if action[0] not in ['move', 'go', 'attack', 'take', 'talk', 'help']:
         action_image_generation(prompt, action[0], player, target)
 
     # for each action, the turns on the campaign will be increased
@@ -474,54 +480,9 @@ def act_talk(player:Character, target:Monster, action:list):
 
      
     was_understansable = False
-    if target.monster_race == player.character_race or target.monster_class == player.character_class or target.monster_race == "Human" or target.is_boss() or "traductor" in player.get_inventory().keys():
+    if target.monster_race == player.character_race or target.monster_class == player.character_class or target.monster_race == "Human" or target.is_boss or "traductor" in player.get_inventory().keys():
+        from DnD_AI.default import understandable_responses
         was_understansable = True
-        understandable_responses = [
-            "Who the hell are you?",
-            "Who let this guy to enter!?",
-            "I'm going to crush all your bones.",
-            "I'm going to eat you alive!",
-            "I'm going to crush you like a bug.",
-            "Sorry dude, they pay too well...",
-            "I mean, it's not personal, but I have to kill you",
-            "Shut up, don't make it more difficult for me...",
-            """LOOK BEHIND YOU!... Gotcha!
-Naah you didn't look, how boring...""",
-            'I was bored in my house, okay?, sorry for this',
-            'XDDDDDDDD, WHAT THE FUCK, YOU CAN TALK?',
-            "I'm starting to feel something for you...",
-            'I need to kill you before I fall in love.',
-            'The Game',
-            'hehe, your mom',
-            'E-eeeto... Nyan?',
-            'Nyanyame nyanyaju nyanyado no nyarabi de nyakunyaku inyanyaku nyanyahan nyanya-dai nyannyaku nyarabete nyagannyagame',
-            'Sowwwyy u///u (wants to kill you)',
-            "miaw (cute, isn't?). Oh, you don't like it?, die then."
-            'When they hired me, they told me that I was going to fight with a strong warrior... But, when I see you, I only see fear.',
-            'I am not in danger, Skyler, I AM THE DANGER',
-            'DAAAAMN, YOU SMELL HORRIBLE',
-            'Never gonna give you up... Never gonna let you down...',
-            'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-            'https://www.youtube.com/watch?v=vVaFS739skE',
-            'XDDDD, so small...',
-            "LET'S FUUUUCK, WOOOOOOOOOH",
-            'What do you think about interspecies relationships?',
-            'Eh, uhm... Are you single?',
-            "Go talk with people outside.",
-            "Do you have no friends or what?",
-            "DON'T TALK TO ME, YOU LOSER",
-            "Y-you scare me T-T",
-            "So you just killed all my family, and now you just want to talk?",
-            "Let's see after you finish... :)",
-            "Why are you so cruel with everybody...",
-            "THEY WERE NOT EVEN HURTING YOU, I HAVE TO STOP YOU OR NO-ONE WILL",
-            "I feel my death close...",
-            "I'm starting to feel... Free. Thank you, for killing me.",
-            "Jesus christ, you are a monster...",
-            "Jesus christ, and I am the monster!?",
-            "Jesus christ, you are a terrible person...",
-            "Jesus christ, do you really think you are the hero?",
-        ]
         response = choice(understandable_responses)
     else:    
         number = randint(2, 20)
