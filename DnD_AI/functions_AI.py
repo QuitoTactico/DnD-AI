@@ -356,6 +356,7 @@ TUTORIAL = """<ul>
                         <li>"turns"</li>
                         <li>"physical_description"</li>
                     </ul>
+                </li>
             </ul>"""
 
 def action_interpreter(prompt_input) -> str:
