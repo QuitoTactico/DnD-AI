@@ -77,7 +77,7 @@ def connect_rooms(mapa, habitacion1, habitacion2, hallway_type, campaign_id):
                     #mapa[puntos1[1] + offset, x] = tipo_pasillo
                     Tile.objects.update_or_create(campaign_id=campaign_id, x=x, y=y, defaults={'tile_type': hallway_type})
                     if random.random() < 0.05:
-                        generate_object_in_coords(campaign_id, x, y, hallway_type)
+                        generate_object_in_coords(campaign_id, x, y, hallway_type, habitacion1)
 
         for y in range(min(puntos1[1], puntos2[1]), max(puntos1[1], puntos2[1]) + 1):
             for offset in range(ancho_pasillo):
@@ -86,7 +86,7 @@ def connect_rooms(mapa, habitacion1, habitacion2, hallway_type, campaign_id):
                     #mapa[y, puntos2[0] + offset] = tipo_pasillo
                     Tile.objects.update_or_create(campaign_id=campaign_id, x=x, y=y, defaults={'tile_type': hallway_type})
                     if random.random() < 0.05:
-                        generate_object_in_coords(campaign_id, x, y, hallway_type)
+                        generate_object_in_coords(campaign_id, x, y, hallway_type, habitacion1)
 
 
     else:  # vertical primero, luego horizontal
@@ -97,7 +97,7 @@ def connect_rooms(mapa, habitacion1, habitacion2, hallway_type, campaign_id):
                     #mapa[y, puntos1[0] + offset] = tipo_pasillo
                     Tile.objects.update_or_create(campaign_id=campaign_id, x=x, y=y, defaults={'tile_type': hallway_type})
                     if random.random() < 0.05:
-                        generate_object_in_coords(campaign_id, x, y, hallway_type)
+                        generate_object_in_coords(campaign_id, x, y, hallway_type, habitacion1)
 
         for x in range(min(puntos1[0], puntos2[0]), max(puntos1[0], puntos2[0]) + 1):
             for offset in range(ancho_pasillo):
@@ -106,7 +106,7 @@ def connect_rooms(mapa, habitacion1, habitacion2, hallway_type, campaign_id):
                     #mapa[puntos2[1] + offset, x] = tipo_pasillo
                     Tile.objects.update_or_create(campaign_id=campaign_id, x=x, y=y, defaults={'tile_type': hallway_type})
                     if random.random() < 0.05:
-                        generate_object_in_coords(campaign_id, x, y, hallway_type)
+                        generate_object_in_coords(campaign_id, x, y, hallway_type, habitacion1)
 
 
 def generate_monster(campaign_id, tile_type):
@@ -132,7 +132,7 @@ def generate_monster(campaign_id, tile_type):
         weapon = get_default_weapon(entity_class=monster_class) if random.random() < 0.5 else get_default_weapon(entity_class=monster_race)
         multiplier = 1
         inventory_random = random.random()
-        inventory=str({'gold':random.randint(10,20)}) if inventory_random < 0.25 else str({'health potion': random.randint(1,3)}) if inventory_random < 0.5 else str({'go back bone': 1}) if inventory_random < 0.75 else str({'key': 1})
+        inventory=str({'traductor': 1}) if inventory_random < 0.01 else str({'gold':random.randint(10,20)}) if inventory_random < 0.25 else str({'health potion': random.randint(1,3)}) if inventory_random < 0.5 else str({'go back bone': 1}) if inventory_random < 0.75 else str({'key': 1})
 
 
     monster = Monster.objects.create(
@@ -209,7 +209,10 @@ def generate_object(campaign_id, room, object_type, entity=None, x=None, y=None)
             else:
                 tries -= 1
 
-        # gold = 33%, bag = 33%, key = 33%
+        # bag = 33% gold = 33%, key = 33%
+
+        # when bag: 
+        # traductor = 1%, health potion = 32%, gold = 32%, go back bone = 32%
         elif object_type == 'small_treasure':
             existent_player = Character.objects.filter(campaign_id=campaign_id, x=x, y=y)
             existent_treasure = Treasure.objects.filter(campaign_id=campaign_id, x=x, y=y)
@@ -218,7 +221,7 @@ def generate_object(campaign_id, room, object_type, entity=None, x=None, y=None)
             if not existent_player and not existent_treasure and not existent_monster:
                 spawn = random.random()
                 if spawn < 0.33:
-                    inventory = str({'health potion': random.randint(1, 2)}) if spawn < 0.11 else str({'gold': random.randint(3,10)}) if spawn < 0.22 else str({'go back bone': 1})
+                    inventory = str({'traductor': 1}) if spawn < 0.01 else str({'health potion': random.randint(1, 2)}) if spawn < 0.11 else str({'gold': random.randint(3,10)}) if spawn < 0.22 else str({'go back bone': 1})
                     Treasure.objects.create(campaign_id=campaign_id, treasure_type='Bag', x=x, y=y,
                                             inventory=inventory)
                 elif spawn < 0.66:
@@ -487,7 +490,7 @@ def generate_key_bosses(campaign_id, n:int = 3):
             physical_resistance=random.randint(10,15), 
             magical_resistance=random.randint(10,15),
             constitution=random.randint(10,15),
-            inventory=str({'gold':500, 'health potion': 10, 'go back bone': 5, 'key': 5}),
+            inventory=str({'gold':500, 'health potion': 10, 'go back bone': 5, 'key': 5, 'traductor': 1}),
             exp_drop=1000,
             x=random.randint(0,10),
             y=random.randint(0,10),

@@ -20,7 +20,6 @@ python manage.py runserver
 
 ## Software requirements
 
-- Python 3.12.X (3.11.X and below are not supported)
 - The needed dependencies and libraries defined in requirements.txt. To get them, run ```pip install -r "requirements.txt"```
 
 ## AI usage requirements

@@ -999,6 +999,7 @@ understandable_responses = [
             "It's okay, kill me... But leave my family alone. Can you promise that to me? (You accepted, but you don't even know who were them.) (They are already dead.)",
             "Mom... Look at me... Do you love me now?...",
             "OKAY, OKAY... KILL ME... But in exchange, don't kill my daugther, please, she's everything to me (You accepted, but you already killed her.)",
-            "Even if I fight with all my strength, but that is not enough... You are... A monster.",
+            "Even if I fight with all my strength, that is not enough... You are... A monster.",
+            "Even if i kill you, someone else will come to kill me. There's no escape, just finish this.",
             "I am... Your father.<br><br><br><br>(Nah i'm not XD)"
         ]

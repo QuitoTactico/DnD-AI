@@ -105,4 +105,51 @@
             </ul>
         </li>
     </ul>
+
+    <hr>
+
+    <h2>To run <em>(do the pip install if it's your first time running the project):</em></h2>
+
+    <pre>
+    pip install -r "requirements.txt"
+    python manage.py runserver
+    </pre>
+
+    <h2>Software requirements</h2>
+
+    <ul>
+    <li>The needed dependencies and libraries defined in requirements.txt. To get them, run <code>pip install -r "requirements.txt"</code></li>
+    </ul>
+
+    <h2>AI usage requirements</h2>
+
+    <ul>
+    <li>For image generation is needed either a <code>OpenAI API key</code> or a <code>HuggingFace API key</code>.</li>
+    <li>For action interpretation, storytelling and campaign's info providing, a <code>Google Gemini API key</code> is needed. OpenAI GPT option will be re-added in the future.</li>
+    </ul>
+
+    <p>You can provide this keys either creating a file called <code>api_keys.env</code> on the root dir of the project.</p>
+
+    <pre>
+    # api_keys.env
+    # on root dir of the project
+
+    openai_api_key = 
+    hf_api_key = 
+    gemini_api_key = 
+    </pre>
+
+    <p>Or a file called <code>API.py</code> on <code>/DnD_AI/</code> (the application, not the project). At the same level of <code>functions_AI.py</code>, the file that uses the api keys.</p>
+
+    <pre>
+    # API.py
+    # on same folder as /DnD_AI/functions_AI.py
+
+    openai_api_key = " "
+    hf_api_key = " "
+    gemini_api_key = " "
+    </pre>
+
+    <p>In any case, <code>the game is still playable with some (or none) of the API keys</code>. While AI generated images being replaced with placeholder images and action inputs not being interpreted, but supporting the use of commands instead.</p>
+
 {% endblock content %}
