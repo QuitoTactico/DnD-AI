@@ -124,28 +124,28 @@ DEFAULT_WEAPON_PER_CLASS.update(DEFAULT_WEAPON_PER_RACE)
 
 DEFAULT_RACE_PER_TILE_TYPE = {
     'grass': [
-        'Centaur', 'Elf', 'Druid', 'Fairy', 'Human', 'Indigenous', 'Werewolf', 'Unicorn'
+        'Centaur', 'Elf', 'Druid', 'Fairy', 'Human', 'Indigenous', 'Werewolf', 'Unicorn', 'Alien'
     ],
     'dirt': [
-        'Dwarf', 'Goblin', 'Orc', 'Troll', 'Rat', 'Wolf'
+        'Dwarf', 'Goblin', 'Orc', 'Troll', 'Rat', 'Wolf', 'Chimera', 'Hydra', 'Zombie'
     ],
     'god': [
-        'Angel', 'Fairy', 'Unicorn', 'Elf'
+        'Angel', 'Fairy', 'Unicorn', 'Elf', 'Alien'
     ],
     'psycho': [
         'Vampire', 'Werewolf', 'Demon', 'Ghost', 'Chimera', 'Hydra', 'Medusa'
     ],
     'hell': [
-        'Demon', 'Dragon', 'Skeleton', 'Zombie', 'Vampire', 'Golem'
+        'Demon', 'Dragon', 'Skeleton', 'Zombie', 'Vampire', 'Golem', 'Ghost'
     ],
     'path': [
-        'Human', 'Elf', 'Centaur', 'Harpy', 'Goblin'
+        'Human', 'Elf', 'Centaur', 'Harpy', 'Goblin', 'Demon', 'Ghost', 'Medusa'
     ],
     'dungeon': [
-        'Mummy', 'Skeleton', 'Minotaur', 'Golem', 'Cyclop', 'Moai'
+        'Mummy', 'Skeleton', 'Minotaur', 'Golem', 'Cyclop', 'Moai', 'Dragon', 'Vampire'
     ],
     'treasure': [
-        'Mimic', 'Goblin', 'Elf', 'Rat', 'Troll'
+        'Mimic', 'Dragon', 'Rat', 'Troll', 'Demon', 'Alien', 'Angel', 'Chimera', 'Hydra', 'Medusa', 'Vampire', 'Zombie', 'Ghost'
     ],
     'portal': [
         'Alien', 'Chimera', 'Dragon', 'Fairy', 'Ghost'
