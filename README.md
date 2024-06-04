@@ -1,5 +1,10 @@
-# Welcome to DnD-AI!
+**`Winners of Inventiva 2024-1 on the "Best Performance" category!`** *Thanks to everybody, you're the real heroes :)*
 
+![The Pibes](unpaid_creators.jpg)
+
+We are already developing a `new version on Go`, with most of the functions `migrated into Javascript`, give it a look: [DnD-AI 2.0](https://github.com/QuitoTactico/DnD-AI-2.0)
+
+# Welcome to DnD-AI!
 
 Each year, 10 million Dungeons and Dragons sessions are created, but did you know that more than half of these cannot take place due to a `lack of a Dungeon Master?` Dungeons and Dragons is a game that relies entirely on the imagination of its players, and among them, the Dungeon Master is `the one who creates the story` the players will follow, develops characters, their abilities, monsters, maps, and items – essentially, `the heart of the game`. We depend heavily on them, and there isn't always someone willing to take on the role.
 
@@ -17,6 +22,8 @@ Unlike similar ideas, we have various visual enhancements, such as `real-time ma
 pip install -r "requirements.txt"
 python manage.py runserver
 ```
+
+Or ```sudo python3 manage.py runserver 0.0.0.0:80``` if you want your own public instance.
 
 ## Software requirements
 
