@@ -197,8 +197,8 @@ Some say that his soul still resides in the game to this day as a playable chara
 ### [DnD-AI: Salcedios](https://www.youtube.com/watch?v=GX2EiZJsDOU)
 [![DnD-AI: Salcedios](https://i.ytimg.com/an_webp/GX2EiZJsDOU/mqdefault_6s.webp?du=3000&sqp=CKiszbgG&rs=AOn4CLAnB_OU488HakmncD0aiUGfeh3GNg)](https://www.youtube.com/watch?v=GX2EiZJsDOU)
 
-### Don't click [here](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
-![image](https://github.com/user-attachments/assets/ce7a3742-5ad5-45e1-9b30-518bd03b575e)
+### [Don't click here](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
+[![image](https://github.com/user-attachments/assets/b9ab6bdb-979f-4e6e-9f7a-b53cd3f81ec3)](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
 
 # Created by:
 > - [Esteban Vergara Giraldo (QuitoTactico)](https://github.com/QuitoTactico)
@@ -206,4 +206,3 @@ Some say that his soul still resides in the game to this day as a playable chara
 > - [Sebastian Salazar Osorio (Chiki)](https://github.com/Sebasalazaro)
 >
 > For the EAFIT course: Integrator project 1
-
