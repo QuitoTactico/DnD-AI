@@ -36,10 +36,12 @@ We know you will break this game into pieces, c'mon, do it
 ### Map and game generation
 Including 8 different biomes with its own unique generated enemies, items, loots and portals. Every campaign is unique!  
 ![image](https://github.com/user-attachments/assets/2967ed75-683b-495e-a3d8-bfdfa35d53c5)  
-![image](https://github.com/user-attachments/assets/a0eecadb-420f-4f11-8160-c46232d115f8)  
+![image](https://github.com/user-attachments/assets/a0eecadb-420f-4f11-8160-c46232d115f8)
 ![image](https://github.com/user-attachments/assets/32ed1f55-9ebb-463e-b28c-948039f288e1)  
 
 ### Interactive interface
+The map is zoomable and draggable/pannable, and the player has a view range. Your party will need to explore to find all the interesting items on the map  
+![image](https://github.com/user-attachments/assets/8bb5e940-1903-40a7-b405-d4817ccdd7b9)  
 Every enemy, chest and item shows the information you need!  
 ![image](https://github.com/user-attachments/assets/d59dbd02-585f-4306-82aa-ae19375ae857)
 
@@ -88,7 +90,8 @@ To help you understand and use all the campaign generator has to offer. Remember
 
 ### No-AI game options
 Don't worry if you don't love these soul-less machines, we have plenty of pre-created bosses, stories and weapons for you  
-![image](https://github.com/user-attachments/assets/b5280ac6-9b43-44fc-a945-e65143d36424)
+![image](https://github.com/user-attachments/assets/b5280ac6-9b43-44fc-a945-e65143d36424)  
+As long as you can handle the bullying...
 
 ### Copyright and moral violations everywhere
 We will have to sell our houses to pay this  
@@ -194,6 +197,8 @@ Some say that his soul still resides in the game to this day as a playable chara
 ### [DnD-AI: Salcedios](https://www.youtube.com/watch?v=GX2EiZJsDOU)
 [![DnD-AI: Salcedios](https://i.ytimg.com/an_webp/GX2EiZJsDOU/mqdefault_6s.webp?du=3000&sqp=CKiszbgG&rs=AOn4CLAnB_OU488HakmncD0aiUGfeh3GNg)](https://www.youtube.com/watch?v=GX2EiZJsDOU)
 
+### Don't click [here](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
+![image](https://github.com/user-attachments/assets/ce7a3742-5ad5-45e1-9b30-518bd03b575e)
 
 # Created by:
 > - [Esteban Vergara Giraldo (QuitoTactico)](https://github.com/QuitoTactico)
@@ -202,5 +207,3 @@ Some say that his soul still resides in the game to this day as a playable chara
 >
 > For the EAFIT course: Integrator project 1
 
-Dont click [here](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
-![image](https://github.com/user-attachments/assets/ae192a67-e76a-4b91-b604-a65dbf2cc359)
