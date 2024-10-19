@@ -60,7 +60,9 @@ They are so damn TOUGH
 
 ### Unique optional bosses
 That hopefully don't violate any copyright laws (help)  
-![image](https://github.com/user-attachments/assets/c171cfbc-56ec-4f63-a225-73a36fc97d05)
+![image](https://github.com/user-attachments/assets/c171cfbc-56ec-4f63-a225-73a36fc97d05)  
+You can request anything to be uploaded, yup  
+![image](https://github.com/user-attachments/assets/8ff6b880-5e96-43a1-a046-f5a5fadc4cb2)
 
 ### Image generation during campaign
 ![image](https://github.com/user-attachments/assets/d1e189d8-e393-4b6e-a372-bd46f041726d)
@@ -84,6 +86,11 @@ Yes. You can loot them. Be happy.
 You can also change it's name and image!  
 ![image](https://github.com/user-attachments/assets/908eb1dd-7efe-4acf-9293-9d19befa8cd4)
 
+### Enemies with EMOTIONS (nah not really)
+![image](https://github.com/user-attachments/assets/5b18c4de-0c36-4cd5-ac97-0b683907332e)  
+Yes, he died, rip Paul  
+![image](https://github.com/user-attachments/assets/9b5a3a59-6680-4026-840d-3d9d7855e6a9)
+
 ### Parameters guide
 To help you understand and use all the campaign generator has to offer. Remember that you can just write everything in natural language, the system will understand :)  
 ![image](https://github.com/user-attachments/assets/0edb455f-8ee8-4662-b3ce-22e0560a3574)
@@ -91,10 +98,11 @@ To help you understand and use all the campaign generator has to offer. Remember
 ### No-AI game options
 Don't worry if you don't love these soul-less machines, we have plenty of pre-created bosses, stories and weapons for you  
 ![image](https://github.com/user-attachments/assets/b5280ac6-9b43-44fc-a945-e65143d36424)  
-As long as you can handle the bullying...
+As long as you can handle the bullying... And the rats  
+![no_api_keys1](https://github.com/user-attachments/assets/d1684b5b-f9ff-4cd2-8a1d-028f013d2c7e)
 
 ### Copyright and moral violations everywhere
-We will have to sell our houses to pay this  
+Who needed basic ethics anyway  
 ![image](https://github.com/user-attachments/assets/ca27d5a2-9244-43ca-865c-5d8d2b32f67a)
 
 ### I told you about the completely normal optional bosses?
@@ -102,6 +110,10 @@ We will have to sell our houses to pay this
 
 ### Awesome fights
 ![image](https://github.com/user-attachments/assets/9f98422f-9a6d-4b4f-97d1-50de40f803bd)
+
+### Marrano agua
+The best feature  
+![marrano_agua](https://github.com/user-attachments/assets/8ff24036-b28d-4e80-9383-5ead1fe434d5)
 
 ### This game fucking sucks
 And it's what makes it absolutely awesome!  
