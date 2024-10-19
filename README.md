@@ -14,6 +14,10 @@ What if we replaced them with an `artificial intelligence` that is available at 
 
 Unlike similar ideas, we have various visual enhancements, such as `real-time map` visualization and the `generation of images` for the epic scenes that, until now, you could only imagine.
 
+This project was deployed on GCP under the domain name of `dnd-ai.online` (Probably shutdown up to this point).
+
+`Our page:` http://dnd-ai.online
+
 `Our wiki:` https://github.com/QuitoTactico/DnD-AI/wiki
 
 `Our backlog:` https://github.com/users/QuitoTactico/projects/1
@@ -80,7 +84,7 @@ Several grid textures (tiles) such as grass, dirt, and sand were sourced from [O
 ### El Joven (entity) Credits
 
 Jonathan, basically. An unlucky friend, used as a test entity for the game.  
-![El_Joven](media\entity\icons\joven.png)  
+![El_Joven](media/entity/icons/joven.png)  
 All intellectual property rights over him are held exclusively by his mother. She has full and perpetual ownership over his creation.
 
 He's a cool developer too btw. https://github.com/jonathanbees  
