@@ -22,14 +22,105 @@ This project was deployed on GCP under the domain name of `dnd-ai.online` (Proba
 
 `Our backlog:` https://github.com/users/QuitoTactico/projects/1
 
-## To run *(do the pip install if it's your first time running the project):*
+# This project offers...
+
+### Generated stories to choose
+You can set the topic, or set your own story from scratch.  
+![Captura de pantalla (488)](https://github.com/user-attachments/assets/e6c38170-e34b-466b-8d71-66da7dcabd3d)
+
+### Player creation
+We know you will break this game into pieces, c'mon, do it  
+![image](https://github.com/user-attachments/assets/42392b34-000f-44a2-ad1c-09cda69ed7fb)  
+![image](https://github.com/user-attachments/assets/ea283b05-1033-4d69-abaf-b75bbd7165dd)  
+
+### Map and game generation
+Including 8 different biomes with its own unique generated enemies, items, loots and portals. Every campaign is unique!  
+![image](https://github.com/user-attachments/assets/2967ed75-683b-495e-a3d8-bfdfa35d53c5)  
+![image](https://github.com/user-attachments/assets/a0eecadb-420f-4f11-8160-c46232d115f8)  
+![image](https://github.com/user-attachments/assets/32ed1f55-9ebb-463e-b28c-948039f288e1)  
+
+### Interactive interface
+Every enemy, chest and item shows the information you need!  
+![image](https://github.com/user-attachments/assets/d59dbd02-585f-4306-82aa-ae19375ae857)
+
+### Multiplayer!!!
+Praise the sun!!!  
+![image](https://github.com/user-attachments/assets/f5c17e55-445d-457b-869b-ae19de613295)
+
+### Three final bosses
+Every campaign performs three unique generated bosses your party needs to defeat to finish the campaign!  
+![image](https://github.com/user-attachments/assets/bad3d81b-2654-4975-8854-60bd3cb6b983)  
+You can recognize them by the pink decoration around them  
+![image](https://github.com/user-attachments/assets/10af0459-df5c-4e1e-bfa7-376bdb43651e)  
+But you will need to explore and find the correct route to reach them  
+![image](https://github.com/user-attachments/assets/00f23b9a-8da6-48db-b6e4-6509851f0e8e)  
+They are so damn TOUGH
+
+### Unique optional bosses
+That hopefully don't violate any copyright laws (help)  
+![image](https://github.com/user-attachments/assets/c171cfbc-56ec-4f63-a225-73a36fc97d05)
+
+### Image generation during campaign
+![image](https://github.com/user-attachments/assets/d1e189d8-e393-4b6e-a372-bd46f041726d)
+
+### Level-up system
+Yeah, stats and more stats, you will not be able to explain all of them to your grandma  
+![image](https://github.com/user-attachments/assets/2fc63230-2426-497d-9716-024703041aae)
+
+### Multiple parallel campaigns
+To play one different with your friends each day  
+![image](https://github.com/user-attachments/assets/7f37cd87-7feb-4f69-89c7-141b88a8cefc)
+
+### Plenty of completely normal weapons
+![image](https://github.com/user-attachments/assets/24a908a5-2969-46fc-85ce-4f20733088a9)
+
+### And plenty of completely stupid weapons for the bosses
+Yes. You can loot them. Be happy.  
+![image](https://github.com/user-attachments/assets/f1e40b15-0406-4d4c-960b-eb45e4ed37c5)
+
+### Weapon upgrades and customization
+You can also change it's name and image!  
+![image](https://github.com/user-attachments/assets/908eb1dd-7efe-4acf-9293-9d19befa8cd4)
+
+### Parameters guide
+To help you understand and use all the campaign generator has to offer. Remember that you can just write everything in natural language, the system will understand :)  
+![image](https://github.com/user-attachments/assets/0edb455f-8ee8-4662-b3ce-22e0560a3574)
+
+### No-AI game options
+Don't worry if you don't love these soul-less machines, we have plenty of pre-created bosses, stories and weapons for you  
+![image](https://github.com/user-attachments/assets/b5280ac6-9b43-44fc-a945-e65143d36424)
+
+### Copyright and moral violations everywhere
+We will have to sell our houses to pay this  
+![image](https://github.com/user-attachments/assets/ca27d5a2-9244-43ca-865c-5d8d2b32f67a)
+
+### I told you about the completely normal optional bosses?
+![image](https://github.com/user-attachments/assets/189944bf-69b0-4251-8fca-09d2989a7006)
+
+### Awesome fights
+![image](https://github.com/user-attachments/assets/9f98422f-9a6d-4b4f-97d1-50de40f803bd)
+
+### This game fucking sucks
+And it's what makes it absolutely awesome!  
+![image](https://github.com/user-attachments/assets/cf1f7123-e84b-4809-a689-81c767620efa)
+
+### And everything you expect from a cursed and brainrotted game of dnd with your friends!
+What are you waiting for? :)
+
+# Running instructions
+
+## To clone and run *(do the pip install if it's your first time running the project):*
 
 ```
+git clone https://github.com/QuitoTactico/DnD-AI
+cd DnD-AI
 pip install -r "requirements.txt"
 python manage.py runserver
 ```
 
 Or ```sudo python3 manage.py runserver 0.0.0.0:80``` if you want your own public instance.
+
+Docker image coming soon. Stay tuned!
 
 ## Software requirements
 
@@ -81,6 +172,11 @@ This game uses icons from [Game-icons.net](https://game-icons.net/), licensed un
 
 Several grid textures (tiles) such as grass, dirt, and sand were sourced from [OpenGameArt.org](https://opengameart.org/). Some of these textures were created by [Lamoot](https://opengameart.org/users/lamoot). The original authors of other textures are unknown. No modifications were made to any of the textures, and all rights to these assets belong to their respective creators.
 
+They are great, we wouldn't have been able to create this game without them.
+
+![image](https://github.com/user-attachments/assets/862e9c6b-9561-4d90-8783-c1650243ea19)
+
+
 ### El Joven (entity) Credits
 
 Jonathan, basically. An unlucky friend, used as a test entity for the game.  
@@ -105,3 +201,6 @@ Some say that his soul still resides in the game to this day as a playable chara
 > - [Sebastian Salazar Osorio (Chiki)](https://github.com/Sebasalazaro)
 >
 > For the EAFIT course: Integrator project 1
+
+Dont click [here](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
+![image](https://github.com/user-attachments/assets/ae192a67-e76a-4b91-b604-a65dbf2cc359)
