@@ -4,6 +4,8 @@
 
 We are already developing a `new version on Go`, with most of the functions `migrated into Javascript`, give it a look: [DnD-AI 2.0](https://github.com/QuitoTactico/DnD-AI-2.0)
 
+Or check other project we developed on django (also with AI usage, better practices, automated tests and continuous deployment): [SoftServe Academy](https://github.com/QuitoTactico/SoftServe-Academy)
+
 # Welcome to DnD-AI!
 
 Each year, 10 million Dungeons and Dragons sessions are created, but did you know that more than half of these cannot take place due to a `lack of a Dungeon Master?` Dungeons and Dragons is a game that relies entirely on the imagination of its players, and among them, the Dungeon Master is `the one who creates the story` the players will follow, develops characters, their abilities, monsters, maps, and items – essentially, `the heart of the game`. We depend heavily on them, and there isn't always someone willing to take on the role.
@@ -65,10 +67,37 @@ In any case, `the game is still playable with some (or none) of the API keys`. W
 
 https://github.com/QuitoTactico/DnD-AI/assets/99926526/f426ac7c-4650-45de-a765-424f47cc1a3c
 
+# External resources credits
 
-## Created by:
-> - [Esteban Vergara Giraldo](https://github.com/QuitoTactico)
-> - [Miguel Angel Cock Cano](https://github.com/MiguelCock)
-> - [Sebastian Salazar Osorio](https://github.com/Sebasalazaro)
+### Icon Credits
+
+This game uses icons from [Game-icons.net](https://game-icons.net/), licensed under the **Creative Commons Attribution 3.0 Unported (CC BY 3.0)** license. No modifications were made to the original icons. You can view the full license here: [https://creativecommons.org/licenses/by/3.0/](https://creativecommons.org/licenses/by/3.0/).
+
+### Tiles Textures Credits
+
+Several grid textures (tiles) such as grass, dirt, and sand were sourced from [OpenGameArt.org](https://opengameart.org/). Some of these textures were created by [Lamoot](https://opengameart.org/users/lamoot). The original authors of other textures are unknown. No modifications were made to any of the textures, and all rights to these assets belong to their respective creators.
+
+### El Joven (entity) Credits
+
+Jonathan, basically. An unlucky friend, used as a test entity for the game.  
+![El_Joven](media\entity\icons\joven.png)  
+All intellectual property rights over him are held exclusively by his mother. She has full and perpetual ownership over his creation.
+
+He's a cool developer too btw. https://github.com/jonathanbees  
+Some say that his soul still resides in the game to this day as a playable character, but also as a boss...  
+
+# Videos
+
+### [DnD-AI Demostration](https://www.youtube.com/watch?v=wstDAuMiXww&t)
+[![DnD-AI Demostration](https://i.ytimg.com/an_webp/wstDAuMiXww/mqdefault_6s.webp?du=3000&sqp=CJyozbgG&rs=AOn4CLC6I5xoSNIQtf2VHg7SqsHWF0_zUg)](https://www.youtube.com/watch?v=wstDAuMiXww&t)
+
+### [DnD-AI: Salcedios](https://www.youtube.com/watch?v=GX2EiZJsDOU)
+[![DnD-AI: Salcedios](https://i.ytimg.com/an_webp/GX2EiZJsDOU/mqdefault_6s.webp?du=3000&sqp=CKiszbgG&rs=AOn4CLAnB_OU488HakmncD0aiUGfeh3GNg)](https://www.youtube.com/watch?v=GX2EiZJsDOU)
+
+
+# Created by:
+> - [Esteban Vergara Giraldo (QuitoTactico)](https://github.com/QuitoTactico)
+> - [Miguel Angel Cock Cano (MACockC)](https://github.com/MiguelCock)
+> - [Sebastian Salazar Osorio (Chiki)](https://github.com/Sebasalazaro)
 >
 > For the EAFIT course: Integrator project 1
