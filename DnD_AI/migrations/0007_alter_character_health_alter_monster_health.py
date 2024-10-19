@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('DnD_AI', '0006_character_recursiveness_monster_recursiveness'),
+        ("DnD_AI", "0006_character_recursiveness_monster_recursiveness"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='character',
-            name='health',
+            model_name="character",
+            name="health",
             field=models.IntegerField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='monster',
-            name='health',
+            model_name="monster",
+            name="health",
             field=models.IntegerField(blank=True, null=True),
         ),
     ]

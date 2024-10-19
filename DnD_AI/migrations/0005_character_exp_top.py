@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('DnD_AI', '0004_weapon_range_level_points'),
+        ("DnD_AI", "0004_weapon_range_level_points"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='character',
-            name='exp_top',
+            model_name="character",
+            name="exp_top",
             field=models.IntegerField(default=30),
         ),
     ]

@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('DnD_AI', '0022_remove_campaign_initial_context_and_more'),
+        ("DnD_AI", "0022_remove_campaign_initial_context_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='campaign',
-            name='achievements',
-            field=models.CharField(default='.', max_length=2000),
+            model_name="campaign",
+            name="achievements",
+            field=models.CharField(default=".", max_length=2000),
         ),
     ]

@@ -6,35 +6,38 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('DnD_AI', '0010_alter_character_inventory'),
+        ("DnD_AI", "0010_alter_character_inventory"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Chest',
+            name="Chest",
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('is_key', models.BooleanField(default=False)),
-                ('x', models.IntegerField(default=0)),
-                ('y', models.IntegerField(default=0)),
-                ('inventory', models.TextField(default="{'gold': 10}")),
+                ("id", models.AutoField(primary_key=True, serialize=False)),
+                ("is_key", models.BooleanField(default=False)),
+                ("x", models.IntegerField(default=0)),
+                ("y", models.IntegerField(default=0)),
+                ("inventory", models.TextField(default="{'gold': 10}")),
             ],
         ),
         migrations.CreateModel(
-            name='History',
+            name="History",
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('is_key', models.BooleanField(default=False)),
-                ('is_image', models.BooleanField(default=False)),
-                ('author', models.CharField(default='SYSTEM', max_length=50)),
-                ('text', models.CharField(default='Hi (Default message)', max_length=2000)),
-                ('color', models.CharField(default='black', max_length=10)),
-                ('date', models.DateTimeField(auto_now_add=True)),
+                ("id", models.AutoField(primary_key=True, serialize=False)),
+                ("is_key", models.BooleanField(default=False)),
+                ("is_image", models.BooleanField(default=False)),
+                ("author", models.CharField(default="SYSTEM", max_length=50)),
+                (
+                    "text",
+                    models.CharField(default="Hi (Default message)", max_length=2000),
+                ),
+                ("color", models.CharField(default="black", max_length=10)),
+                ("date", models.DateTimeField(auto_now_add=True)),
             ],
         ),
         migrations.RenameField(
-            model_name='monster',
-            old_name='is_key_for_campaign',
-            new_name='is_key',
+            model_name="monster",
+            old_name="is_key_for_campaign",
+            new_name="is_key",
         ),
     ]

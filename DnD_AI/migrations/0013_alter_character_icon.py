@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('DnD_AI', '0012_monster_is_boss_alter_character_image_and_more'),
+        ("DnD_AI", "0012_monster_is_boss_alter_character_image_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='character',
-            name='icon',
-            field=models.ImageField(blank=True, null=True, upload_to='entity/icons/'),
+            model_name="character",
+            name="icon",
+            field=models.ImageField(blank=True, null=True, upload_to="entity/icons/"),
         ),
     ]

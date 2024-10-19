@@ -14,6 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
 from django.urls import path
 from DnD_AI import views as dnd
@@ -22,16 +23,16 @@ from django.conf.urls.static import static
 from django.conf import settings
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', dnd.home, name='home'),
-    path('home', dnd.home, name='home'),
-    path('about', dnd.about, name='about'),
-    path('guide', dnd.guide, name='guide'),
-    path('campaignselection', dnd.campaignSelection, name='campaignSelection'),
-    path('campaigncreation', dnd.campaignCreation, name='campaignCreation'),
-    path('playerselection', dnd.playerSelection, name='playerSelection'),
-    path('playercreation', dnd.playerCreation, name='playerCreation'),
-    path('game', dnd.game, name='game'),
+    path("admin/", admin.site.urls),
+    path("", dnd.home, name="home"),
+    path("home", dnd.home, name="home"),
+    path("about", dnd.about, name="about"),
+    path("guide", dnd.guide, name="guide"),
+    path("campaignselection", dnd.campaignSelection, name="campaignSelection"),
+    path("campaigncreation", dnd.campaignCreation, name="campaignCreation"),
+    path("playerselection", dnd.playerSelection, name="playerSelection"),
+    path("playercreation", dnd.playerCreation, name="playerCreation"),
+    path("game", dnd.game, name="game"),
 ]
 
-urlpatterns += static(settings.MEDIA_URL , document_root = settings.MEDIA_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

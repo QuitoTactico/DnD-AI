@@ -6,23 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('DnD_AI', '0008_alter_character_name'),
+        ("DnD_AI", "0008_alter_character_name"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='character',
-            name='inventory',
-            field=models.TextField(default='{}'),
+            model_name="character",
+            name="inventory",
+            field=models.TextField(default="{}"),
         ),
         migrations.AddField(
-            model_name='monster',
-            name='inventory',
+            model_name="monster",
+            name="inventory",
             field=models.TextField(default="{'gold': 10}"),
         ),
         migrations.AlterField(
-            model_name='monster',
-            name='name',
+            model_name="monster",
+            name="name",
             field=models.CharField(blank=True, max_length=30, null=True),
         ),
     ]

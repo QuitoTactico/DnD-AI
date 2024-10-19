@@ -7,18 +7,28 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('DnD_AI', '0001_initial'),
+        ("DnD_AI", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='character',
-            name='weapon',
-            field=models.ForeignKey(blank=True, null=True, on_delete=models.SET(DnD_AI.models.get_bare_hands), to='DnD_AI.weapon'),
+            model_name="character",
+            name="weapon",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=models.SET(DnD_AI.models.get_bare_hands),
+                to="DnD_AI.weapon",
+            ),
         ),
         migrations.AlterField(
-            model_name='monster',
-            name='weapon',
-            field=models.ForeignKey(blank=True, null=True, on_delete=models.SET(DnD_AI.models.get_bare_hands), to='DnD_AI.weapon'),
+            model_name="monster",
+            name="weapon",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=models.SET(DnD_AI.models.get_bare_hands),
+                to="DnD_AI.weapon",
+            ),
         ),
     ]

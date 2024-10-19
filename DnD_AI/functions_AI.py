@@ -10,7 +10,7 @@ try:
 except:
     try:
         from models import *
-    except: 
+    except:
         from .models import *
 
 
@@ -27,7 +27,6 @@ except:
     pass
 
 
-
 # ================ OBTAINING THE KEYS ================
 
 
@@ -41,49 +40,57 @@ except:
 #   3. having api_keys.env in the same folder than this file
 #   4. having API.py in the root, two ways to import it
 #   5. having any .env file in any folder in the root or above (damn... jesus christ)
-try:    # 1
-    from .API import openai_api_key, hf_api_key, gemini_api_key   
+try:  # 1
+    from .API import openai_api_key, hf_api_key, gemini_api_key
 except:
-    try:    # 2
+    try:  # 2
         from dotenv import load_dotenv
-        load_dotenv('api_keys.env')
 
-        openai_api_key = os.getenv('openai_api_key') # its required to have either the openai 
-        hf_api_key = os.getenv('hf_api_key')         # or the huggingface api key
-        gemini_api_key = os.getenv('gemini_api_key') # its required to have the google gemini api key
+        load_dotenv("api_keys.env")
+
+        openai_api_key = os.getenv(
+            "openai_api_key"
+        )  # its required to have either the openai
+        hf_api_key = os.getenv("hf_api_key")  # or the huggingface api key
+        gemini_api_key = os.getenv(
+            "gemini_api_key"
+        )  # its required to have the google gemini api key
     except:
-        try:   # 3
-            load_dotenv('DnD_AI/api_keys.env')
+        try:  # 3
+            load_dotenv("DnD_AI/api_keys.env")
 
-            openai_api_key = os.getenv('openai_api_key')
-            hf_api_key = os.getenv('hf_api_key')        
-            gemini_api_key = os.getenv('gemini_api_key')
+            openai_api_key = os.getenv("openai_api_key")
+            hf_api_key = os.getenv("hf_api_key")
+            gemini_api_key = os.getenv("gemini_api_key")
         except:
             import sys
+
             sys.path.append("..")  # Añade la carpeta superior al PATH de Python
 
-            try:   # 4
-                from .API import openai_api_key, hf_api_key, gemini_api_key 
+            try:  # 4
+                from .API import openai_api_key, hf_api_key, gemini_api_key
             except:
-                try: 
-                    from API import openai_api_key, hf_api_key, gemini_api_key   
+                try:
+                    from API import openai_api_key, hf_api_key, gemini_api_key
                 except:
-                    try:   # 5
+                    try:  # 5
                         load_dotenv()
-                        openai_api_key = os.getenv('openai_api_key')
-                        hf_api_key = os.getenv('hf_api_key')        
-                        gemini_api_key = os.getenv('gemini_api_key')
+                        openai_api_key = os.getenv("openai_api_key")
+                        hf_api_key = os.getenv("hf_api_key")
+                        gemini_api_key = os.getenv("gemini_api_key")
                     except:
-                        pass # you just don't have api keys... so you can't use the AI functions
-                
+                        pass  # you just don't have api keys... so you can't use the AI functions
+
 NO_API_KEYS_STR = "Sorry dude, you didn't set the api keys or you ran out of balance. Please set the api keys or try again later. Jaja salu2"
 
-def NO_API_KEYS_IMG(): return f"media/entity/icons/no_api_keys{randint(1,3)}.png"
+
+def NO_API_KEYS_IMG():
+    return f"media/entity/icons/no_api_keys{randint(1,3)}.png"
 
 
 # ================ IMAGE GENERATION ================
 
-#illustrations_dir = "media\\illustrations\\"
+# illustrations_dir = "media\\illustrations\\"
 illustrations_dir = "media/illustrations/"
 
 
@@ -96,21 +103,21 @@ except:
 
 
 def image_generator_DallE(prompt):
-    '''Through OpenAI API, uses dall-e-3'''
+    """Through OpenAI API, uses dall-e-3"""
 
     try:
         response_dall_e = client_openai.images.generate(
             model="dall-e-3",
             prompt=prompt,
-            size="1024x1024", # the image generation is being too slow
-            #size="512x512",
-            #style="vivid",    # i've found this is possible
-            #style="natural", 
+            size="1024x1024",  # the image generation is being too slow
+            # size="512x512",
+            # style="vivid",    # i've found this is possible
+            # style="natural",
             quality="standard",
             n=1,
         )
 
-        #os.makedirs(image_dir, exist_ok=True)
+        # os.makedirs(image_dir, exist_ok=True)
 
         for _, image_data in enumerate(response_dall_e.data):
             i = randint(0, 9999999)
@@ -119,20 +126,20 @@ def image_generator_DallE(prompt):
 
             image_response = requests.get(image_url)
 
-            #with open(os.path.join(image_dir, f"image_{i}.png"), "wb") as f:
-                #f.write(image_response.content)
-                #return image_data.url
+            # with open(os.path.join(image_dir, f"image_{i}.png"), "wb") as f:
+            # f.write(image_response.content)
+            # return image_data.url
 
-            #image_route = f"{illustrations_dir}image_{i}.png"
+            # image_route = f"{illustrations_dir}image_{i}.png"
             image_dir = f"{illustrations_dir}image_DE_{i}.png"
             image_bytes = image_response.content
             image = Image.open(BytesIO(image_bytes))
             try:
                 image.save(image_dir)
             except:
-                image.save(image_dir.replace('/', '\\'))
-            #image.show()
-            return image_dir.replace('\\', '/')
+                image.save(image_dir.replace("/", "\\"))
+            # image.show()
+            return image_dir.replace("\\", "/")
     except:
         try:
             return image_generator_StabDiff(prompt)
@@ -146,41 +153,44 @@ StabDiff_API_URL = "https://api-inference.huggingface.co/models/stabilityai/stab
 
 headers = {"Authorization": f"Bearer {hf_api_key}"}
 
+
 def StabDiff_query(payload):
-	response = requests.post(StabDiff_API_URL, headers=headers, json=payload)
-	return response.content
+    response = requests.post(StabDiff_API_URL, headers=headers, json=payload)
+    return response.content
+
 
 def image_generator_StabDiff(prompt_input):
-    '''Through HuggingFace API, uses stable diffusion x1 1.0'''
+    """Through HuggingFace API, uses stable diffusion x1 1.0"""
 
     try:
         prompt = f"Epic scene of {prompt_input}"
 
-        image_bytes = StabDiff_query({
-            "inputs": prompt,
-        })
+        image_bytes = StabDiff_query(
+            {
+                "inputs": prompt,
+            }
+        )
 
         i = randint(0, 999999999999999999)
 
         # ruta absoluta del directorio de ilustraciones, no funcionó
-        #abs_illustrations_dir = os.path.abspath(illustrations_dir)
+        # abs_illustrations_dir = os.path.abspath(illustrations_dir)
 
         # ruta absoluta al guardar la imagen
-        #image_route = f"{abs_illustrations_dir}\image_{i}.png"
-        #image_route = f"media\\image_{i}.png"
+        # image_route = f"{abs_illustrations_dir}\image_{i}.png"
+        # image_route = f"media\\image_{i}.png"
         image_dir = f"{illustrations_dir}image_SD_{i}.png"
-        
+
         image = Image.open(BytesIO(image_bytes))
         try:
             image.save(image_dir)
         except:
-            image.save(image_dir.replace('/', '\\'))
-        #image.show()
-        #return image
-        return image_dir.replace('\\', '/')
+            image.save(image_dir.replace("/", "\\"))
+        # image.show()
+        # return image
+        return image_dir.replace("\\", "/")
     except:
         return NO_API_KEYS_IMG()
-
 
 
 # ================ TEXT GENERATION ================
@@ -191,7 +201,7 @@ template = """Question: {question}
 
 Answer: Let's think step by step, supossing that i am in a fantastical role-playing game, and i am the player's character.
 """
-#Answer: Let's think step by step, supossing that i am in a fantastical role-playing game, and i am a character. BTW im gay
+# Answer: Let's think step by step, supossing that i am in a fantastical role-playing game, and i am a character. BTW im gay
 
 prompt_template = PromptTemplate.from_template(template)
 
@@ -202,10 +212,11 @@ try:
 except:
     pass
 
+
 def continue_history_gpt(prompt):
     try:
         response = llm_chain.invoke(prompt)
-        return response['text'].replace('\n', '<br>')
+        return response["text"].replace("\n", "<br>")
     except:
         return NO_API_KEYS_STR
 
@@ -213,14 +224,14 @@ def continue_history_gpt(prompt):
 # ------------------ GOOGLE (GEMINI) ------------------
 
 try:
-    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = gemini_api_key
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = gemini_api_key
 
-    gemini_model = genai.GenerativeModel('gemini-pro')
+    gemini_model = genai.GenerativeModel("gemini-pro")
 
     genai.configure(api_key=gemini_api_key)
 
-    # later, initialice as None, and ask if it's none on the views. If it is None, initialize it with the campaign context. 
-    # if it's not None, let's assume that it has already the history of the campaign. 
+    # later, initialice as None, and ask if it's none on the views. If it is None, initialize it with the campaign context.
+    # if it's not None, let's assume that it has already the history of the campaign.
     gemini_chat = gemini_model.start_chat(history=[])
 except:
     pass
@@ -230,42 +241,74 @@ safety_settings = {
     HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
     HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
     HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
-    }
+}
 
-def create_initial_stories_gemini(prompt:str="", n:int=3) -> list:
-    prompt = prompt or ""   # if prompt is None, then it will be an empty string
+
+def create_initial_stories_gemini(prompt: str = "", n: int = 3) -> list:
+    prompt = prompt or ""  # if prompt is None, then it will be an empty string
     stories = []
-    world_type = ["fantasy", "sci-fi", "medieval", "cyberpunk", "post-apocalyptic", "steampunk", "futuristic", "dystopian", "utopian", "magical", "mystical", "mythical", "legendary", "historical", "modern"]
-    #render_format = "Use the html tag for underline instead of **"
+    world_type = [
+        "fantasy",
+        "sci-fi",
+        "medieval",
+        "cyberpunk",
+        "post-apocalyptic",
+        "steampunk",
+        "futuristic",
+        "dystopian",
+        "utopian",
+        "magical",
+        "mystical",
+        "mythical",
+        "legendary",
+        "historical",
+        "modern",
+    ]
+    # render_format = "Use the html tag for underline instead of **"
     render_format = ". Write it using the HTML formats when underlining or bolding. No other format is allowed."
 
     for _ in range(n):
         try:
-            story = gemini_model.generate_content(f"Tell me a story about a {choice(world_type)} world where i have to defeat some strong enemies and bosses to win, this is a initial story of a game. Also tell me at least three names of key bosses and it's race and class to be defeated, and why i have to defeat them. Don't talk about a protagonist or a specific hero, just leave it like a mission to fulfill for 'anyone' or 'you (talking to the player)'. "+prompt+render_format,
-                                              safety_settings=safety_settings)
+            story = gemini_model.generate_content(
+                f"Tell me a story about a {choice(world_type)} world where i have to defeat some strong enemies and bosses to win, this is a initial story of a game. Also tell me at least three names of key bosses and it's race and class to be defeated, and why i have to defeat them. Don't talk about a protagonist or a specific hero, just leave it like a mission to fulfill for 'anyone' or 'you (talking to the player)'. "
+                + prompt
+                + render_format,
+                safety_settings=safety_settings,
+            )
             initial_story = story.text.replace("\n", "<br>")
         except:
             initial_story = NO_API_KEYS_STR
-        
-        
+
         stories.append(initial_story)
     return stories
 
 
-def continue_history_gemini(prompt:str="", campaign_story:str="", campaign_achievements:str="") -> str:
+def continue_history_gemini(
+    prompt: str = "", campaign_story: str = "", campaign_achievements: str = ""
+) -> str:
     try:
-        response = gemini_chat.send_message(f"i did this: {prompt}. Progress the story taking in count that i'm in this world: {campaign_story}. and now my party already achieved this: {campaign_achievements}"+"Use the html tag for underline instead of **",
-                                            safety_settings=safety_settings)
+        response = gemini_chat.send_message(
+            f"i did this: {prompt}. Progress the story taking in count that i'm in this world: {campaign_story}. and now my party already achieved this: {campaign_achievements}"
+            + "Use the html tag for underline instead of **",
+            safety_settings=safety_settings,
+        )
         return response.text
     except:
         return NO_API_KEYS_STR
 
 
-def ask_world_info_gemini(prompt:str="about what to do next", campaign_story:str="", campaign_achievements:str="") -> str:
+def ask_world_info_gemini(
+    prompt: str = "about what to do next",
+    campaign_story: str = "",
+    campaign_achievements: str = "",
+) -> str:
     render_format = ". Write it using the HTML formats when underlining or bolding. No other format is allowed."
     try:
-        response = gemini_chat.send_message(f"Tell me {prompt}. Answer taking in count that i've already achieved this: [{campaign_achievements}].\nIn this world: [{campaign_story}]\n."+render_format,
-                                            safety_settings=safety_settings)
+        response = gemini_chat.send_message(
+            f"Tell me {prompt}. Answer taking in count that i've already achieved this: [{campaign_achievements}].\nIn this world: [{campaign_story}]\n."
+            + render_format,
+            safety_settings=safety_settings,
+        )
         return response.text
     except:
         return NO_API_KEYS_STR
@@ -359,6 +402,7 @@ TUTORIAL = """<ul>
                 </li>
             </ul>"""
 
+
 def action_interpreter(prompt_input) -> str:
     instruction = """I need you to categorize this natural language desired action into a function (act) according to this definitions. And depending on the function, I need its inputs too, all in just a line, no more. Always add the function at the beginning of the line. Never write the inputs name. Just write something like "attack skeleton james". For move, use specifically its valid values. Here are the functions and their inputs:
     
@@ -395,82 +439,95 @@ def action_interpreter(prompt_input) -> str:
     "make my Revolver's range bigger" -> "levelup range Revolver"
     without saying the function
     """
-    #about_what: "player", "enemies", "bosses", "world", "game", "story", "quests", "items", "weapons", "enemies", "bosses", "npcs",
+    # about_what: "player", "enemies", "bosses", "world", "game", "story", "quests", "items", "weapons", "enemies", "bosses", "npcs",
 
     prompt = f"{instruction} So... now categorize this: {prompt_input}"
 
     try:
-        response = gemini_model.generate_content(prompt,
-                                        safety_settings=safety_settings)
+        response = gemini_model.generate_content(
+            prompt, safety_settings=safety_settings
+        )
         try:
-            return response.text 
+            return response.text
         except ValueError:
             # If the response doesn't contain text, check if the prompt was blocked.
             # Also check the finish reason to see if the response was blocked.
             # If the finish reason was SAFETY, the safety ratings have more details.
-            return  f"""{response.prompt_feedback}
+            return f"""{response.prompt_feedback}
                         {response.candidates[0].finish_reason}
                         {response.candidates[0].safety_ratings}"""
     except:
         '''
         return f"""{NO_API_KEYS_STR}
-        
+
         But if you want to play anyways, there's the list of commands. they all starts with /
-        
+
         {('zzzul'+instruction[377:-33]+'zzzulf').replace("\n", "zzzlifzzzli")}
-        
+
         all starting with /""".replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>").replace('zzzulf', '</ul>').replace('zzzul', '<ul>').replace('zzzlif', '</li>').replace('zzzli', '<li>')
         '''
 
-        return f"""{NO_API_KEYS_STR}
+        return (
+            f"""{NO_API_KEYS_STR}
         
         But if you want to play anyways, there's the list of commands. they start with /
-        """.replace("\n", "<br>")+TUTORIAL
-    
+        """.replace(
+                "\n", "<br>"
+            )
+            + TUTORIAL
+        )
+
         # Dios obra de formas misteriosas
 
 
-def campaign_interpreter(campaign_id, n = int):
+def campaign_interpreter(campaign_id, n=int):
     campaign = Campaign.objects.get(id=campaign_id)
 
     attributes_response = {}
 
-    for attribute in ['name', 'race', 'class', 'physical_description']:
-        
-        
-        intro = f"Give me the {attribute} of the bosses of this story:" if attribute != 'physical_description' else f"Create the {attribute} of the {n} bosses of this story, a detailed physical description, perfect for image generation, talking about its clothes, physical appareance, colors, and others, you can create one if it's not said, 100 characters aprox:"
+    for attribute in ["name", "race", "class", "physical_description"]:
+
+        intro = (
+            f"Give me the {attribute} of the bosses of this story:"
+            if attribute != "physical_description"
+            else f"Create the {attribute} of the {n} bosses of this story, a detailed physical description, perfect for image generation, talking about its clothes, physical appareance, colors, and others, you can create one if it's not said, 100 characters aprox:"
+        )
 
         prompt = f"""{intro}
         {campaign.initial_story}
 
         Please give it in a raw format and separed by |, like just this:  {attribute}1|{attribute}2|{attribute}3
-        No other formats are allowed.""" 
+        No other formats are allowed."""
 
         try:
-            response = gemini_model.generate_content(prompt,
-                                            safety_settings=safety_settings)
-            
-            attributes_response[attribute] = response.text.split('|')
-            
+            response = gemini_model.generate_content(
+                prompt, safety_settings=safety_settings
+            )
+
+            attributes_response[attribute] = response.text.split("|")
+
         except:
-            return {} , False
-        
+            return {}, False
+
     return attributes_response, True
 
 
 # ==================================== TESTING ====================================
 
+
 def test():
     initial_story = ""
     while True:
-        option = input("""
+        option = input(
+            """
                        1. Action Interpreter
                        2. Image Generation
                        3. Initial story generation
                        4. Story progression
                        Any other. Exit
-                       -> """)
-        
+                       -> """
+        )
+
         if option == "1":
             action = action_interpreter(input("What do you want to do?"))
             print(action)
@@ -492,16 +549,16 @@ def test():
                 image.show()
             except:
                 pass
-            
+
         elif option == "3":
             initial_stories = create_initial_stories_gemini()
             for i, story in enumerate(initial_stories):
-                print("\n",i,"-"*20)
+                print("\n", i, "-" * 20)
                 print(story)
-            
+
             selected_story = int(input("Select a story: "))
             initial_story = initial_stories[selected_story]
-    
+
         elif option == "4":
             prompt = input("What have you done?")
             story = continue_history_gemini(prompt, initial_story)
@@ -510,12 +567,13 @@ def test():
         else:
             break
 
-#test()
+
+# test()
 
 
 # ==================================== PAST TRIES RESOURCES ====================================
 
-'''
+"""
 # config openai key
 openai.api_key = openai_api_key
 
@@ -528,9 +586,9 @@ response = openai.Completion.create(
 print(response.choices[0].text.strip())
 # create language chain
 #chain = langchain.LanguageChain()
-'''
+"""
 
-'''
+"""
 def get_response(prompt):
 
     
@@ -557,13 +615,13 @@ def get_response(prompt):
     #print(response.choices[0].text.strip())
     #print(query.choices[0].message.content)
 
-'''
+"""
 
-'''
+"""
             #text_history.append(request.POST['player_name']+': '+request.POST['prompt'])
             
             made_by = 'SYSTEM: '
             for i in response:
                 text_history.append(made_by+str(i))
                 made_by=''
-'''
+"""

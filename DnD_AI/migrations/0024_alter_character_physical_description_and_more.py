@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('DnD_AI', '0023_alter_campaign_achievements'),
+        ("DnD_AI", "0023_alter_campaign_achievements"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='character',
-            name='physical_description',
+            model_name="character",
+            name="physical_description",
             field=models.CharField(blank=True, max_length=400, null=True),
         ),
         migrations.AlterField(
-            model_name='monster',
-            name='physical_description',
+            model_name="monster",
+            name="physical_description",
             field=models.CharField(blank=True, max_length=400, null=True),
         ),
     ]

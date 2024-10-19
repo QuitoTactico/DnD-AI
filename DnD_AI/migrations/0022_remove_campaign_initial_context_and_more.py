@@ -6,37 +6,37 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('DnD_AI', '0021_remove_history_image'),
+        ("DnD_AI", "0021_remove_history_image"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='campaign',
-            name='initial_context',
+            model_name="campaign",
+            name="initial_context",
         ),
         migrations.AddField(
-            model_name='campaign',
-            name='achievements',
-            field=models.CharField(default='', max_length=2000),
+            model_name="campaign",
+            name="achievements",
+            field=models.CharField(default="", max_length=2000),
         ),
         migrations.AddField(
-            model_name='campaign',
-            name='initial_story',
-            field=models.CharField(default='A fantasy world', max_length=4000),
+            model_name="campaign",
+            name="initial_story",
+            field=models.CharField(default="A fantasy world", max_length=4000),
         ),
         migrations.AddField(
-            model_name='campaign',
-            name='objectives_remaining',
+            model_name="campaign",
+            name="objectives_remaining",
             field=models.IntegerField(default=3),
         ),
         migrations.AlterField(
-            model_name='campaign',
-            name='objective_str',
-            field=models.CharField(default='Defeat the key bosses', max_length=2000),
+            model_name="campaign",
+            name="objective_str",
+            field=models.CharField(default="Defeat the key bosses", max_length=2000),
         ),
         migrations.AlterField(
-            model_name='history',
-            name='text',
-            field=models.CharField(default='Hi (Default message)', max_length=5000),
+            model_name="history",
+            name="text",
+            field=models.CharField(default="Hi (Default message)", max_length=5000),
         ),
     ]

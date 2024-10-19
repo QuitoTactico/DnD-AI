@@ -6,23 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('DnD_AI', '0011_chest_history_and_more'),
+        ("DnD_AI", "0011_chest_history_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='monster',
-            name='is_boss',
+            model_name="monster",
+            name="is_boss",
             field=models.BooleanField(default=False),
         ),
         migrations.AlterField(
-            model_name='character',
-            name='image',
-            field=models.ImageField(blank=True, null=True, upload_to='entity/images/'),
+            model_name="character",
+            name="image",
+            field=models.ImageField(blank=True, null=True, upload_to="entity/images/"),
         ),
         migrations.AlterField(
-            model_name='monster',
-            name='icon',
-            field=models.ImageField(blank=True, null=True, upload_to='entity/icons/'),
+            model_name="monster",
+            name="icon",
+            field=models.ImageField(blank=True, null=True, upload_to="entity/icons/"),
         ),
     ]
